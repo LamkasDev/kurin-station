@@ -1,33 +1,33 @@
-KITSUNEPLATFORM=kitsune64
-KITSUNEDIR=$(USERPROFILE)\Desktop\kitsune
+KURINPLATFORM=kurin64
+KURINDIR=$(USERPROFILE)\Desktop\kurin
 
 GOOS=windows
 GOARCH=amd64
-GOTAGS=$(KITSUNEPLATFORM),kitsunedebug
+GOTAGS=$(KURINPLATFORM),kurindebug
 
-.PHONY: buildbrowser build install runbrowser run clean
-buildbrowser:
+.PHONY: buildgame build install rungame run clean
+buildgame:
 	@set GOOS=$(GOOS)
 	@set GOARCH=$(GOARCH)
-	@go build -o build/$(KITSUNEPLATFORM)/kitsune_browser.exe -tags $(GOTAGS) cmd/browser/main.go
+	@go build -o build/$(KURINPLATFORM)/kurinstation.exe -tags $(GOTAGS) cmd/game/main.go
 
-build: buildbrowser
+build: buildgame
 
 install: build
-	@if exist "$(KITSUNEDIR)\bin\$(KITSUNEPLATFORM)" rmdir /S /Q "$(KITSUNEDIR)\bin\$(KITSUNEPLATFORM)"
-	@xcopy "build\$(KITSUNEPLATFORM)" "$(KITSUNEDIR)\bin\$(KITSUNEPLATFORM)\" /E /C /I >nul
-	@if exist"$(KITSUNEDIR)\resources" rmdir /S /Q "$(KITSUNEDIR)\resources"
-	@xcopy "resources" "$(KITSUNEDIR)\resources\" /E /C /I >nul
+	@if exist "$(KURINDIR)\bin\$(KURINPLATFORM)" rmdir /S /Q "$(KURINDIR)\bin\$(KURINPLATFORM)"
+	@xcopy "build\$(KURINPLATFORM)" "$(KURINDIR)\bin\$(KURINPLATFORM)\" /E /C /I >nul
+	@if exist"$(KURINDIR)\resources" rmdir /S /Q "$(KURINDIR)\resources"
+	@xcopy "resources" "$(KURINDIR)\resources\" /E /C /I >nul
 
-runbrowser: buildbrowser
-	@if not exist "$(KITSUNEDIR)\bin\dev" mkdir "$(KITSUNEDIR)\bin\dev"
-	@copy "build\$(KITSUNEPLATFORM)\kitsune_browser.exe" "$(KITSUNEDIR)\bin\dev\kitsune_browser.exe" >nul
-	@cd "build\$(KITSUNEPLATFORM)" && .\kitsune_browser.exe
+rungame: buildgame
+	@if not exist "$(KURINDIR)\bin\dev" mkdir "$(KURINDIR)\bin\dev"
+	@copy "build\$(KURINPLATFORM)\kurin.exe" "$(KURINDIR)\bin\dev\kurinstation.exe" >nul
+	@cd "build\$(KURINPLATFORM)" && .\kurinstation.exe
 
 run: build
-	@if exist "$(KITSUNEDIR)\bin\dev" rmdir /S /Q "$(KITSUNEDIR)\bin\dev"
-	@xcopy "build\$(KITSUNEPLATFORM)" "$(KITSUNEDIR)\bin\dev\" /E /C /I >nul
-	@cd "build\$(KITSUNEPLATFORM)" && .\kitsune_browser.exe
+	@if exist "$(KURINDIR)\bin\dev" rmdir /S /Q "$(KURINDIR)\bin\dev"
+	@xcopy "build\$(KURINPLATFORM)" "$(KURINDIR)\bin\dev\" /E /C /I >nul
+	@cd "build\$(KURINPLATFORM)" && .\kurinstation.exe
 
 clean:
 	@if exist "build" rmdir /S /Q build

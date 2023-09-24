@@ -1,5 +1,5 @@
-//go:build !kitsunedebug
+//go:build !kurindebug
 
 package arch
 
-const KitsuneDebug = false
+const KurinDebug = false

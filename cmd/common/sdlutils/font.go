@@ -5,7 +5,7 @@ import (
 	"github.com/veandco/go-sdl2/ttf"
 )
 
-func RenderUTF8SolidTexture(renderer *sdl.Renderer, font *ttf.Font, text string, color sdl.Color) (*sdl.Surface, *sdl.Texture, *error) {
+func CreateUTF8SolidTexture(renderer *sdl.Renderer, font *ttf.Font, text string, color sdl.Color) (*sdl.Surface, *sdl.Texture, *error) {
 	textSurface, err := font.RenderUTF8Solid(text, color)
 	if err != nil {
 		return nil, nil, &err
@@ -16,4 +16,33 @@ func RenderUTF8SolidTexture(renderer *sdl.Renderer, font *ttf.Font, text string,
 	}
 
 	return textSurface, textTexture, nil
+}
+
+func RenderUTF8SolidTexture(renderer *sdl.Renderer, font *ttf.Font, text string, color sdl.Color, position sdl.Point, scale sdl.FPoint) *error {
+	textSurface, textTexture, err := CreateUTF8SolidTexture(renderer, font, text, color)
+	if err != nil {
+		return err
+	}
+	if err := renderer.Copy(textTexture, nil, &sdl.Rect{
+		X: position.X,
+		Y: position.Y,
+		W: int32(float32(textSurface.W) * scale.X),
+		H: int32(float32(textSurface.H) * scale.Y),
+	}); err != nil {
+		return &err
+	}
+
+	return nil
+}
+
+func RenderUTF8SolidTextureRect(renderer *sdl.Renderer, font *ttf.Font, text string, color sdl.Color, rect sdl.Rect) *error {
+	_, textTexture, err := CreateUTF8SolidTexture(renderer, font, text, color)
+	if err != nil {
+		return err
+	}
+	if err := renderer.Copy(textTexture, nil, &rect); err != nil {
+		return &err
+	}
+
+	return nil
 }

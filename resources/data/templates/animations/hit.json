@@ -1,0 +1,21 @@
+{
+    "id": "hit",
+    "steps": [
+        {
+            "offset": {
+                "x": 0,
+                "y": 0.2
+            },
+            "ticks": 5,
+			"direction": true
+        },
+        {
+            "offset": {
+                "x": 0,
+                "y": -0.2
+            },
+            "ticks": 15,
+			"direction": true
+        }
+    ]
+}

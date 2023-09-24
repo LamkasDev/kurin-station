@@ -1,0 +1,53 @@
+package event
+
+import (
+	"github.com/LamkasDev/kurin/cmd/gameplay"
+	"github.com/LamkasDev/kurin/cmd/gfx"
+)
+
+type KurinEventManager struct {
+	Layers   []*KurinEventLayer
+	Renderer *gfx.KurinRenderer
+	Mouse    KurinMouse
+	Keyboard KurinKeyboard
+}
+
+func NewKurinEventManager(renderer *gfx.KurinRenderer) (KurinEventManager, *error) {
+	manager := KurinEventManager{
+		Layers:   []*KurinEventLayer{},
+		Renderer: renderer,
+		Mouse:    NewKurinMouse(),
+		Keyboard: NewKurinKeyboard(),
+	}
+
+	return manager, nil
+}
+
+func LoadKurinEventManager(manager *KurinEventManager) *error {
+	for _, layer := range manager.Layers {
+		if err := layer.Load(manager, layer); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func ProcessKurinEventManager(manager *KurinEventManager, game *gameplay.KurinGame) *error {
+	for _, layer := range manager.Layers {
+		if err := layer.Process(manager, layer, game); err != nil {
+			return err
+		}
+	}
+	manager.Mouse.PendingLeft = nil
+	manager.Mouse.PendingRight = nil
+	manager.Mouse.Scroll = 0
+	manager.Keyboard.Pending = nil
+	manager.Keyboard.Input = ""
+
+	return nil
+}
+
+func FreeKurinEventManager(manager *KurinEventManager) *error {
+	return nil
+}
