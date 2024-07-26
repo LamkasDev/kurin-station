@@ -12,13 +12,13 @@ type KurinGame struct {
 	SelectedCharacter *KurinCharacter
 	HoveredCharacter  *KurinCharacter
 
-	Items       []*KurinItem
 	HoveredItem *KurinItem
 
 	JobController      KurinJobController
 	ParticleController KurinParticleController
 	RunechatController KurinRunechatController
 	SoundController    KurinSoundController
+	ForceController KurinForceController
 }
 
 type KurinGameMarshal struct {
@@ -30,22 +30,42 @@ func NewKurinGame() KurinGame {
 	game := KurinGame{
 		Map:                kmap,
 		Characters:         []*KurinCharacter{},
-		Items:              []*KurinItem{},
 		JobController:      NewKurinJobController(),
 		ParticleController: NewKurinParticleController(),
 		SoundController:    NewKurinSoundController(),
+		ForceController: NewKurinForceController(),
 	}
 	for i := 0; i < 2; i++ {
 		character := NewKurinCharacterRandom(&kmap)
 		game.Characters = append(game.Characters, character)
 		game.SelectedCharacter = character
 	}
-	for i := 0; i < 10; i++ {
-		item := NewKurinItemRandom("survivalknife", &kmap)
-		game.Items = append(game.Items, item)
-	}
 
 	return game
+}
+
+func TransferKurinItemToCharacter(game *KurinGame, item *KurinItem, character *KurinCharacter) bool {
+	if RawIsKurinCharacterHandEmpty(character) {
+		return false
+	}
+	if RawTransferKurinItemFromCharacter(item, &game.Map, character) {
+		delete(game.ForceController.Forces, item)
+		return true
+	}
+
+	return false
+}
+
+func TransferKurinItemFromCharacter(game *KurinGame, item *KurinItem, character *KurinCharacter) bool {
+	if RawIsKurinCharacterHandEmpty(character) {
+		return false
+	}
+
+	return RawTransferKurinItemFromCharacter(item, &game.Map, character)
+}
+
+func DropKurinItemFromCharacter(game *KurinGame, character *KurinCharacter) bool {
+	return TransferKurinItemFromCharacter(game, character.Inventory.Hands[character.ActiveHand], character)
 }
 
 func MarshalKurinGame(game *KurinGame) (KurinGameMarshal, *error) {

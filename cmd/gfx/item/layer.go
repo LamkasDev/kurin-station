@@ -29,7 +29,7 @@ func LoadKurinRendererLayerItem(renderer *gfx.KurinRenderer, layer *gfx.KurinRen
 }
 
 func RenderKurinRendererLayerItem(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame) *error {
-	for _, item := range game.Items {
+	for _, item := range game.Map.Items {
 		RenderKurinItem(renderer, layer, game, item)
 	}
 

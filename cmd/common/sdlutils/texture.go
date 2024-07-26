@@ -68,6 +68,32 @@ func RenderTexture(renderer *sdl.Renderer, texture TextureWithSize, position sdl
 	return nil
 }
 
+func EmptyTextureCopy(renderer *sdl.Renderer, original TextureWithSizeAndSurface) TextureWithSizeAndSurface {
+	texture, err := renderer.CreateTexture(original.Surface.Format.Format, sdl.TEXTUREACCESS_TARGET, original.Surface.W, original.Surface.H)
+	if err != nil {
+		panic(err)
+	}
+	return TextureWithSizeAndSurface{
+		Base: TextureWithSize{
+			Texture: texture,
+			Size: original.Base.Size,
+		},
+		Surface: nil,
+	}
+}
+
+func RotateTextureInPlace(renderer *sdl.Renderer, original TextureWithSizeAndSurface, target *TextureWithSizeAndSurface, angle float64) {
+	if err := renderer.SetRenderTarget(target.Base.Texture); err != nil {
+		panic(err)
+	}
+	if err := renderer.CopyEx(original.Base.Texture, nil, &sdl.Rect{X: 0, Y: 0, W: original.Surface.W, H: original.Surface.H}, angle, nil, sdl.RendererFlip(0)); err != nil {
+		panic(err)
+	}
+	if err := renderer.SetRenderTarget(nil); err != nil {
+		panic(err)
+	}
+}
+
 func GetPixelAt(texture TextureWithSizeAndSurface, position sdl.Point) *sdl.Color {
 	pixels := texture.Surface.Pixels()
 	i := int(position.Y*texture.Surface.Pitch + position.X*int32(texture.Surface.BytesPerPixel()))

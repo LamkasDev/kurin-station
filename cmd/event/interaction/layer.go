@@ -37,14 +37,17 @@ func ProcessKurinEventLayerInteraction(manager *event.KurinEventManager, layer *
 		manager.Mouse.PendingLeft = nil
 	}
 
+	// TODO: add hovered tile and object
+
 	itemLayer := layer.Data.(KurinEventLayerInteractionData).ItemLayer
 	game.HoveredItem = nil
-	for _, currentItem := range game.Items {
+	for _, currentItem := range game.Map.Items {
 		if !gameplay.CanKurinCharacterInteractWithItem(game.SelectedCharacter, currentItem) {
 			continue
 		}
 		graphic := itemLayer.Data.(item.KurinRendererLayerItemData).Items[currentItem.Type]
 		hoveredOffset := gfx.GetHoveredOffset(&manager.Renderer.WindowContext, item.GetKurinItemRect(manager.Renderer, itemLayer, game, currentItem))
+		hoveredOffset = sdlutils.RotatePoint(hoveredOffset, sdl.Point{X: graphic.Texture.Surface.W/2, Y: graphic.Texture.Surface.H/2}, float32(currentItem.Transform.Rotation))
 		if hoveredOffset.InRect(&sdl.Rect{W: graphic.Texture.Base.Size.W, H: graphic.Texture.Base.Size.H}) {
 			hoveredColor := sdlutils.GetPixelAt(graphic.Texture, hoveredOffset)
 			if hoveredColor != nil && sdlutils.IsColorVisible(*hoveredColor) {

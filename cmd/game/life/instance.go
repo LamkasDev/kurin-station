@@ -6,6 +6,7 @@ import (
 	"github.com/LamkasDev/kurin/cmd/event/base"
 	"github.com/LamkasDev/kurin/cmd/event/camera"
 	eventDebug "github.com/LamkasDev/kurin/cmd/event/debug"
+	"github.com/LamkasDev/kurin/cmd/event/force"
 	eventHud "github.com/LamkasDev/kurin/cmd/event/hud"
 	"github.com/LamkasDev/kurin/cmd/event/interaction"
 	"github.com/LamkasDev/kurin/cmd/event/keybinds"
@@ -78,6 +79,7 @@ func NewKurinInstance() (KurinInstance, *error) {
 	instance.EventManager.Layers = append(instance.EventManager.Layers, eventActions.NewKurinEventLayerActions(actionsLayer, toolLayer))
 	instance.EventManager.Layers = append(instance.EventManager.Layers, keybinds.NewKurinEventLayerKeybinds())
 	instance.EventManager.Layers = append(instance.EventManager.Layers, movement.NewKurinEventLayerMovement())
+	instance.EventManager.Layers = append(instance.EventManager.Layers, force.NewKurinEventLayerForce())
 	instance.EventManager.Layers = append(instance.EventManager.Layers, camera.NewKurinEventLayerCamera())
 	instance.EventManager.Layers = append(instance.EventManager.Layers, eventHud.NewKurinEventLayerHUD())
 	instance.EventManager.Layers = append(instance.EventManager.Layers, interaction.NewKurinEventLayerInteraction(itemLayer))

@@ -131,7 +131,7 @@ func CanKurinCharacterInteractWithTile(character *KurinCharacter, tile *KurinTil
 }
 
 func CanKurinCharacterInteractWithItem(character *KurinCharacter, item *KurinItem) bool {
-	return sdlutils.GetDistanceSimple(character.Position.Base, sdlutils.FPointToPoint(item.Position.Base)) <= 1
+	return sdlutils.GetDistanceSimple(character.Position.Base, sdlutils.FPointToPoint(item.Transform.Position.Base)) <= 1
 }
 
 func CanKurinCharacterInteractWithCharacter(character *KurinCharacter, other *KurinCharacter) bool {
@@ -153,6 +153,12 @@ func InteractKurinCharacter(character *KurinCharacter, game *KurinGame, position
 	if len(tile.Objects) > 0 {
 		HitObject(game, character, tile, tile.Objects[0])
 		return
+	}
+
+	if game.HoveredItem != nil {
+		if RawTransferKurinItemToCharacter(game.HoveredItem, &game.Map, character) {
+			character.Fatigue += 20
+		}
 	}
 }
 

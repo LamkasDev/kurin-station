@@ -1,5 +1,13 @@
 package mathutils
 
+func AbsFloat32(a float32) float32 {
+	if a < 0 {
+		return -a
+	}
+
+	return a
+}
+
 func MinFloat32(a, b float32) float32 {
 	if a < b {
 		return a

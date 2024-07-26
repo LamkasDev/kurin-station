@@ -11,6 +11,7 @@ type KurinMap struct {
 	Seed  int64
 	Size  sdlutils.Vector3
 	Tiles [][][]*KurinTile
+	Items       []*KurinItem
 
 	Random      *rand.Rand
 	Pathfinding KurinPathfindingGrid
@@ -26,6 +27,7 @@ func NewKurinMap(size sdlutils.Vector3) KurinMap {
 		Seed:  0,
 		Size:  size,
 		Tiles: make([][][]*KurinTile, size.Base.X),
+		Items:              []*KurinItem{},
 	}
 	kmap.Random = rand.New(rand.NewSource(kmap.Seed))
 	for x := int32(0); x < kmap.Size.Base.X; x++ {
@@ -40,6 +42,10 @@ func NewKurinMap(size sdlutils.Vector3) KurinMap {
 				kmap.Tiles[x][y][z] = tile
 			}
 		}
+	}
+	for i := 0; i < 10; i++ {
+		item := NewKurinItemRandom("survivalknife", &kmap)
+		kmap.Items = append(kmap.Items, item)
 	}
 	kmap.Pathfinding = NewKurinPathfindingGrid(&kmap)
 

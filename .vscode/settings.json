@@ -1,0 +1,5 @@
+{
+  "go.buildTags": "kurin64,kurindebug",
+  "go.lintTool": "golangci-lint",
+  "go.lintFlags": ["--fast"]
+}

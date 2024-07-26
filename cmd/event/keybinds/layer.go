@@ -9,6 +9,7 @@ import (
 	"github.com/LamkasDev/kurin/cmd/event"
 	"github.com/LamkasDev/kurin/cmd/gameplay"
 	"github.com/LamkasDev/kurin/cmd/gfx"
+	"github.com/LamkasDev/kurin/cmd/gfx/render"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -40,6 +41,28 @@ func ProcessKurinEventLayerKeybinds(manager *event.KurinEventManager, layer *eve
 			case gameplay.KurinHandRight:
 				game.SelectedCharacter.ActiveHand = gameplay.KurinHandLeft
 			}
+		case sdl.K_q:
+			if game.SelectedCharacter == nil {
+				return nil
+			}
+			gameplay.DropKurinItemFromCharacter(game, game.SelectedCharacter)
+		case sdl.K_r:
+			if game.SelectedCharacter == nil {
+				return nil
+			}
+			item := game.SelectedCharacter.Inventory.Hands[game.SelectedCharacter.ActiveHand]
+			if !gameplay.DropKurinItemFromCharacter(game, game.SelectedCharacter) {
+				return nil
+			}
+			wpos := render.ScreenToWorldPosition(manager.Renderer, manager.Renderer.WindowContext.MousePosition)
+			force := gameplay.KurinForce{
+				Item: item,
+				Target: sdl.FPoint{
+					X: float32(wpos.X) + 0.5,
+					Y: float32(wpos.Y) + 0.5,
+				},
+			}
+			game.ForceController.Forces[item] = &force
 		case sdl.K_f:
 			switch manager.Renderer.WindowContext.CameraMode {
 			case gfx.KurinRendererCameraModeCharacter:
