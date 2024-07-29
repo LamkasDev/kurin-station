@@ -18,21 +18,22 @@ func CreateUTF8SolidTexture(renderer *sdl.Renderer, font *ttf.Font, text string,
 	return textSurface, textTexture, nil
 }
 
-func RenderUTF8SolidTexture(renderer *sdl.Renderer, font *ttf.Font, text string, color sdl.Color, position sdl.Point, scale sdl.FPoint) *error {
+func RenderUTF8SolidTexture(renderer *sdl.Renderer, font *ttf.Font, text string, color sdl.Color, position sdl.Point, scale sdl.FPoint) (*error, *sdl.Rect) {
 	textSurface, textTexture, err := CreateUTF8SolidTexture(renderer, font, text, color)
 	if err != nil {
-		return err
+		return err, nil
 	}
-	if err := renderer.Copy(textTexture, nil, &sdl.Rect{
+	rect := &sdl.Rect{
 		X: position.X,
 		Y: position.Y,
 		W: int32(float32(textSurface.W) * scale.X),
 		H: int32(float32(textSurface.H) * scale.Y),
-	}); err != nil {
-		return &err
+	}
+	if err := renderer.Copy(textTexture, nil, rect); err != nil {
+		return &err, nil
 	}
 
-	return nil
+	return nil, rect
 }
 
 func RenderUTF8SolidTextureRect(renderer *sdl.Renderer, font *ttf.Font, text string, color sdl.Color, rect sdl.Rect) *error {

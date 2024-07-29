@@ -47,5 +47,10 @@ func CanEnterKurinTile(tile *KurinTile) bool {
 }
 
 func GetKurinTileDescription(tile *KurinTile) string {
-	return fmt.Sprintf("%s [%d_%d]", tile.Type, tile.Position.Base.X, tile.Position.Base.Y)
+	text := fmt.Sprintf("[%d_%d] %s", tile.Position.Base.X, tile.Position.Base.Y, tile.Type)
+	if len(tile.Objects) > 0 {
+		text = fmt.Sprintf("%s %s", text, tile.Objects[0].Type)
+	}
+	
+	return text
 }

@@ -5,6 +5,7 @@ import (
 	eventActions "github.com/LamkasDev/kurin/cmd/event/actions"
 	"github.com/LamkasDev/kurin/cmd/event/base"
 	"github.com/LamkasDev/kurin/cmd/event/camera"
+	eventContext "github.com/LamkasDev/kurin/cmd/event/context"
 	eventDebug "github.com/LamkasDev/kurin/cmd/event/debug"
 	"github.com/LamkasDev/kurin/cmd/event/force"
 	eventHud "github.com/LamkasDev/kurin/cmd/event/hud"
@@ -16,6 +17,7 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx"
 	"github.com/LamkasDev/kurin/cmd/gfx/actions"
 	"github.com/LamkasDev/kurin/cmd/gfx/animation"
+	"github.com/LamkasDev/kurin/cmd/gfx/context"
 	"github.com/LamkasDev/kurin/cmd/gfx/debug"
 	"github.com/LamkasDev/kurin/cmd/gfx/hud"
 	"github.com/LamkasDev/kurin/cmd/gfx/item"
@@ -64,6 +66,8 @@ func NewKurinInstance() (KurinInstance, *error) {
 	instance.Renderer.Layers = append(instance.Renderer.Layers, actionsLayer)
 	instance.Renderer.Layers = append(instance.Renderer.Layers, tooltip.NewKurinRendererLayerTooltip())
 	instance.Renderer.Layers = append(instance.Renderer.Layers, hud.NewKurinRendererLayerHUD(itemLayer))
+	contextLayer := context.NewKurinRendererLayerContext()
+	instance.Renderer.Layers = append(instance.Renderer.Layers, contextLayer)
 	debugLayer := debug.NewKurinRendererLayerDebug()
 	instance.Renderer.Layers = append(instance.Renderer.Layers, debugLayer)
 	instance.Renderer.Layers = append(instance.Renderer.Layers, animation.NewKurinRendererLayerAnimation())
@@ -75,6 +79,7 @@ func NewKurinInstance() (KurinInstance, *error) {
 		return instance, err
 	}
 	instance.EventManager.Layers = append(instance.EventManager.Layers, base.NewKurinEventLayerBase())
+	instance.EventManager.Layers = append(instance.EventManager.Layers, eventContext.NewKurinEventLayerContext(contextLayer))
 	instance.EventManager.Layers = append(instance.EventManager.Layers, eventTool.NewKurinEventLayerTool(toolLayer))
 	instance.EventManager.Layers = append(instance.EventManager.Layers, eventActions.NewKurinEventLayerActions(actionsLayer, toolLayer))
 	instance.EventManager.Layers = append(instance.EventManager.Layers, keybinds.NewKurinEventLayerKeybinds())

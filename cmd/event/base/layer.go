@@ -60,10 +60,8 @@ func ProcessKurinEventLayerBase(manager *event.KurinEventManager, layer *event.K
 				switch val.Button {
 				case sdl.ButtonLeft:
 					manager.Mouse.PendingLeft = &wpos
-					manager.Mouse.LastLeft = &wpos
 				case sdl.ButtonRight:
 					manager.Mouse.PendingRight = &wpos
-					manager.Mouse.LastRight = &wpos
 				}
 			}
 		case sdl.TextInputEvent:
