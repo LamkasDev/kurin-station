@@ -41,7 +41,7 @@ func RenderKurinCharacter(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererL
 		}
 
 		texture := graphic.Textures[part.Id][character.Direction]
-		prect := sdlutils.AddRectAndPoint(rect, sdl.Point{X: int32(float32(offset.X) * renderer.WindowContext.CameraZoom.X), Y: int32(float32(offset.Y) * renderer.WindowContext.CameraZoom.Y)})
+		prect := sdlutils.AddRectAndPoint(rect, sdl.Point{X: int32(float32(offset.X) * renderer.RendererContext.CameraZoom.X), Y: int32(float32(offset.Y) * renderer.RendererContext.CameraZoom.Y)})
 		if err := renderer.Renderer.Copy(texture.Texture, nil, &prect); err != nil {
 			return &err
 		}

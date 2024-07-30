@@ -19,6 +19,13 @@ func Vector3ToFVector3(vector3 Vector3) FVector3 {
 	}
 }
 
+func Vector3ToFVector3Center(vector3 Vector3) FVector3 {
+	return FVector3{
+		Base: PointToFPointCenter(vector3.Base),
+		Z:    vector3.Z,
+	}
+}
+
 func FVector3ToVector3(fvector3 FVector3) Vector3 {
 	return Vector3{
 		Base: FPointToPoint(fvector3.Base),

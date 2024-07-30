@@ -6,11 +6,10 @@ type KurinSpeciesTemplate struct {
 }
 
 type KurinSpeciesTemplateBodypart struct {
-	Id      string                              `json:"id"`
-	Species *bool                               `json:"species"`
-	Type    *bool                               `json:"type"`
-	Path    *string                             `json:"path"`
-	Offset  *KurinSpeciesTemplateBodypartOffset `json:"offset"`
+	Id     string                              `json:"id"`
+	Type   *bool                               `json:"type"`
+	Path   *string                             `json:"path"`
+	Offset *KurinSpeciesTemplateBodypartOffset `json:"offset"`
 }
 
 type KurinSpeciesTemplateBodypartOffset struct {

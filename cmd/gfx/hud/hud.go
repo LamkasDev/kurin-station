@@ -16,8 +16,8 @@ type KurinHUDElementGetPosition func(window sdl.Point) sdl.Point
 type KurinHUDElementClick func(game *gameplay.KurinGame)
 
 var KurinHUDElementHandLeft = KurinHUDElement{
-	GetPosition: func(window sdl.Point) sdl.Point {
-		return sdl.Point{X: int32(float32(window.X) / 2), Y: window.Y - 72}
+	GetPosition: func(windowSize sdl.Point) sdl.Point {
+		return sdl.Point{X: int32(float32(windowSize.X) / 2), Y: windowSize.Y - 72}
 	},
 	Click: func(game *gameplay.KurinGame) {
 		if game.SelectedCharacter == nil {
@@ -28,8 +28,8 @@ var KurinHUDElementHandLeft = KurinHUDElement{
 }
 
 var KurinHUDElementHandRight = KurinHUDElement{
-	GetPosition: func(window sdl.Point) sdl.Point {
-		return sdl.Point{X: int32(float32(window.X)/2) - 64, Y: window.Y - 72}
+	GetPosition: func(windowSize sdl.Point) sdl.Point {
+		return sdl.Point{X: int32(float32(windowSize.X)/2) - 64, Y: windowSize.Y - 72}
 	},
 	Click: func(game *gameplay.KurinGame) {
 		if game.SelectedCharacter == nil {
@@ -40,8 +40,8 @@ var KurinHUDElementHandRight = KurinHUDElement{
 }
 
 var KurinHUDElementPDA = KurinHUDElement{
-	GetPosition: func(window sdl.Point) sdl.Point {
-		return sdl.Point{X: window.X - 72, Y: 8}
+	GetPosition: func(windowSize sdl.Point) sdl.Point {
+		return sdl.Point{X: windowSize.X - 72, Y: 8}
 	},
 	Click: func(game *gameplay.KurinGame) {
 

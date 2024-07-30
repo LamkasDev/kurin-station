@@ -36,14 +36,14 @@ func LoadKurinRendererLayerTool(renderer *gfx.KurinRenderer, layer *gfx.KurinRen
 }
 
 func RenderKurinRendererLayerTool(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame) *error {
-	if renderer.WindowContext.State != gfx.KurinRendererContextStateTool {
+	if renderer.RendererContext.State != gfx.KurinRendererContextStateTool {
 		return nil
 	}
 	data := layer.Data.(KurinRendererLayerToolData)
 
 	if data.Mode == KurinToolModeBuild {
 		// sdlutils.RenderUTF8SolidTexture(renderer.Renderer, renderer.Fonts.Container[gfx.KurinRendererFontDefault], "Build", sdl.Color{R: 255, G: 255, B: 255}, sdl.Point{X: renderer.WindowContext.MousePosition.X - 16, Y: renderer.WindowContext.MousePosition.Y - 16})
-		wrect := render.ScreenToWorldRect(renderer, sdl.Rect{X: renderer.WindowContext.MousePosition.X, Y: renderer.WindowContext.MousePosition.Y, W: gameplay.KurinTileSize.X, H: gameplay.KurinTileSize.Y})
+		wrect := render.ScreenToWorldRect(renderer, sdl.Rect{X: renderer.RendererContext.MousePosition.X, Y: renderer.RendererContext.MousePosition.Y, W: gameplay.KurinTileSize.X, H: gameplay.KurinTileSize.Y})
 		tile := gameplay.GetTileAt(&game.Map, sdlutils.Vector3{Base: sdl.Point{X: wrect.X, Y: wrect.Y}, Z: 0})
 		if tile == nil {
 			return nil

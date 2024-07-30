@@ -1,56 +1,56 @@
 {
-	"id": "human",
-    "parts": [
-        {
-            "id": "chest",
-            "type": true
-        },
-        {
-            "id": "head",
-            "type": true
-        },
-        {
-            "id": "l_arm"
-        },
-        {
-            "id": "l_hand"
-        },
-        {
-            "id": "l_leg"
-        },
-        {
-            "id": "r_arm"
-        },
-        {
-            "id": "r_hand"
-        },
-        {
-            "id": "r_leg"
-        },
-        {
-            "id": "female_neko_black",
-            "path": "underwear",
-            "species": false
-        },
-        {
-            "id": "capformal",
-            "path": "armor",
-            "species": false
-        },
-        {
-            "id": "hair_longer_bedhead",
-            "path": "hair",
-            "species": false
-        },
-        {
-            "id": "ears_cat",
-            "path": "cat_features",
-            "species": false
-        },
-        {
-            "id": "cat_tail",
-            "path": "cat_features",
-            "species": false
-        }
-    ]
+  "id": "human",
+  "parts": [
+    {
+      "id": "human_chest",
+      "type": true
+    },
+    {
+      "id": "human_head",
+      "type": true
+    },
+    {
+      "id": "human_l_arm"
+    },
+    {
+      "id": "human_l_hand"
+    },
+    {
+      "id": "human_l_leg"
+    },
+    {
+      "id": "human_r_arm"
+    },
+    {
+      "id": "human_r_hand"
+    },
+    {
+      "id": "human_r_leg"
+    },
+    {
+      "id": "female_neko_black",
+      "path": "underwear",
+      "species": false
+    },
+    {
+      "id": "capformal",
+      "path": "armor",
+      "species": false
+    },
+    {
+      "id": "hair_longer_bedhead",
+      "path": "hair",
+      "species": false
+    },
+    {
+      "id": "ears_cat",
+      "path": "cat_features",
+      "species": false
+    },
+    {
+      "id": "cat_tail",
+      "path": "cat_features",
+      "species": false
+    }
+  ]
 }

@@ -18,6 +18,7 @@ type KurinTurfGraphic struct {
 }
 
 func NewKurinTurfGraphic(renderer *gfx.KurinRenderer, tileId string) (*KurinTurfGraphic, *error) {
+	graphicDirectory := path.Join(constants.TexturesPath, "turfs", tileId)
 	graphic := KurinTurfGraphic{
 		Textures: make([]sdlutils.TextureWithSize, 4),
 	}
@@ -30,13 +31,6 @@ func NewKurinTurfGraphic(renderer *gfx.KurinRenderer, tileId string) (*KurinTurf
 		return &graphic, &err
 	}
 
-	partDirectory := constants.TexturesPath
-	if graphic.Template.Path != nil {
-		partDirectory = path.Join(partDirectory, *graphic.Template.Path)
-	} else {
-		partDirectory = path.Join(partDirectory, "floors")
-	}
-
 	num := 4
 	if graphic.Template.Rotate != nil && !*graphic.Template.Rotate {
 		num = 1
@@ -44,7 +38,7 @@ func NewKurinTurfGraphic(renderer *gfx.KurinRenderer, tileId string) (*KurinTurf
 
 	var err *error
 	for i := 0; i < num; i++ {
-		partPath := path.Join(partDirectory, fmt.Sprintf("%s_%d.png", tileId, i))
+		partPath := path.Join(graphicDirectory, fmt.Sprintf("%s_%d.png", tileId, i))
 		if graphic.Textures[i], err = sdlutils.LoadTexture(renderer.Renderer, partPath); err != nil {
 			return &graphic, err
 		}

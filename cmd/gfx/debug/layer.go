@@ -32,14 +32,14 @@ func RenderKurinRendererLayerDebug(renderer *gfx.KurinRenderer, layer *gfx.Kurin
 	if err := renderer.Renderer.SetDrawColor(0, 255, 0, 0); err != nil {
 		return &err
 	}
-	sdlutils.RenderUTF8SolidTexture(renderer.Renderer, renderer.Fonts.Container[gfx.KurinRendererFontDefault], fmt.Sprintf("Camera Mode: %v", renderer.WindowContext.CameraMode), sdl.Color{R: 255, G: 255, B: 255}, sdl.Point{X: 10, Y: 10}, sdl.FPoint{X: 1, Y: 1})
+	sdlutils.RenderUTF8SolidTexture(renderer.Renderer, renderer.Fonts.Container[gfx.KurinRendererFontDefault], fmt.Sprintf("Camera Mode: %v", renderer.RendererContext.CameraMode), sdl.Color{R: 255, G: 255, B: 255}, sdl.Point{X: 10, Y: 10}, sdl.FPoint{X: 1, Y: 1})
 	/* if err := renderer.Renderer.DrawLine(int32(renderer.WindowContext.WindowSize.Float.X/2), 0, int32(renderer.WindowContext.WindowSize.Float.X/2), renderer.WindowContext.WindowSize.Integer.Y); err != nil {
 		return &err
 	}
 	if err := renderer.Renderer.DrawLine(0, int32(renderer.WindowContext.WindowSize.Float.Y/2), renderer.WindowContext.WindowSize.Integer.X, int32(renderer.WindowContext.WindowSize.Float.Y/2)); err != nil {
 		return &err
 	} */
-	wrect := render.ScreenToWorldRect(renderer, sdl.Rect{X: renderer.WindowContext.MousePosition.X, Y: renderer.WindowContext.MousePosition.Y, W: gameplay.KurinTileSize.X, H: gameplay.KurinTileSize.Y})
+	wrect := render.ScreenToWorldRect(renderer, sdl.Rect{X: renderer.RendererContext.MousePosition.X, Y: renderer.RendererContext.MousePosition.Y, W: gameplay.KurinTileSize.X, H: gameplay.KurinTileSize.Y})
 	/* srect := camera.WorldToScreenRect(renderer, sdlutils.RectToFRect(wrect))
 	if err := renderer.Renderer.DrawRect(&srect); err != nil {
 		return &err

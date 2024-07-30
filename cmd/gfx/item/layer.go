@@ -24,6 +24,9 @@ func LoadKurinRendererLayerItem(renderer *gfx.KurinRenderer, layer *gfx.KurinRen
 	if layer.Data.(KurinRendererLayerItemData).Items["survivalknife"], err = NewKurinItemGraphic(renderer, "survivalknife"); err != nil {
 		return err
 	}
+	if layer.Data.(KurinRendererLayerItemData).Items["welder"], err = NewKurinItemGraphic(renderer, "welder"); err != nil {
+		return err
+	}
 
 	return nil
 }

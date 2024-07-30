@@ -1,12 +1,12 @@
 package gameplay
 
 type KurinJobDriver struct {
-	Ticks   int32
+	Tile  *KurinTile
+	Ticks int32
+
 	Assign  KurinJobDriverAssign
 	Process KurinJobDriverProcess
-
-	Tile *KurinTile
-	Data interface{}
+	Data    interface{}
 }
 
 type KurinJobDriverAssign func(driver *KurinJobDriver, game *KurinGame, character *KurinCharacter)

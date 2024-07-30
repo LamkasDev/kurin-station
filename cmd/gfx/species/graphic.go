@@ -52,15 +52,12 @@ func NewKurinSpeciesGraphic(renderer *gfx.KurinRenderer, speciesId string, speci
 	for _, part := range graphic.Template.Parts {
 		partDirectory := constants.TexturesPath
 		if part.Path != nil {
-			partDirectory = path.Join(partDirectory, *part.Path)
+			partDirectory = path.Join(partDirectory, *part.Path, part.Id)
 		} else {
-			partDirectory = path.Join(partDirectory, "bodyparts_greyscale")
+			partDirectory = path.Join(partDirectory, "bodyparts_greyscale", part.Id)
 		}
 
 		partFile := part.Id
-		if part.Species == nil || *part.Species {
-			partFile = fmt.Sprintf("%s_%s", speciesId, partFile)
-		}
 		if part.Type != nil && *part.Type {
 			partFile = fmt.Sprintf("%s_%s", partFile, speciesType)
 		}

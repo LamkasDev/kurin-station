@@ -16,12 +16,11 @@ func NewKurinEventLayerBase() *event.KurinEventLayer {
 	return &event.KurinEventLayer{
 		Load:    LoadKurinEventLayerBase,
 		Process: ProcessKurinEventLayerBase,
+		Data: KurinEventLayerBaseData{},
 	}
 }
 
 func LoadKurinEventLayerBase(manager *event.KurinEventManager, layer *event.KurinEventLayer) *error {
-	layer.Data = KurinEventLayerBaseData{}
-
 	return nil
 }
 
@@ -35,10 +34,10 @@ func ProcessKurinEventLayerBase(manager *event.KurinEventManager, layer *event.K
 			switch val.Event {
 			case sdl.WINDOWEVENT_RESIZED:
 				w, h := manager.Renderer.Window.GetSize()
-				manager.Renderer.WindowContext.WindowSize = sdl.Point{X: w, Y: h}
+				manager.Renderer.RendererContext.WindowSize = sdl.Point{X: w, Y: h}
 			}
 		case sdl.MouseMotionEvent:
-			manager.Renderer.WindowContext.MousePosition = sdl.Point{
+			manager.Renderer.RendererContext.MousePosition = sdl.Point{
 				X: val.X,
 				Y: val.Y,
 			}
@@ -56,7 +55,7 @@ func ProcessKurinEventLayerBase(manager *event.KurinEventManager, layer *event.K
 		case sdl.MouseButtonEvent:
 			switch val.Type {
 			case sdl.MOUSEBUTTONDOWN:
-				wpos := render.ScreenToWorldPosition(manager.Renderer, manager.Renderer.WindowContext.MousePosition)
+				wpos := render.ScreenToWorldPosition(manager.Renderer, manager.Renderer.RendererContext.MousePosition)
 				switch val.Button {
 				case sdl.ButtonLeft:
 					manager.Mouse.PendingLeft = &wpos

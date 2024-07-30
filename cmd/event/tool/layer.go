@@ -29,7 +29,7 @@ func LoadKurinEventLayerTool(manager *event.KurinEventManager, layer *event.Kuri
 }
 
 func ProcessKurinEventLayerTool(manager *event.KurinEventManager, layer *event.KurinEventLayer, game *gameplay.KurinGame) *error {
-	if manager.Renderer.WindowContext.State == gfx.KurinRendererContextStateTool {
+	if manager.Renderer.RendererContext.State == gfx.KurinRendererContextStateTool {
 		ProcessKurinEventLayerToolInput(manager, layer, game)
 	}
 
@@ -41,17 +41,17 @@ func ProcessKurinEventLayerToolInput(manager *event.KurinEventManager, layer *ev
 	if manager.Keyboard.Pending != nil {
 		switch *manager.Keyboard.Pending {
 		case sdl.K_ESCAPE:
-			manager.Renderer.WindowContext.State = gfx.KurinRendererContextStateNone
+			manager.Renderer.RendererContext.State = gfx.KurinRendererContextStateNone
 			manager.Keyboard.Pending = nil
 			return
 		}
 	}
 	if manager.Mouse.PendingRight != nil {
-		manager.Renderer.WindowContext.State = gfx.KurinRendererContextStateNone
+		manager.Renderer.RendererContext.State = gfx.KurinRendererContextStateNone
 		manager.Mouse.PendingRight = nil
 	}
 	if manager.Mouse.PendingLeft != nil {
-		wrect := render.ScreenToWorldRect(manager.Renderer, sdl.Rect{X: manager.Renderer.WindowContext.MousePosition.X, Y: manager.Renderer.WindowContext.MousePosition.Y, W: gameplay.KurinTileSize.X, H: gameplay.KurinTileSize.Y})
+		wrect := render.ScreenToWorldRect(manager.Renderer, sdl.Rect{X: manager.Renderer.RendererContext.MousePosition.X, Y: manager.Renderer.RendererContext.MousePosition.Y, W: gameplay.KurinTileSize.X, H: gameplay.KurinTileSize.Y})
 		tile := gameplay.GetTileAt(&game.Map, sdlutils.Vector3{Base: sdl.Point{X: wrect.X, Y: wrect.Y}, Z: 0})
 		if tile == nil {
 			return

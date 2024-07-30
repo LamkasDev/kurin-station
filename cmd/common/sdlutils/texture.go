@@ -55,17 +55,18 @@ func LoadTextureWithSurface(renderer *sdl.Renderer, path string) (TextureWithSiz
 	}, nil
 }
 
-func RenderTexture(renderer *sdl.Renderer, texture TextureWithSize, position sdl.Point, scale sdl.FPoint) *error {
-	if err := renderer.Copy(texture.Texture, nil, &sdl.Rect{
+func RenderTexture(renderer *sdl.Renderer, texture TextureWithSize, position sdl.Point, scale sdl.FPoint) (*error, sdl.Rect) {
+	rect := sdl.Rect{
 		X: position.X,
 		Y: position.Y,
 		W: int32(float32(texture.Size.W) * scale.X),
 		H: int32(float32(texture.Size.H) * scale.Y),
-	}); err != nil {
-		return &err
+	}
+	if err := renderer.Copy(texture.Texture, nil, &rect); err != nil {
+		return &err, rect
 	}
 
-	return nil
+	return nil, rect
 }
 
 func GetPixelAt(texture TextureWithSizeAndSurface, position sdl.Point) *sdl.Color {

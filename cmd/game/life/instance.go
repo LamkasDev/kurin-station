@@ -109,8 +109,8 @@ func RunKurinInstance(instance *KurinInstance) *error {
 	if err := event.ProcessKurinEventManager(&instance.EventManager, &instance.Game); err != nil {
 		return err
 	}
-	instance.Renderer.WindowContext.CameraTileSize = render.GetCameraTileSize(instance.Renderer)
-	instance.Renderer.WindowContext.CameraOffset = render.GetCameraOffset(instance.Renderer)
+	instance.Renderer.RendererContext.CameraTileSize = render.GetCameraTileSize(instance.Renderer)
+	instance.Renderer.RendererContext.CameraOffset = render.GetCameraOffset(instance.Renderer)
 
 	if err := sound.ProcessKurinSoundManager(&instance.SoundManager, &instance.Game); err != nil {
 		return err

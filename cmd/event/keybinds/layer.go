@@ -6,6 +6,7 @@ import (
 	"path"
 
 	"github.com/LamkasDev/kurin/cmd/common/constants"
+	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
 	"github.com/LamkasDev/kurin/cmd/event"
 	"github.com/LamkasDev/kurin/cmd/gameplay"
 	"github.com/LamkasDev/kurin/cmd/gfx"
@@ -54,22 +55,19 @@ func ProcessKurinEventLayerKeybinds(manager *event.KurinEventManager, layer *eve
 			if !gameplay.DropKurinItemFromCharacter(game, game.SelectedCharacter) {
 				return nil
 			}
-			wpos := render.ScreenToWorldPosition(manager.Renderer, manager.Renderer.WindowContext.MousePosition)
+			wpos := render.ScreenToWorldPosition(manager.Renderer, manager.Renderer.RendererContext.MousePosition)
 			force := gameplay.KurinForce{
 				Item: item,
-				Target: sdl.FPoint{
-					X: float32(wpos.X) + 0.5,
-					Y: float32(wpos.Y) + 0.5,
-				},
+				Target: sdlutils.PointToFPointCenter(wpos),
 			}
 			game.ForceController.Forces[item] = &force
 		case sdl.K_f:
-			switch manager.Renderer.WindowContext.CameraMode {
+			switch manager.Renderer.RendererContext.CameraMode {
 			case gfx.KurinRendererCameraModeCharacter:
-				manager.Renderer.WindowContext.CameraMode = gfx.KurinRendererCameraModeFree
+				manager.Renderer.RendererContext.CameraMode = gfx.KurinRendererCameraModeFree
 				game.SelectedCharacter = nil
 			case gfx.KurinRendererCameraModeFree:
-				manager.Renderer.WindowContext.CameraMode = gfx.KurinRendererCameraModeCharacter
+				manager.Renderer.RendererContext.CameraMode = gfx.KurinRendererCameraModeCharacter
 				game.SelectedCharacter = game.Characters[0]
 			}
 		case sdl.K_s:

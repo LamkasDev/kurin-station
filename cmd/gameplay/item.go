@@ -11,30 +11,22 @@ import (
 type KurinItem struct {
 	Type     string
 	Transform *sdlutils.Transform
+
+	GetTextures KurinItemGetTextures
+	Process  KurinItemProcess
+	Data interface{}
 }
 
-func NewKurinItem(itype string, transform *sdlutils.Transform) *KurinItem {
-	return &KurinItem{
-		Type:     itype,
-		Transform: transform,
-	}
-}
+type KurinItemGetTextures func(item *KurinItem, game *KurinGame) []int
+type KurinItemProcess func(item *KurinItem, game *KurinGame)
 
-func NewKurinItemRandom(itype string, kmap *KurinMap) *KurinItem {
-	item := &KurinItem{
-		Type: itype,
-	}
+func NewKurinItemRandom(itemType string, kmap *KurinMap) *KurinItem {
+	item := NewKurinItem(itemType, nil)
 	for {
 		position := sdlutils.Vector3{Base: sdl.Point{X: int32(rand.Float32() * float32(kmap.Size.Base.X)), Y: int32(rand.Float32() * float32(kmap.Size.Base.Y))}, Z: 0}
 		if CanEnterPosition(kmap, position) {
 			item.Transform = &sdlutils.Transform{
-				Position: sdlutils.FVector3{
-					Base: sdl.FPoint{
-						X: float32(position.Base.X) + 0.5,
-						Y: float32(position.Base.Y) + 0.5,
-					},
-					Z: position.Z,
-				},
+				Position:  sdlutils.Vector3ToFVector3Center(position),
 				Rotation: 0,
 			}
 			break
@@ -99,13 +91,7 @@ func RawTransferKurinItemFromCharacter(item *KurinItem, kmap *KurinMap, characte
 	}
 
 	item.Transform = &sdlutils.Transform{
-		Position: sdlutils.FVector3{
-			Base: sdl.FPoint{
-				X: float32(character.Position.Base.X) + 0.5,
-				Y: float32(character.Position.Base.Y) + 0.5,
-			},
-			Z: character.Position.Z,
-		},
+		Position:  sdlutils.Vector3ToFVector3Center(character.Position),
 		Rotation: 0,
 	}
 	RawAddKurinItemToMap(item, kmap)

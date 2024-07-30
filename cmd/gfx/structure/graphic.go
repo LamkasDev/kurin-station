@@ -19,6 +19,7 @@ type KurinStructureGraphic struct {
 }
 
 func NewKurinStructureGraphic(renderer *gfx.KurinRenderer, structureId string) (*KurinStructureGraphic, *error) {
+	graphicDirectory := path.Join(constants.TexturesPath, "structures", structureId)
 	graphic := KurinStructureGraphic{
 		Textures: make([]sdlutils.TextureWithSize, 4),
 	}
@@ -31,13 +32,6 @@ func NewKurinStructureGraphic(renderer *gfx.KurinRenderer, structureId string) (
 		return &graphic, &err
 	}
 
-	partDirectory := constants.TexturesPath
-	if graphic.Template.Path != nil {
-		partDirectory = path.Join(partDirectory, *graphic.Template.Path)
-	} else {
-		partDirectory = path.Join(partDirectory, "structures")
-	}
-
 	num := 4
 	if graphic.Template.Rotate != nil && !*graphic.Template.Rotate {
 		num = 1
@@ -45,12 +39,12 @@ func NewKurinStructureGraphic(renderer *gfx.KurinRenderer, structureId string) (
 
 	var err *error
 	for i := 0; i < num; i++ {
-		partPath := path.Join(partDirectory, fmt.Sprintf("%s_%d.png", structureId, i))
+		partPath := path.Join(graphicDirectory, fmt.Sprintf("%s_%d.png", structureId, i))
 		if graphic.Textures[i], err = sdlutils.LoadTexture(renderer.Renderer, partPath); err != nil {
 			return &graphic, err
 		}
 	}
-	if blueprint, err := sdlutils.LoadTexture(renderer.Renderer, path.Join(partDirectory, fmt.Sprintf("%s_0_blueprint.png", structureId))); err == nil {
+	if blueprint, err := sdlutils.LoadTexture(renderer.Renderer, path.Join(graphicDirectory, fmt.Sprintf("%s_0_blueprint.png", structureId))); err == nil {
 		graphic.Blueprint = &blueprint
 	}
 

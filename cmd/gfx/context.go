@@ -1,6 +1,7 @@
 package gfx
 
 import (
+	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -57,4 +58,15 @@ func GetHoveredOffset(context *KurinRendererContext, base sdl.Rect) sdl.Point {
 		X: int32(float32(context.MousePosition.X-base.X) / context.CameraZoom.X),
 		Y: int32(float32(context.MousePosition.Y-base.Y) / context.CameraZoom.Y),
 	}
+}
+
+func IsHoveredOffsetSolid(texture sdlutils.TextureWithSizeAndSurface, offset sdl.Point) bool {
+	if offset.InRect(&sdl.Rect{W: texture.Base.Size.W, H: texture.Base.Size.H}) {
+		hoveredColor := sdlutils.GetPixelAt(texture, offset)
+		if hoveredColor != nil && sdlutils.IsColorVisible(*hoveredColor) {
+			return true
+		}
+	}
+
+	return false
 }

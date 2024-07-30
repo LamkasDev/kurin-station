@@ -47,6 +47,7 @@ func NewKurinCharacterRandom(kmap *KurinMap) *KurinCharacter {
 		AnimationController: NewKurinAnimationController(),
 	}
 	character.Inventory.Hands[KurinHandLeft] = NewKurinItem("survivalknife", nil)
+	character.Inventory.Hands[KurinHandRight] = NewKurinItem("welder", nil)
 
 	for {
 		position := sdlutils.Vector3{Base: sdl.Point{X: int32(rand.Float32() * float32(kmap.Size.Base.X)), Y: int32(rand.Float32() * float32(kmap.Size.Base.Y))}, Z: 0}
@@ -165,7 +166,7 @@ func InteractKurinCharacter(character *KurinCharacter, game *KurinGame, position
 func HitObject(game *KurinGame, character *KurinCharacter, tile *KurinTile, object *KurinObject) {
 	PlayKurinCharacterAnimation(character, "hit")
 	PlaySound(&game.SoundController, "grillehit")
-	CreateKurinParticle(&game.ParticleController, NewKurinParticleCross(game, sdlutils.FVector3{Base: sdl.FPoint{X: float32(tile.Position.Base.X) + 0.5, Y: float32(tile.Position.Base.Y) + 0.5}, Z: tile.Position.Z}))
+	CreateKurinParticle(&game.ParticleController, NewKurinParticleCross(game, sdlutils.Vector3ToFVector3Center(tile.Position)))
 	character.Fatigue += 60
 }
 

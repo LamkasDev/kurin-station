@@ -43,8 +43,12 @@ func NewKurinMap(size sdlutils.Vector3) KurinMap {
 			}
 		}
 	}
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 3; i++ {
 		item := NewKurinItemRandom("survivalknife", &kmap)
+		kmap.Items = append(kmap.Items, item)
+	}
+	for i := 0; i < 3; i++ {
+		item := NewKurinItemRandom("welder", &kmap)
 		kmap.Items = append(kmap.Items, item)
 	}
 	kmap.Pathfinding = NewKurinPathfindingGrid(&kmap)

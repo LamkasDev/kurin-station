@@ -28,17 +28,18 @@ func LoadKurinEventLayerDebug(manager *event.KurinEventManager, layer *event.Kur
 }
 
 func ProcessKurinEventLayerDebug(manager *event.KurinEventManager, layer *event.KurinEventLayer, game *gameplay.KurinGame) *error {
-	if manager.Keyboard.Pending != nil {
-		switch *manager.Keyboard.Pending {
-		case sdl.K_p:
-			actionsData := layer.Data.(KurinEventLayerDebugData).Layer.Data.(debug.KurinRendererLayerDebugData)
-			actionsData.Path = gameplay.FindKurinPath(&game.Map.Pathfinding, game.SelectedCharacter.Position, sdlutils.Vector3{Base: sdl.Point{X: 0, Y: 0}, Z: 0})
-			layer.Data.(KurinEventLayerDebugData).Layer.Data = actionsData
-		default:
-			return nil
-		}
-		manager.Keyboard.Pending = nil
+	if manager.Keyboard.Pending == nil {
+		return nil
 	}
+	data := layer.Data.(KurinEventLayerDebugData).Layer.Data.(debug.KurinRendererLayerDebugData)
+	switch *manager.Keyboard.Pending {
+	case sdl.K_p:
+		data.Path = gameplay.FindKurinPath(&game.Map.Pathfinding, game.SelectedCharacter.Position, sdlutils.Vector3{Base: sdl.Point{X: 0, Y: 0}, Z: 0})
+		manager.Keyboard.Pending = nil
+	default:
+		return nil
+	}
+	layer.Data.(KurinEventLayerDebugData).Layer.Data = data
 
 	return nil
 }
