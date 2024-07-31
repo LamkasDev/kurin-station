@@ -33,7 +33,7 @@ func LoadKurinRendererLayerCharacter(renderer *gfx.KurinRenderer, layer *gfx.Kur
 func RenderKurinRendererLayerCharacter(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame) *error {
 	for _, character := range game.Characters {
 		gameplay.ProcessKurinCharacter(game, character)
-		RenderKurinCharacter(renderer, layer, character)
+		RenderKurinCharacter(renderer, layer, game, character)
 	}
 
 	return nil

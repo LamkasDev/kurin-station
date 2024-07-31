@@ -60,6 +60,13 @@ func GetHoveredOffset(context *KurinRendererContext, base sdl.Rect) sdl.Point {
 	}
 }
 
+func GetHoveredOffsetUnscaled(context *KurinRendererContext, base sdl.Point) sdl.Point {
+	return sdl.Point{
+		X: context.MousePosition.X-base.X,
+		Y: context.MousePosition.Y-base.Y,
+	}
+}
+
 func IsHoveredOffsetSolid(texture sdlutils.TextureWithSizeAndSurface, offset sdl.Point) bool {
 	if offset.InRect(&sdl.Rect{W: texture.Base.Size.W, H: texture.Base.Size.H}) {
 		hoveredColor := sdlutils.GetPixelAt(texture, offset)

@@ -3,6 +3,7 @@ package event
 import (
 	"github.com/LamkasDev/kurin/cmd/gameplay"
 	"github.com/LamkasDev/kurin/cmd/gfx"
+	"github.com/veandco/go-sdl2/sdl"
 )
 
 type KurinEventManager struct {
@@ -39,6 +40,8 @@ func ProcessKurinEventManager(manager *KurinEventManager, game *gameplay.KurinGa
 			return err
 		}
 	}
+	sdl.SetCursor(manager.Mouse.Cursors[manager.Mouse.Cursor])
+	manager.Mouse.Cursor = sdl.SYSTEM_CURSOR_ARROW
 	manager.Mouse.PendingLeft = nil
 	manager.Mouse.PendingRight = nil
 	manager.Mouse.Scroll = 0

@@ -9,21 +9,21 @@ import (
 )
 
 func GetCameraTileSize(renderer *gfx.KurinRenderer) sdl.FPoint {
-	return sdlutils.MultiplyFPoints(sdlutils.PointToFPoint(gameplay.KurinTileSize), renderer.RendererContext.CameraZoom)
+	return sdlutils.MultiplyFPoints(sdlutils.PointToFPoint(gameplay.KurinTileSize), renderer.Context.CameraZoom)
 }
 
 func GetCameraOffset(renderer *gfx.KurinRenderer) sdl.FPoint {
 	return sdlutils.SubtractFPoints(
 		sdlutils.AddFPoints(
-			sdlutils.MultiplyFPoints(renderer.RendererContext.CameraPosition, renderer.RendererContext.CameraTileSize),
-			sdlutils.DivideFPointByFloat(renderer.RendererContext.CameraTileSize, 2),
+			sdlutils.MultiplyFPoints(renderer.Context.CameraPosition, renderer.Context.CameraTileSize),
+			sdlutils.DivideFPointByFloat(renderer.Context.CameraTileSize, 2),
 		),
-		sdlutils.DivideFPointByFloat(sdlutils.PointToFPoint(renderer.RendererContext.WindowSize), 2),
+		sdlutils.DivideFPointByFloat(sdlutils.PointToFPoint(renderer.Context.WindowSize), 2),
 	)
 }
 
 func WorldToScreenPosition(renderer *gfx.KurinRenderer, world sdl.FPoint) sdl.Point {
-	return sdlutils.FPointToPoint(sdlutils.SubtractFPoints(sdlutils.MultiplyFPoints(world, renderer.RendererContext.CameraTileSize), renderer.RendererContext.CameraOffset))
+	return sdlutils.FPointToPoint(sdlutils.SubtractFPoints(sdlutils.MultiplyFPoints(world, renderer.Context.CameraTileSize), renderer.Context.CameraOffset))
 }
 
 func WorldToScreenRect(renderer *gfx.KurinRenderer, world sdl.FRect) sdl.Rect {
@@ -31,14 +31,14 @@ func WorldToScreenRect(renderer *gfx.KurinRenderer, world sdl.FRect) sdl.Rect {
 	return sdl.Rect{
 		X: pos.X,
 		Y: pos.Y,
-		W: int32(world.W * renderer.RendererContext.CameraZoom.X), H: int32(world.H * renderer.RendererContext.CameraZoom.Y),
+		W: int32(world.W * renderer.Context.CameraZoom.X), H: int32(world.H * renderer.Context.CameraZoom.Y),
 	}
 }
 
 func ScreenToWorldPosition(renderer *gfx.KurinRenderer, screen sdl.Point) sdl.Point {
 	return sdl.Point{
-		X: int32(math32.Floor((renderer.RendererContext.CameraOffset.X + float32(screen.X)) / renderer.RendererContext.CameraTileSize.X)),
-		Y: int32(math32.Floor((renderer.RendererContext.CameraOffset.Y + float32(screen.Y)) / renderer.RendererContext.CameraTileSize.Y)),
+		X: int32(math32.Floor((renderer.Context.CameraOffset.X + float32(screen.X)) / renderer.Context.CameraTileSize.X)),
+		Y: int32(math32.Floor((renderer.Context.CameraOffset.Y + float32(screen.Y)) / renderer.Context.CameraTileSize.Y)),
 	}
 }
 

@@ -35,7 +35,7 @@ func ProcessKurinEventLayerActions(manager *event.KurinEventManager, layer *even
 	if manager.Keyboard.Pending == nil {
 		return nil
 	}
-	if manager.Renderer.RendererContext.State == gfx.KurinRendererContextStateActions {
+	if manager.Renderer.Context.State == gfx.KurinRendererContextStateActions {
 		ProcessKurinEventLayerActionsInput(manager, layer, game)
 		manager.Keyboard.Pending = nil
 		return nil
@@ -60,7 +60,7 @@ func StartKurinEventLayerActionsInput(manager *event.KurinEventManager, layer *e
 	layer.Data.(KurinEventLayerActionsData).ActionsLayer.Data = data
 	
 	manager.Keyboard.InputMode = true
-	manager.Renderer.RendererContext.State = gfx.KurinRendererContextStateActions
+	manager.Renderer.Context.State = gfx.KurinRendererContextStateActions
 }
 
 func ProcessKurinEventLayerActionsInput(manager *event.KurinEventManager, layer *event.KurinEventLayer, game *gameplay.KurinGame) {
@@ -109,7 +109,7 @@ func ExecuteKurinEventLayerActionsInput(manager *event.KurinEventManager, layer 
 
 	switch data.Mode {
 	case actions.KurinActionModeBuild:
-		manager.Renderer.RendererContext.State = gfx.KurinRendererContextStateTool
+		manager.Renderer.Context.State = gfx.KurinRendererContextStateTool
 		toolData := layer.Data.(KurinEventLayerActionsData).ToolLayer.Data.(tool.KurinRendererLayerToolData)
 		toolData.Mode = tool.KurinToolModeBuild
 		toolData.Prefab = gameplay.NewKurinObject(actions.GetMenuStructureGraphics(&data)[data.Index].Template.Id)
@@ -128,6 +128,6 @@ func EndKurinEventLayerActionsInput(manager *event.KurinEventManager, layer *eve
 	data.Index = 0
 	layer.Data.(KurinEventLayerActionsData).ActionsLayer.Data = data
 
-	manager.Renderer.RendererContext.State = gfx.KurinRendererContextStateNone
+	manager.Renderer.Context.State = gfx.KurinRendererContextStateNone
 	manager.Keyboard.InputMode = false
 }

@@ -47,10 +47,24 @@ func SubtractFPoints(a sdl.FPoint, b sdl.FPoint) sdl.FPoint {
 	}
 }
 
+func MultiplyPoints(a sdl.Point, b sdl.Point) sdl.Point {
+	return sdl.Point{
+		X: a.X * b.X,
+		Y: a.Y * b.Y,
+	}
+}
+
 func MultiplyFPoints(a sdl.FPoint, b sdl.FPoint) sdl.FPoint {
 	return sdl.FPoint{
 		X: a.X * b.X,
 		Y: a.Y * b.Y,
+	}
+}
+
+func DividePoints(a sdl.Point, b sdl.Point) sdl.Point {
+	return sdl.Point{
+		X: a.X / b.X,
+		Y: a.Y / b.Y,
 	}
 }
 

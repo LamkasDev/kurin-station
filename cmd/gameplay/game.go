@@ -7,11 +7,11 @@ import (
 
 type KurinGame struct {
 	Map KurinMap
-
+	Ticks uint64
 	Characters        []*KurinCharacter
+
 	SelectedCharacter *KurinCharacter
 	HoveredCharacter  *KurinCharacter
-
 	HoveredItem *KurinItem
 
 	JobController      KurinJobController
@@ -29,6 +29,7 @@ func NewKurinGame() KurinGame {
 	kmap := NewKurinMap(sdlutils.Vector3{Base: sdl.Point{X: 25, Y: 25}, Z: 1})
 	game := KurinGame{
 		Map:                kmap,
+		Ticks: 0,
 		Characters:         []*KurinCharacter{},
 		JobController:      NewKurinJobController(),
 		ParticleController: NewKurinParticleController(),
@@ -42,6 +43,13 @@ func NewKurinGame() KurinGame {
 	}
 
 	return game
+}
+
+func ProcessKurinGame(game *KurinGame) {
+	for _, character := range game.Characters {
+		ProcessKurinCharacter(game, character)
+	}
+	game.Ticks++
 }
 
 func TransferKurinItemToCharacter(game *KurinGame, item *KurinItem, character *KurinCharacter) bool {

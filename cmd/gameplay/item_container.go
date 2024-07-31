@@ -14,6 +14,11 @@ func NewKurinItem(itemType string, transform *sdlutils.Transform) *KurinItem {
 		GetTextures: func(item *KurinItem, game *KurinGame) []int {
 			return []int{0};
 		},
+		GetTextureHand: func(item *KurinItem, game *KurinGame) int {
+			return 0;
+		},
+		Interact: func(item *KurinItem, game *KurinGame) {},
+		Process: func(item *KurinItem, game *KurinGame) {},
 		Data: nil,
 	}
 }

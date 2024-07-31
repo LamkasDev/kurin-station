@@ -17,13 +17,13 @@ type KurinItemGraphic struct {
 	Template templates.KurinItemTemplate
 	Textures  []sdlutils.TextureWithSizeAndSurface
 	Outline  *sdlutils.TextureWithSize
-	Hands    map[gameplay.KurinHand][]sdlutils.TextureWithSize
+	Hands    map[gameplay.KurinHand][][]sdlutils.TextureWithSize
 }
 
 func NewKurinItemGraphic(renderer *gfx.KurinRenderer, itemId string) (*KurinItemGraphic, *error) {
 	graphicDirectory := path.Join(constants.TexturesPath, "items", itemId)
 	graphic := KurinItemGraphic{
-		Hands: map[gameplay.KurinHand][]sdlutils.TextureWithSize{},
+		Hands: map[gameplay.KurinHand][][]sdlutils.TextureWithSize{},
 	}
 
 	templateBytes, templateErr := os.ReadFile(path.Join(constants.DataPath, "templates", "items", fmt.Sprintf("%s.json", itemId)))
@@ -54,19 +54,30 @@ func NewKurinItemGraphic(renderer *gfx.KurinRenderer, itemId string) (*KurinItem
 	}
 
 	if graphic.Template.Hand == nil || *graphic.Template.Hand {
-		graphic.Hands[gameplay.KurinHandLeft] = make([]sdlutils.TextureWithSize, 4)
-		for i := 0; i < 4; i++ {
-			handPath := path.Join(graphicDirectory, fmt.Sprintf("%s_left_%d.png", itemId, i))
-			if handTexture, err := sdlutils.LoadTexture(renderer.Renderer, handPath); err == nil {
-				graphic.Hands[gameplay.KurinHandLeft][i] = handTexture
+		textures := 1
+		if graphic.Template.StatesHand != nil {
+			textures = *graphic.Template.StatesHand
+		}
+
+		graphic.Hands[gameplay.KurinHandLeft] = make([][]sdlutils.TextureWithSize, textures)
+		for j := 0; j < textures; j++ {
+			graphic.Hands[gameplay.KurinHandLeft][j] = make([]sdlutils.TextureWithSize, 4)
+			for i := 0; i < 4; i++ {
+				handPath := path.Join(graphicDirectory, fmt.Sprintf("%s_left_%d_%d.png", itemId, j, i))
+				if handTexture, err := sdlutils.LoadTexture(renderer.Renderer, handPath); err == nil {
+					graphic.Hands[gameplay.KurinHandLeft][j][i] = handTexture
+				}
 			}
 		}
 
-		graphic.Hands[gameplay.KurinHandRight] = make([]sdlutils.TextureWithSize, 4)
-		for i := 0; i < 4; i++ {
-			handPath := path.Join(graphicDirectory, fmt.Sprintf("%s_right_%d.png", itemId, i))
-			if handTexture, err := sdlutils.LoadTexture(renderer.Renderer, handPath); err == nil {
-				graphic.Hands[gameplay.KurinHandRight][i] = handTexture
+		graphic.Hands[gameplay.KurinHandRight] = make([][]sdlutils.TextureWithSize, textures)
+		for j := 0; j < textures; j++ {
+			graphic.Hands[gameplay.KurinHandRight][j] = make([]sdlutils.TextureWithSize, 4)
+			for i := 0; i < 4; i++ {
+				handPath := path.Join(graphicDirectory, fmt.Sprintf("%s_right_%d_%d.png", itemId, j, i))
+				if handTexture, err := sdlutils.LoadTexture(renderer.Renderer, handPath); err == nil {
+					graphic.Hands[gameplay.KurinHandRight][j][i] = handTexture
+				}
 			}
 		}
 	}

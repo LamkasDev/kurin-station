@@ -18,20 +18,20 @@ func GetKurinCharacterRect(renderer *gfx.KurinRenderer, character *gameplay.Kuri
 	})
 }
 
-func RenderKurinCharacter(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, character *gameplay.KurinCharacter) *error {
+func RenderKurinCharacter(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame, character *gameplay.KurinCharacter) *error {
 	graphic := layer.Data.(KurinRendererLayerCharacterData).Species[character.Species].Types[character.Type]
 	rect := GetKurinCharacterRect(renderer, character)
 
 	switch character.Direction {
 	case gameplay.KurinDirectionNorth:
-		RenderKurinCharacterHand(renderer, layer, character, gameplay.KurinHandLeft, rect)
-		RenderKurinCharacterHand(renderer, layer, character, gameplay.KurinHandRight, rect)
+		RenderKurinCharacterHand(renderer, layer, game, character, gameplay.KurinHandLeft, rect)
+		RenderKurinCharacterHand(renderer, layer, game, character, gameplay.KurinHandRight, rect)
 	case gameplay.KurinDirectionEast:
-		RenderKurinCharacterHand(renderer, layer, character, gameplay.KurinHandLeft, rect)
+		RenderKurinCharacterHand(renderer, layer, game, character, gameplay.KurinHandLeft, rect)
 	case gameplay.KurinDirectionSouth:
 		break
 	case gameplay.KurinDirectionWest:
-		RenderKurinCharacterHand(renderer, layer, character, gameplay.KurinHandRight, rect)
+		RenderKurinCharacterHand(renderer, layer, game, character, gameplay.KurinHandRight, rect)
 	}
 
 	for _, part := range graphic.Template.Parts {
@@ -41,7 +41,7 @@ func RenderKurinCharacter(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererL
 		}
 
 		texture := graphic.Textures[part.Id][character.Direction]
-		prect := sdlutils.AddRectAndPoint(rect, sdl.Point{X: int32(float32(offset.X) * renderer.RendererContext.CameraZoom.X), Y: int32(float32(offset.Y) * renderer.RendererContext.CameraZoom.Y)})
+		prect := sdlutils.AddRectAndPoint(rect, sdl.Point{X: int32(float32(offset.X) * renderer.Context.CameraZoom.X), Y: int32(float32(offset.Y) * renderer.Context.CameraZoom.Y)})
 		if err := renderer.Renderer.Copy(texture.Texture, nil, &prect); err != nil {
 			return &err
 		}
@@ -51,25 +51,23 @@ func RenderKurinCharacter(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererL
 	case gameplay.KurinDirectionNorth:
 		break
 	case gameplay.KurinDirectionEast:
-		RenderKurinCharacterHand(renderer, layer, character, gameplay.KurinHandRight, rect)
+		RenderKurinCharacterHand(renderer, layer, game, character, gameplay.KurinHandRight, rect)
 	case gameplay.KurinDirectionSouth:
-		RenderKurinCharacterHand(renderer, layer, character, gameplay.KurinHandLeft, rect)
-		RenderKurinCharacterHand(renderer, layer, character, gameplay.KurinHandRight, rect)
+		RenderKurinCharacterHand(renderer, layer, game, character, gameplay.KurinHandLeft, rect)
+		RenderKurinCharacterHand(renderer, layer, game, character, gameplay.KurinHandRight, rect)
 	case gameplay.KurinDirectionWest:
-		RenderKurinCharacterHand(renderer, layer, character, gameplay.KurinHandLeft, rect)
+		RenderKurinCharacterHand(renderer, layer, game, character, gameplay.KurinHandLeft, rect)
 	}
 
 	return nil
 }
 
-func RenderKurinCharacterHand(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, character *gameplay.KurinCharacter, hand gameplay.KurinHand, rect sdl.Rect) *error {
+func RenderKurinCharacterHand(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame, character *gameplay.KurinCharacter, hand gameplay.KurinHand, rect sdl.Rect) *error {
 	handItem := character.Inventory.Hands[hand]
 	if handItem != nil {
-		handDirections, ok := layer.Data.(KurinRendererLayerCharacterData).ItemLayer.Data.(item.KurinRendererLayerItemData).Items[handItem.Type].Hands[hand]
-		if ok {
-			if err := renderer.Renderer.Copy(handDirections[character.Direction].Texture, nil, &rect); err != nil {
-				return &err
-			}
+		graphicDirections := layer.Data.(KurinRendererLayerCharacterData).ItemLayer.Data.(item.KurinRendererLayerItemData).Items[handItem.Type].Hands[hand][handItem.GetTextureHand(handItem, game)]
+		if err := renderer.Renderer.Copy(graphicDirections[character.Direction].Texture, nil, &rect); err != nil {
+			return &err
 		}
 	}
 

@@ -13,7 +13,7 @@ type KurinRenderer struct {
 	Renderer      *sdl.Renderer
 	Icons         KurinRendererIcons
 	Fonts         KurinRendererFonts
-	RendererContext KurinRendererContext
+	Context KurinRendererContext
 	Layers        []*KurinRendererLayer
 }
 
@@ -24,7 +24,7 @@ type KurinRendererIcons struct {
 func NewKurinRenderer() (*KurinRenderer, *error) {
 	renderer := &KurinRenderer{
 		Icons:         KurinRendererIcons{},
-		RendererContext: NewKurinRendererContext(),
+		Context: NewKurinRendererContext(),
 		Layers:        []*KurinRendererLayer{},
 	}
 	err := sdl.Init(sdl.INIT_EVERYTHING)
@@ -39,7 +39,7 @@ func NewKurinRenderer() (*KurinRenderer, *error) {
 		800, 600, sdl.WINDOW_SHOWN|sdl.WINDOW_RESIZABLE); err != nil {
 		return renderer, &err
 	}
-	renderer.RendererContext.WindowSize = sdl.Point{X: 800, Y: 600}
+	renderer.Context.WindowSize = sdl.Point{X: 800, Y: 600}
 
 	if renderer.Renderer, err = sdl.CreateRenderer(renderer.Window, -1, sdl.RENDERER_ACCELERATED); err != nil {
 		return renderer, &err
@@ -99,7 +99,7 @@ func RenderKurinRenderer(renderer *KurinRenderer, game *gameplay.KurinGame) *err
 
 func PresentKurinRenderer(renderer *KurinRenderer) {
 	renderer.Renderer.Present()
-	renderer.RendererContext.Frame++
+	renderer.Context.Frame++
 }
 
 // TODO: make layers free themselves.

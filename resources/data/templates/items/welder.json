@@ -1,4 +1,5 @@
 {
   "id": "welder",
-  "states": 3
+  "states": 3,
+  "statesHand": 2
 }

@@ -13,11 +13,15 @@ type KurinItem struct {
 	Transform *sdlutils.Transform
 
 	GetTextures KurinItemGetTextures
+	GetTextureHand KurinItemGetTextureHand
+	Interact KurinItemInteract
 	Process  KurinItemProcess
 	Data interface{}
 }
 
 type KurinItemGetTextures func(item *KurinItem, game *KurinGame) []int
+type KurinItemGetTextureHand func(item *KurinItem, game *KurinGame) int
+type KurinItemInteract func(item *KurinItem, game *KurinGame)
 type KurinItemProcess func(item *KurinItem, game *KurinGame)
 
 func NewKurinItemRandom(itemType string, kmap *KurinMap) *KurinItem {

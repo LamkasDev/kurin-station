@@ -31,7 +31,7 @@ func ProcessKurinEventLayerMovement(manager *event.KurinEventManager, layer *eve
 	for _, character := range game.Characters {
 		character.PositionRender = mathutils.LerpFPoint(character.PositionRender, sdlutils.PointToFPoint(character.Position.Base), 0.2)
 	}
-	if manager.Renderer.RendererContext.CameraMode != gfx.KurinRendererCameraModeCharacter || manager.Keyboard.InputMode {
+	if manager.Renderer.Context.CameraMode != gfx.KurinRendererCameraModeCharacter || manager.Keyboard.InputMode {
 		return nil
 	}
 

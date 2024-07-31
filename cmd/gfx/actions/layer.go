@@ -49,7 +49,7 @@ func LoadKurinRendererLayerActions(renderer *gfx.KurinRenderer, layer *gfx.Kurin
 }
 
 func RenderKurinRendererLayerActions(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame) *error {
-	if renderer.RendererContext.State != gfx.KurinRendererContextStateActions {
+	if renderer.Context.State != gfx.KurinRendererContextStateActions {
 		return nil
 	}
 
@@ -60,7 +60,7 @@ func RenderKurinRendererLayerActions(renderer *gfx.KurinRenderer, layer *gfx.Kur
 	blue := sdl.Color{R: 66, G: 135, B: 245}
 	gray := sdl.Color{R: 36, G: 36, B: 36}
 	size := &sdl.Rect{W: 312, H: 36}
-	half := gfx.GetHalfWindowSize(&renderer.RendererContext)
+	half := gfx.GetHalfWindowSize(&renderer.Context)
 	rect := &sdl.Rect{X: int32(float32(half.X) - (float32(size.W) / 2)), Y: int32(float32(half.Y)-(float32(size.H)/2)) - 92, W: size.W, H: size.H}
 	irect := sdl.Rect{X: rect.X + 4, Y: rect.Y + 4, W: int32(nameWidth) + 16, H: size.H - 8}
 

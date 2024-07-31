@@ -65,7 +65,8 @@ func NewKurinInstance() (KurinInstance, *error) {
 	actionsLayer := actions.NewKurinRendererLayerActions(objectLayer)
 	instance.Renderer.Layers = append(instance.Renderer.Layers, actionsLayer)
 	instance.Renderer.Layers = append(instance.Renderer.Layers, tooltip.NewKurinRendererLayerTooltip())
-	instance.Renderer.Layers = append(instance.Renderer.Layers, hud.NewKurinRendererLayerHUD(itemLayer))
+	hudLayer := hud.NewKurinRendererLayerHUD(itemLayer)
+	instance.Renderer.Layers = append(instance.Renderer.Layers, hudLayer)
 	contextLayer := context.NewKurinRendererLayerContext()
 	instance.Renderer.Layers = append(instance.Renderer.Layers, contextLayer)
 	debugLayer := debug.NewKurinRendererLayerDebug()
@@ -86,7 +87,7 @@ func NewKurinInstance() (KurinInstance, *error) {
 	instance.EventManager.Layers = append(instance.EventManager.Layers, movement.NewKurinEventLayerMovement())
 	instance.EventManager.Layers = append(instance.EventManager.Layers, force.NewKurinEventLayerForce())
 	instance.EventManager.Layers = append(instance.EventManager.Layers, camera.NewKurinEventLayerCamera())
-	instance.EventManager.Layers = append(instance.EventManager.Layers, eventHud.NewKurinEventLayerHUD())
+	instance.EventManager.Layers = append(instance.EventManager.Layers, eventHud.NewKurinEventLayerHUD(hudLayer, itemLayer))
 	instance.EventManager.Layers = append(instance.EventManager.Layers, interaction.NewKurinEventLayerInteraction(itemLayer))
 	instance.EventManager.Layers = append(instance.EventManager.Layers, eventDebug.NewKurinEventLayerDebug(debugLayer))
 	if err := event.LoadKurinEventManager(&instance.EventManager); err != nil {
@@ -109,8 +110,8 @@ func RunKurinInstance(instance *KurinInstance) *error {
 	if err := event.ProcessKurinEventManager(&instance.EventManager, &instance.Game); err != nil {
 		return err
 	}
-	instance.Renderer.RendererContext.CameraTileSize = render.GetCameraTileSize(instance.Renderer)
-	instance.Renderer.RendererContext.CameraOffset = render.GetCameraOffset(instance.Renderer)
+	instance.Renderer.Context.CameraTileSize = render.GetCameraTileSize(instance.Renderer)
+	instance.Renderer.Context.CameraOffset = render.GetCameraOffset(instance.Renderer)
 
 	if err := sound.ProcessKurinSoundManager(&instance.SoundManager, &instance.Game); err != nil {
 		return err

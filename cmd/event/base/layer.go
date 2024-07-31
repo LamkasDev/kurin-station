@@ -34,10 +34,10 @@ func ProcessKurinEventLayerBase(manager *event.KurinEventManager, layer *event.K
 			switch val.Event {
 			case sdl.WINDOWEVENT_RESIZED:
 				w, h := manager.Renderer.Window.GetSize()
-				manager.Renderer.RendererContext.WindowSize = sdl.Point{X: w, Y: h}
+				manager.Renderer.Context.WindowSize = sdl.Point{X: w, Y: h}
 			}
 		case sdl.MouseMotionEvent:
-			manager.Renderer.RendererContext.MousePosition = sdl.Point{
+			manager.Renderer.Context.MousePosition = sdl.Point{
 				X: val.X,
 				Y: val.Y,
 			}
@@ -55,7 +55,7 @@ func ProcessKurinEventLayerBase(manager *event.KurinEventManager, layer *event.K
 		case sdl.MouseButtonEvent:
 			switch val.Type {
 			case sdl.MOUSEBUTTONDOWN:
-				wpos := render.ScreenToWorldPosition(manager.Renderer, manager.Renderer.RendererContext.MousePosition)
+				wpos := render.ScreenToWorldPosition(manager.Renderer, manager.Renderer.Context.MousePosition)
 				switch val.Button {
 				case sdl.ButtonLeft:
 					manager.Mouse.PendingLeft = &wpos
@@ -67,6 +67,7 @@ func ProcessKurinEventLayerBase(manager *event.KurinEventManager, layer *event.K
 			manager.Keyboard.Input = val.GetText()
 		}
 	}
+	gameplay.ProcessKurinGame(game)
 
 	return nil
 }

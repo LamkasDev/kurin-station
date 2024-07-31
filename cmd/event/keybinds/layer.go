@@ -55,19 +55,19 @@ func ProcessKurinEventLayerKeybinds(manager *event.KurinEventManager, layer *eve
 			if !gameplay.DropKurinItemFromCharacter(game, game.SelectedCharacter) {
 				return nil
 			}
-			wpos := render.ScreenToWorldPosition(manager.Renderer, manager.Renderer.RendererContext.MousePosition)
+			wpos := render.ScreenToWorldPosition(manager.Renderer, manager.Renderer.Context.MousePosition)
 			force := gameplay.KurinForce{
 				Item: item,
 				Target: sdlutils.PointToFPointCenter(wpos),
 			}
 			game.ForceController.Forces[item] = &force
 		case sdl.K_f:
-			switch manager.Renderer.RendererContext.CameraMode {
+			switch manager.Renderer.Context.CameraMode {
 			case gfx.KurinRendererCameraModeCharacter:
-				manager.Renderer.RendererContext.CameraMode = gfx.KurinRendererCameraModeFree
+				manager.Renderer.Context.CameraMode = gfx.KurinRendererCameraModeFree
 				game.SelectedCharacter = nil
 			case gfx.KurinRendererCameraModeFree:
-				manager.Renderer.RendererContext.CameraMode = gfx.KurinRendererCameraModeCharacter
+				manager.Renderer.Context.CameraMode = gfx.KurinRendererCameraModeCharacter
 				game.SelectedCharacter = game.Characters[0]
 			}
 		case sdl.K_s:
