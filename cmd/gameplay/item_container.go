@@ -1,24 +1,34 @@
 package gameplay
 
-import "github.com/LamkasDev/kurin/cmd/common/sdlutils"
-
-func NewKurinItem(itemType string, transform *sdlutils.Transform) *KurinItem {
+func NewKurinItem(itemType string) *KurinItem {
 	switch itemType {
 	case "welder":
-		return NewKurinItemWelder(transform)
+		return NewKurinItemWelder()
 	}
 
+	return NewKurinItemRaw(itemType)
+}
+
+func NewKurinItemRaw(itemType string) *KurinItem {
 	return &KurinItem{
+		Id:   GetNextId(),
 		Type: itemType,
-		Transform: transform,
-		GetTextures: func(item *KurinItem, game *KurinGame) []int {
-			return []int{0};
+		GetTextures: func(item *KurinItem) []int {
+			return []int{0}
 		},
-		GetTextureHand: func(item *KurinItem, game *KurinGame) int {
-			return 0;
+		GetTextureHand: func(item *KurinItem) int {
+			return 0
 		},
-		Interact: func(item *KurinItem, game *KurinGame) {},
-		Process: func(item *KurinItem, game *KurinGame) {},
-		Data: nil,
+		OnHandInteraction: func(item *KurinItem) {},
+		OnTileInteraction: func(item *KurinItem, tile *KurinTile) bool {
+			return false
+		},
+		EncodeData: func(item *KurinItem) []byte {
+			return []byte{}
+		},
+		DecodeData: func(item *KurinItem, data []byte) {},
+		Process:    func(item *KurinItem) {},
+		CanHit:     true,
+		Data:       nil,
 	}
 }

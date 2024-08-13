@@ -3,34 +3,48 @@ package gameplay
 import (
 	"math"
 
-	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
+	"github.com/kelindar/binary"
 )
 
 type KurinItemWelderData struct {
 	Enabled bool
 }
 
-func NewKurinItemWelder(transform *sdlutils.Transform) *KurinItem {
-	return &KurinItem{
-		Type:      "welder",
-		Transform: transform,
-		GetTextures: GetTexturesKurinItemWelder,
-		GetTextureHand: GetTextureHandKurinItemWelder,
-		Interact: func(item *KurinItem, game *KurinGame) {
-			data := item.Data.(KurinItemWelderData)
-			data.Enabled = !data.Enabled
-			item.Data = data
-		},
-		Process: func(item *KurinItem, game *KurinGame) {},
-		Data: KurinItemWelderData{
-			Enabled: false,
-		},
+func NewKurinItemWelder() *KurinItem {
+	item := NewKurinItemRaw("welder")
+	item.GetTextures = GetTexturesKurinItemWelder
+	item.GetTextureHand = GetTextureHandKurinItemWelder
+	item.OnHandInteraction = func(item *KurinItem) {
+		data := item.Data.(KurinItemWelderData)
+		data.Enabled = !data.Enabled
+		if data.Enabled {
+			PlaySoundVolume(&KurinGameInstance.SoundController, "welderactivate", 0.5)
+		} else {
+			PlaySoundVolume(&KurinGameInstance.SoundController, "welderdeactivate", 0.5)
+		}
+		item.Data = data
 	}
+	item.EncodeData = func(item *KurinItem) []byte {
+		itemData := item.Data.(KurinItemWelderData)
+		data, _ := binary.Marshal(&itemData)
+		return data
+	}
+	item.DecodeData = func(item *KurinItem, data []byte) {
+		var itemData KurinItemWelderData 
+		binary.Unmarshal(data, &itemData)
+		item.Data = itemData
+	}
+	item.CanHit = false
+	item.Data = KurinItemWelderData{
+		Enabled: false,
+	}
+
+	return item
 }
 
-func GetTexturesKurinItemWelder(item *KurinItem, game *KurinGame) []int {
+func GetTexturesKurinItemWelder(item *KurinItem) []int {
 	if(item.Data.(KurinItemWelderData).Enabled) {
-		if int64(math.Floor(float64(game.Ticks) / 8)) % 2 == 0 {
+		if int64(math.Floor(float64(KurinGameInstance.Ticks) / 8)) % 2 == 0 {
 			return []int{0, 2}
 		}
 		return []int{0, 1}
@@ -39,9 +53,9 @@ func GetTexturesKurinItemWelder(item *KurinItem, game *KurinGame) []int {
 	return []int{0}
 }
 
-func GetTextureHandKurinItemWelder(item *KurinItem, game *KurinGame) int {
+func GetTextureHandKurinItemWelder(item *KurinItem) int {
 	if(item.Data.(KurinItemWelderData).Enabled) {
-		if int64(math.Floor(float64(game.Ticks) / 8)) % 2 == 0 {
+		if int64(math.Floor(float64(KurinGameInstance.Ticks) / 8)) % 2 == 0 {
 			return 1
 		}
 		return 0

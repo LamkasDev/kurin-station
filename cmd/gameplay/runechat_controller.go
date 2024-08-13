@@ -22,6 +22,7 @@ func CreateKurinRunechatMessage(controller *KurinRunechatController, runechat *K
 func ProcessKurinRunechat(controller *KurinRunechatController, runechat *KurinRunechat) {
 	runechat.Ticks--
 	if runechat.Ticks == 0 {
+		DestroyKurinRunechat(runechat)
 		i := slices.Index(controller.Messages, runechat)
 		controller.Messages = slices.Delete(controller.Messages, i, i+1)
 	}

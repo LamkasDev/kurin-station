@@ -1,11 +1,11 @@
 package actions
 
 import (
+	"fmt"
 	"path"
 
 	"github.com/LamkasDev/kurin/cmd/common/constants"
 	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
-	"github.com/LamkasDev/kurin/cmd/gameplay"
 	"github.com/LamkasDev/kurin/cmd/gfx"
 	"github.com/veandco/go-sdl2/sdl"
 )
@@ -37,9 +37,9 @@ func NewKurinRendererLayerActions(objectLayer *gfx.KurinRendererLayer) *gfx.Kuri
 	}
 }
 
-func LoadKurinRendererLayerActions(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) *error {
+func LoadKurinRendererLayerActions(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
 	data := layer.Data.(KurinRendererLayerActionsData)
-	var err *error
+	var err error
 	if data.UseTexture, err = sdlutils.LoadTexture(renderer.Renderer, path.Join(constants.TexturesPath, "icons", "radial_use_0.png")); err != nil {
 		return err
 	}
@@ -48,14 +48,14 @@ func LoadKurinRendererLayerActions(renderer *gfx.KurinRenderer, layer *gfx.Kurin
 	return nil
 }
 
-func RenderKurinRendererLayerActions(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame) *error {
+func RenderKurinRendererLayerActions(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
 	if renderer.Context.State != gfx.KurinRendererContextStateActions {
 		return nil
 	}
 
 	actionsData := layer.Data.(KurinRendererLayerActionsData)
 	name := GetKurinActionModeName(actionsData.Mode)
-	nameWidth, _, _ := renderer.Fonts.Container[gfx.KurinRendererFontDefault].SizeUTF8(name)
+	nameWidth, _, _ := renderer.Fonts.Default.SizeUTF8(name)
 
 	blue := sdl.Color{R: 66, G: 135, B: 245}
 	gray := sdl.Color{R: 36, G: 36, B: 36}
@@ -71,11 +71,11 @@ func RenderKurinRendererLayerActions(renderer *gfx.KurinRenderer, layer *gfx.Kur
 
 	sdlutils.SetDrawColor(renderer.Renderer, gray)
 	renderer.Renderer.FillRect(rect)
-	sdlutils.RenderUTF8SolidTexture(renderer.Renderer, renderer.Fonts.Container[gfx.KurinRendererFontDefault], input, sdl.Color{R: 255, G: 255, B: 255}, sdl.Point{X: rect.X + 10 + irect.W, Y: rect.Y + 10}, sdl.FPoint{X: 1, Y: 1})
+	sdlutils.RenderLabel(renderer.Renderer, "actions.input", renderer.Fonts.Default, sdlutils.White, input, sdl.Point{X: rect.X + 10 + irect.W, Y: rect.Y + 10}, sdl.FPoint{X: 1, Y: 1})
 
 	sdlutils.SetDrawColor(renderer.Renderer, blue)
 	renderer.Renderer.DrawRect(&irect)
-	sdlutils.RenderUTF8SolidTexture(renderer.Renderer, renderer.Fonts.Container[gfx.KurinRendererFontDefault], name, blue, sdl.Point{X: rect.X + 12, Y: rect.Y + 10}, sdl.FPoint{X: 1, Y: 1})
+	sdlutils.RenderLabel(renderer.Renderer, "actions.name", renderer.Fonts.Default, sdl.Color{R: 66, G: 135, B: 245}, name, sdl.Point{X: rect.X + 12, Y: rect.Y + 10}, sdl.FPoint{X: 1, Y: 1})
 
 	if actionsData.Mode == KurinActionModeBuild {
 		structures := GetMenuStructureGraphics(&actionsData)
@@ -101,10 +101,10 @@ func RenderKurinRendererLayerActions(renderer *gfx.KurinRenderer, layer *gfx.Kur
 			structurePoint := sdl.Point{X: menurect.X + 12, Y: menurect.Y + 12}
 			sdlutils.RenderTexture(renderer.Renderer, structureTexture, structurePoint, sdl.FPoint{X: 1.5, Y: 1.5})
 			if structureGraphic.Template.Name != nil {
-				sdlutils.RenderUTF8SolidTexture(renderer.Renderer, renderer.Fonts.Container[gfx.KurinRendererFontDefault], *structureGraphic.Template.Name, blue, sdl.Point{X: menurect.X + 72, Y: menurect.Y + 12}, sdl.FPoint{X: 1, Y: 1})
+				sdlutils.RenderLabel(renderer.Renderer, fmt.Sprintf("actions.name.%d", i), renderer.Fonts.Default, blue, *structureGraphic.Template.Name, sdl.Point{X: menurect.X + 72, Y: menurect.Y + 12}, sdl.FPoint{X: 1, Y: 1})
 			}
 			if structureGraphic.Template.Description != nil {
-				sdlutils.RenderUTF8SolidTexture(renderer.Renderer, renderer.Fonts.Container[gfx.KurinRendererFontDefault], *structureGraphic.Template.Description, blue, sdl.Point{X: menurect.X + 72, Y: menurect.Y + 36}, sdl.FPoint{X: 1, Y: 1})
+				sdlutils.RenderLabel(renderer.Renderer, fmt.Sprintf("actions.description.%d", i), renderer.Fonts.Default, blue, *structureGraphic.Template.Description, sdl.Point{X: menurect.X + 72, Y: menurect.Y + 36}, sdl.FPoint{X: 1, Y: 1})
 			}
 
 			if actionsData.Index == i {

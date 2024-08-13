@@ -1,20 +1,25 @@
 package gameplay
 
 import (
-	"github.com/veandco/go-sdl2/sdl"
+	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
 )
 
 type KurinRunechat struct {
-	Color   sdl.Color
 	Message string
 	Ticks   uint32
 	Data    interface{}
+	Texture *sdlutils.TextureWithSize
 }
 
 func NewKurinRunechat(message string) *KurinRunechat {
 	return &KurinRunechat{
-		Color:   sdl.Color{R: 255, G: 255, B: 255},
 		Message: message,
 		Ticks:   360,
+	}
+}
+
+func DestroyKurinRunechat(runechat *KurinRunechat) {
+	if runechat.Texture != nil {
+		runechat.Texture.Texture.Destroy()
 	}
 }

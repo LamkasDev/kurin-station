@@ -21,16 +21,17 @@ var FontsPath = ""
 var DataPath = ""
 var SoundsPath = ""
 
-var ApplicationProfile = ""
+var ApplicationProfileCpu = ""
+var ApplicationProfileHeap = ""
 var ApplicationIcon = ""
 var ApplicationFontDefault = ""
 var ApplicationFontPixeled = ""
 var ApplicationFontOutline = ""
 
-func LoadConstants() *error {
+func LoadConstants() error {
 	ex, err := os.Executable()
 	if err != nil {
-		return &err
+		return err
 	}
 
 	if arch.KurinDebug {
@@ -38,7 +39,7 @@ func LoadConstants() *error {
 	} else {
 		u, err := user.Current()
 		if err != nil {
-			return &err
+			return err
 		}
 
 		ApplicationPath = path.Join(u.HomeDir, "Documents", "kurin")
@@ -58,7 +59,8 @@ func LoadConstants() *error {
 	DataPath = path.Join(ResourcesPath, "data")
 	SoundsPath = path.Join(ResourcesPath, "sounds")
 
-	ApplicationProfile = path.Join(ResourcesPath, "cpu.prof")
+	ApplicationProfileCpu = path.Join(TempPath, "cpu.prof")
+	ApplicationProfileHeap = path.Join(TempPath, "heap.out")
 	ApplicationIcon = path.Join(IconsPath, "icon.png")
 	ApplicationFontDefault = path.Join(FontsPath, "Roboto-Regular.ttf")
 	ApplicationFontPixeled = path.Join(FontsPath, "Pixeled.ttf")

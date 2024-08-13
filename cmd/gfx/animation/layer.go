@@ -19,8 +19,8 @@ func NewKurinRendererLayerAnimation() *gfx.KurinRendererLayer {
 	}
 }
 
-func LoadKurinRendererLayerAnimation(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) *error {
-	var err *error
+func LoadKurinRendererLayerAnimation(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
+	var err error
 	if layer.Data.(KurinRendererLayerAnimationData).Animations["hit"], err = NewKurinAnimationGraphic(renderer, "hit"); err != nil {
 		return err
 	}
@@ -28,8 +28,8 @@ func LoadKurinRendererLayerAnimation(renderer *gfx.KurinRenderer, layer *gfx.Kur
 	return nil
 }
 
-func RenderKurinRendererLayerAnimation(_ *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame) *error {
-	for _, character := range game.Characters {
+func RenderKurinRendererLayerAnimation(_ *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
+	for _, character := range gameplay.KurinGameInstance.Characters {
 		if character.AnimationController.Animation != nil {
 			graphic := layer.Data.(KurinRendererLayerAnimationData).Animations[character.AnimationController.Animation.Type]
 			if character.AnimationController.Animation.Step == -1 {

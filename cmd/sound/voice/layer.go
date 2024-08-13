@@ -11,6 +11,7 @@ import (
 	"github.com/LamkasDev/kurin/cmd/sound"
 	"github.com/mandelsoft/vfs/pkg/memoryfs"
 	"github.com/mandelsoft/vfs/pkg/vfs"
+	"github.com/veandco/go-sdl2/mix"
 )
 
 var KurinAvailablePitches = []float32{0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4}
@@ -36,9 +37,9 @@ func GetCachePitchedPath(trackId string, pitch float32) string {
 	return path.Join(constants.TempAudioPath, fmt.Sprintf("%s_%d.ogg", trackId, int(pitch*100)))
 }
 
-func LoadKurinSoundLayerVoice(manager *sound.KurinSoundManager, layer *sound.KurinSoundLayer) *error {
+func LoadKurinSoundLayerVoice(manager *sound.KurinSoundManager, layer *sound.KurinSoundLayer) error {
 	data := layer.Data.(KurinSoundLayerVoiceData)
-	var err *error
+	var err error
 	if data.Silence, err = sound.NewKurinTrackComplex(manager, "silence", 1); err != nil {
 		return err
 	}
@@ -58,10 +59,10 @@ func LoadKurinSoundLayerVoice(manager *sound.KurinSoundManager, layer *sound.Kur
 	return nil
 }
 
-func ProcessKurinSoundLayerVoice(manager *sound.KurinSoundManager, layer *sound.KurinSoundLayer, game *gameplay.KurinGame) *error {
+func ProcessKurinSoundLayerVoice(manager *sound.KurinSoundManager, layer *sound.KurinSoundLayer) error {
 	data := layer.Data.(KurinSoundLayerVoiceData)
-	if len(game.RunechatController.Sounds) > 0 {
-		for _, runechatSound := range game.RunechatController.Sounds {
+	if len(gameplay.KurinGameInstance.RunechatController.Sounds) > 0 {
+		for _, runechatSound := range gameplay.KurinGameInstance.RunechatController.Sounds {
 			paths := []string{}
 			for _, rune := range runechatSound.Runechat.Message {
 				switch rune {
@@ -77,11 +78,13 @@ func ProcessKurinSoundLayerVoice(manager *sound.KurinSoundManager, layer *sound.
 			if err != nil {
 				return err
 			}
-			if err := track.Base.Data.Play(1); err != nil {
-				return &err
+			c, err := track.Base.Data.Play(-1, 0)
+			if err != nil {
+				return err
 			}
+			mix.Volume(c, 128)
 		}
-		game.RunechatController.Sounds = []*gameplay.KurinRunechatSound{}
+		gameplay.KurinGameInstance.RunechatController.Sounds = []*gameplay.KurinRunechatSound{}
 	}
 
 	return nil

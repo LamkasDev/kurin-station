@@ -23,9 +23,12 @@ func GetKurinRunechatCharacterRect(renderer *gfx.KurinRenderer, layer *gfx.Kurin
 	}
 }
 
-func RenderKurinRunechatCharacter(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, runechat *gameplay.KurinRunechat, offset int32) *error {
+func RenderKurinRunechatCharacter(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, runechat *gameplay.KurinRunechat, offset int32) error {
 	rect := GetKurinRunechatCharacterRect(renderer, layer, runechat, offset)
-	sdlutils.RenderUTF8SolidTextureRect(renderer.Renderer, renderer.Fonts.Container[gfx.KurinRendererFontPixeled], runechat.Message, runechat.Color, rect)
+	if runechat.Texture == nil {
+		runechat.Texture, _ = sdlutils.CreateUTF8SolidTexture(renderer.Renderer, renderer.Fonts.Container[gfx.KurinRendererFontPixeled], sdlutils.White, runechat.Message)
+	}
+	sdlutils.RenderUTF8SolidTextureRect(renderer.Renderer, runechat.Texture, rect)
 
 	return nil
 }

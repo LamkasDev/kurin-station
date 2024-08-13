@@ -61,6 +61,13 @@ func MultiplyFPoints(a sdl.FPoint, b sdl.FPoint) sdl.FPoint {
 	}
 }
 
+func DividePoint(point sdl.Point, n float32) sdl.Point {
+	return sdl.Point{
+		X: int32(float32(point.X) / n),
+		Y: int32(float32(point.Y) / n),
+	}
+}
+
 func DividePoints(a sdl.Point, b sdl.Point) sdl.Point {
 	return sdl.Point{
 		X: a.X / b.X,

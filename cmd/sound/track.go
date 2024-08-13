@@ -11,16 +11,16 @@ import (
 
 type KurinTrack struct {
 	Path string
-	Data *mix.Music
+	Data *mix.Chunk
 }
 
-func NewKurinTrack(manager *KurinSoundManager, trackId string) (*KurinTrack, *error) {
+func NewKurinTrack(manager *KurinSoundManager, trackDirectory string, trackId string) (*KurinTrack, error) {
 	track := KurinTrack{
-		Path: path.Join(constants.SoundsPath, "effects", fmt.Sprintf("%s.ogg", trackId)),
+		Path: path.Join(constants.SoundsPath, trackDirectory, fmt.Sprintf("%s.ogg", trackId)),
 	}
 
 	var err error
-	track.Data, err = mix.LoadMUS(track.Path)
+	track.Data, err = mix.LoadWAV(track.Path)
 	if err != nil {
 		return &track, nil
 	}

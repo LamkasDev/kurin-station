@@ -1,10 +1,10 @@
 package job
 
 import (
+	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
 	"github.com/LamkasDev/kurin/cmd/gameplay"
 	"github.com/LamkasDev/kurin/cmd/gfx"
 	"github.com/LamkasDev/kurin/cmd/gfx/structure"
-	"github.com/veandco/go-sdl2/sdl"
 )
 
 type KurinRendererLayerJobData struct {
@@ -21,36 +21,38 @@ func NewKurinRendererLayerJob(objectLayer *gfx.KurinRendererLayer) *gfx.KurinRen
 	}
 }
 
-func LoadKurinRendererLayerJob(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) *error {
+func LoadKurinRendererLayerJob(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
 	return nil
 }
 
-func RenderKurinRendererLayerJob(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame) *error {
-	data := layer.Data.(KurinRendererLayerJobData)
-	for _, ijob := range game.JobController.Jobs.Rep {
-		if ijob == nil {
+func RenderKurinRendererLayerJob(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
+	for _, job := range gameplay.KurinGameInstance.JobController.Jobs.Rep {
+		if job == nil {
 			continue
 		}
-
-		job := ijob.(*gameplay.KurinJobDriver)
-		switch val := job.Data.(type) {
-		case gameplay.KurinJobDriverBuildData:
-			if err := structure.RenderKurinObjectBlueprint(renderer, data.ObjectLayer, job.Tile, val.Prefab, sdl.Color{R: 255, G: 255, B: 255}); err != nil {
-				return err
-			}
+		if err := RenderKurinJob(renderer, layer, job.(*gameplay.KurinJobDriver)); err != nil {
+			return err
 		}
 	}
 
-	for _, character := range game.Characters {
+	for _, character := range gameplay.KurinGameInstance.Characters {
 		if character.JobTracker.Job == nil {
 			continue
 		}
+		if err := RenderKurinJob(renderer, layer, character.JobTracker.Job); err != nil {
+			return err
+		}
+	}
 
-		switch val := character.JobTracker.Job.Data.(type) {
-		case gameplay.KurinJobDriverBuildData:
-			if err := structure.RenderKurinObjectBlueprint(renderer, data.ObjectLayer, character.JobTracker.Job.Tile, val.Prefab, sdl.Color{R: 255, G: 255, B: 255}); err != nil {
-				return err
-			}
+	return nil
+}
+
+func RenderKurinJob(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, job *gameplay.KurinJobDriver) error {
+	data := layer.Data.(KurinRendererLayerJobData)
+	switch val := job.Data.(type) {
+	case gameplay.KurinJobDriverBuildData:
+		if err := structure.RenderKurinObjectBlueprint(renderer, data.ObjectLayer, val.Prefab, sdlutils.White); err != nil {
+			return err
 		}
 	}
 

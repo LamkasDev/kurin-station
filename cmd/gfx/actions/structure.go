@@ -15,7 +15,7 @@ func GetMenuStructureGraphics(data *KurinRendererLayerActionsData) []*structure.
 		return structures[i].Template.Id < structures[j].Template.Id
 	})
 	newStructures := filter.Choose(structures, func(item *structure.KurinStructureGraphic) bool {
-		return item.Template.Name != nil && strings.Contains(*item.Template.Name, data.Input)
+		return item.Blueprint != nil && strings.Contains(*item.Template.Name, data.Input)
 	}).([]*structure.KurinStructureGraphic)
 
 	return newStructures

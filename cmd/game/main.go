@@ -16,17 +16,18 @@ func main() {
 		panic(err)
 	}
 
-	profileFile, perr := os.Create(constants.ApplicationProfile)
-	if perr != nil {
-		panic(perr)
-	}
-	if err := pprof.StartCPUProfile(profileFile); err != nil {
+	cpuProfileFile, err := os.Create(constants.ApplicationProfileCpu)
+	if err != nil {
 		panic(err)
 	}
+	if err := pprof.StartCPUProfile(cpuProfileFile); err != nil {
+		panic(err)
+	}
+	// runtime.MemProfileRate = 1
 
 	instance, err := life.NewKurinInstance()
 	if err != nil {
-		panic(*err)
+		panic(err)
 	}
 
 	fps := 60
@@ -41,13 +42,20 @@ func main() {
 		}
 		timing.KurinTimingGlobal.FrameTime = tickMs
 	}
-
-	if ferr := life.FreeKurinInstance(&instance); ferr != nil {
-		panic(*ferr)
-	}
-	pprof.StopCPUProfile()
-	sdl.Quit()
-	if err != nil {
-		panic(*err)
+	if instance.EventManager.Close {
+		pprof.StopCPUProfile()
+		heapProfileFile, perr := os.Create(constants.ApplicationProfileHeap)
+		if perr != nil {
+			panic(perr)
+		}
+		if err := pprof.WriteHeapProfile(heapProfileFile); err != nil {
+			panic(err)
+		}
+		if err := life.FreeKurinInstance(&instance); err != nil {
+			panic(err)
+		}
+		sdl.Quit()
+	} else if err != nil {
+		panic(err)
 	}
 }

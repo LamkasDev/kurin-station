@@ -19,26 +19,27 @@ func NewKurinRendererLayerObject() *gfx.KurinRendererLayer {
 	}
 }
 
-func LoadKurinRendererLayerObject(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) *error {
-	var err *error
+func LoadKurinRendererLayerObject(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
+	var err error
 	if layer.Data.(KurinRendererLayerObjectData).Structures["grille"], err = NewKurinStructureGraphic(renderer, "grille"); err != nil {
 		return err
 	}
 	if layer.Data.(KurinRendererLayerObjectData).Structures["displaced"], err = NewKurinStructureGraphic(renderer, "displaced"); err != nil {
 		return err
 	}
+	if layer.Data.(KurinRendererLayerObjectData).Structures["pod"], err = NewKurinStructureGraphic(renderer, "pod"); err != nil {
+		return err
+	}
+	if layer.Data.(KurinRendererLayerObjectData).Structures["broken_grille"], err = NewKurinStructureGraphic(renderer, "broken_grille"); err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func RenderKurinRendererLayerObject(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame) *error {
-	for x := int32(0); x < game.Map.Size.Base.X; x++ {
-		for y := int32(0); y < game.Map.Size.Base.Y; y++ {
-			tile := game.Map.Tiles[x][y][0]
-			for _, obj := range tile.Objects {
-				RenderKurinObject(renderer, layer, tile, obj)
-			}
-		}
+func RenderKurinRendererLayerObject(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
+	for _, obj := range gameplay.KurinGameInstance.Map.Objects {
+		RenderKurinObject(renderer, layer, obj)
 	}
 
 	return nil

@@ -26,11 +26,11 @@ func NewKurinEventLayerContext(contextLayer *gfx.KurinRendererLayer) *event.Kuri
 	}
 }
 
-func LoadKurinEventLayerContext(manager *event.KurinEventManager, layer *event.KurinEventLayer) *error {
+func LoadKurinEventLayerContext(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerContext(manager *event.KurinEventManager, layer *event.KurinEventLayer, game *gameplay.KurinGame) *error {
+func ProcessKurinEventLayerContext(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
 	if manager.Renderer.Context.State != gfx.KurinRendererContextStateNone {
 		return nil
 	}
@@ -46,7 +46,7 @@ func ProcessKurinEventLayerContext(manager *event.KurinEventManager, layer *even
 		}
 	}
 	if manager.Mouse.PendingRight != nil {
-		tile := gameplay.GetTileAt(&game.Map, sdlutils.Vector3{Base: *manager.Mouse.PendingRight, Z: game.SelectedCharacter.Position.Z})
+		tile := gameplay.GetTileAt(&gameplay.KurinGameInstance.Map, sdlutils.Vector3{Base: *manager.Mouse.PendingRight, Z: gameplay.KurinGameInstance.SelectedCharacter.Position.Z})
 		if tile != nil {
 			position := manager.Renderer.Context.MousePosition
 			data.Position = &position

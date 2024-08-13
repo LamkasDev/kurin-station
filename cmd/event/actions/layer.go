@@ -27,16 +27,16 @@ func NewKurinEventLayerActions(actionsLayer *gfx.KurinRendererLayer, toolLayer *
 	}
 }
 
-func LoadKurinEventLayerActions(manager *event.KurinEventManager, layer *event.KurinEventLayer) *error {
+func LoadKurinEventLayerActions(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerActions(manager *event.KurinEventManager, layer *event.KurinEventLayer, game *gameplay.KurinGame) *error {
+func ProcessKurinEventLayerActions(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
 	if manager.Keyboard.Pending == nil {
 		return nil
 	}
 	if manager.Renderer.Context.State == gfx.KurinRendererContextStateActions {
-		ProcessKurinEventLayerActionsInput(manager, layer, game)
+		ProcessKurinEventLayerActionsInput(manager, layer)
 		manager.Keyboard.Pending = nil
 		return nil
 	}
@@ -63,15 +63,15 @@ func StartKurinEventLayerActionsInput(manager *event.KurinEventManager, layer *e
 	manager.Renderer.Context.State = gfx.KurinRendererContextStateActions
 }
 
-func ProcessKurinEventLayerActionsInput(manager *event.KurinEventManager, layer *event.KurinEventLayer, game *gameplay.KurinGame) {
+func ProcessKurinEventLayerActionsInput(manager *event.KurinEventManager, layer *event.KurinEventLayer) {
 	data := layer.Data.(KurinEventLayerActionsData).ActionsLayer.Data.(actions.KurinRendererLayerActionsData)
 	input := data.Input
 	switch *manager.Keyboard.Pending {
 	case sdl.K_ESCAPE:
-		EndKurinEventLayerActionsInput(manager, layer, game)
+		EndKurinEventLayerActionsInput(manager, layer)
 		return
 	case sdl.K_RETURN:
-		ExecuteKurinEventLayerActionsInput(manager, layer, game)
+		ExecuteKurinEventLayerActionsInput(manager, layer)
 		return
 	case sdl.K_UP:
 		data.Index = ix.Max(ix.Min(data.Index-1, len(actions.GetMenuStructureGraphics(&data))-1), 0)
@@ -102,27 +102,27 @@ func ProcessKurinEventLayerActionsInput(manager *event.KurinEventManager, layer 
 	layer.Data.(KurinEventLayerActionsData).ActionsLayer.Data = data
 }
 
-func ExecuteKurinEventLayerActionsInput(manager *event.KurinEventManager, layer *event.KurinEventLayer, game *gameplay.KurinGame) {
+func ExecuteKurinEventLayerActionsInput(manager *event.KurinEventManager, layer *event.KurinEventLayer) {
 	data := layer.Data.(KurinEventLayerActionsData).ActionsLayer.Data.(actions.KurinRendererLayerActionsData)
 	input := data.Input
-	EndKurinEventLayerActionsInput(manager, layer, game)
+	EndKurinEventLayerActionsInput(manager, layer)
 
 	switch data.Mode {
 	case actions.KurinActionModeBuild:
 		manager.Renderer.Context.State = gfx.KurinRendererContextStateTool
 		toolData := layer.Data.(KurinEventLayerActionsData).ToolLayer.Data.(tool.KurinRendererLayerToolData)
 		toolData.Mode = tool.KurinToolModeBuild
-		toolData.Prefab = gameplay.NewKurinObject(actions.GetMenuStructureGraphics(&data)[data.Index].Template.Id)
+		toolData.Prefab = gameplay.NewKurinObject(&gameplay.KurinTile{}, actions.GetMenuStructureGraphics(&data)[data.Index].Template.Id)
 		layer.Data.(KurinEventLayerActionsData).ToolLayer.Data = toolData
 	case actions.KurinActionModeSay:
 		if len(input) == 0 {
 			return
 		}
-		gameplay.CreateKurinRunechatMessage(&game.RunechatController, gameplay.NewKurinRunechatCharacter(game.SelectedCharacter, input))
+		gameplay.CreateKurinRunechatMessage(&gameplay.KurinGameInstance.RunechatController, gameplay.NewKurinRunechatCharacter(gameplay.KurinGameInstance.SelectedCharacter, input))
 	}
 }
 
-func EndKurinEventLayerActionsInput(manager *event.KurinEventManager, layer *event.KurinEventLayer, game *gameplay.KurinGame) {
+func EndKurinEventLayerActionsInput(manager *event.KurinEventManager, layer *event.KurinEventLayer) {
 	data := layer.Data.(KurinEventLayerActionsData).ActionsLayer.Data.(actions.KurinRendererLayerActionsData)
 	data.Input = ""
 	data.Index = 0

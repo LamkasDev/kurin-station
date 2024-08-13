@@ -1,22 +1,25 @@
 run:
-    build-tags:
+  build-tags:
     - kurin64
     - kurindebug
 linters:
-    presets:
-        - bugs
-        - comment
-        - complexity
-        - error
-        # - format
-        # - import
-        - metalinter
-        - module
-        - performance
-        - sql
-        # - style
-        - test
-        - unused
-    disable: 
-        - exhaustruct
-        - depguard
+  presets:
+    - bugs
+    - comment
+    - complexity
+    - error
+    - format
+    - import
+    - metalinter
+    - module
+    - performance
+    # - sql
+    - style
+    # - test
+    - unused
+  disable:
+    - goimports
+    - depguard
+linters-settings:
+  gofmt:
+    simplify: false

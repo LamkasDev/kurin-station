@@ -20,18 +20,18 @@ type KurinItemGraphic struct {
 	Hands    map[gameplay.KurinHand][][]sdlutils.TextureWithSize
 }
 
-func NewKurinItemGraphic(renderer *gfx.KurinRenderer, itemId string) (*KurinItemGraphic, *error) {
+func NewKurinItemGraphic(renderer *gfx.KurinRenderer, itemId string) (*KurinItemGraphic, error) {
 	graphicDirectory := path.Join(constants.TexturesPath, "items", itemId)
 	graphic := KurinItemGraphic{
 		Hands: map[gameplay.KurinHand][][]sdlutils.TextureWithSize{},
 	}
 
-	templateBytes, templateErr := os.ReadFile(path.Join(constants.DataPath, "templates", "items", fmt.Sprintf("%s.json", itemId)))
-	if templateErr != nil {
-		return &graphic, &templateErr
+	templateBytes, err := os.ReadFile(path.Join(constants.DataPath, "templates", "items", fmt.Sprintf("%s.json", itemId)))
+	if err != nil {
+		return &graphic, err
 	}
 	if err := json.Unmarshal(templateBytes, &graphic.Template); err != nil {
-		return &graphic, &err
+		return &graphic, err
 	}
 
 	textures := 1
@@ -40,7 +40,6 @@ func NewKurinItemGraphic(renderer *gfx.KurinRenderer, itemId string) (*KurinItem
 	}
 	graphic.Textures = make([]sdlutils.TextureWithSizeAndSurface, textures)
 	
-	var err *error
 	for i := 0; i < textures; i++ {
 		graphicPath := path.Join(graphicDirectory, fmt.Sprintf("%s_%d.png", itemId, i))
 		if graphic.Textures[i], err = sdlutils.LoadTextureWithSurface(renderer.Renderer, graphicPath); err != nil {

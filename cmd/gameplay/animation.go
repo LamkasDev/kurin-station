@@ -8,9 +8,9 @@ type KurinAnimation struct {
 	Ticks int32
 }
 
-func NewKurinAnimation(atype string) *KurinAnimation {
+func NewKurinAnimation(animationType string) *KurinAnimation {
 	return &KurinAnimation{
-		Type:  atype,
+		Type:  animationType,
 		Step:  -1,
 		Ticks: 0,
 	}

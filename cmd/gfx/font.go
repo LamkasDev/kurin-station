@@ -7,26 +7,34 @@ import (
 
 type KurinRendererFonts struct {
 	Container map[string]*ttf.Font
+	Default *ttf.Font
+	DefaultSmall *ttf.Font
 }
 
 const KurinRendererFontDefault = "default"
+const KurinRendererFontDefaultSmall = "default.small"
 const KurinRendererFontPixeled = "pixeled"
 const KurinRendererFontOutline = "outline"
 
-func NewKurinRendererFonts() (KurinRendererFonts, *error) {
+func NewKurinRendererFonts() (KurinRendererFonts, error) {
 	fonts := KurinRendererFonts{
 		Container: map[string]*ttf.Font{},
 	}
 	var err error
 	if fonts.Container[KurinRendererFontDefault], err = ttf.OpenFont(constants.ApplicationFontDefault, 14); err != nil {
-		return fonts, &err
+		return fonts, err
+	}
+	if fonts.Container[KurinRendererFontDefaultSmall], err = ttf.OpenFont(constants.ApplicationFontDefault, 10); err != nil {
+		return fonts, err
 	}
 	if fonts.Container[KurinRendererFontPixeled], err = ttf.OpenFont(constants.ApplicationFontPixeled, 24); err != nil {
-		return fonts, &err
+		return fonts, err
 	}
 	if fonts.Container[KurinRendererFontOutline], err = ttf.OpenFont(constants.ApplicationFontOutline, 24); err != nil {
-		return fonts, &err
+		return fonts, err
 	}
+	fonts.Default = fonts.Container[KurinRendererFontDefault]
+	fonts.DefaultSmall = fonts.Container[KurinRendererFontDefaultSmall]
 
 	return fonts, nil
 }

@@ -20,18 +20,18 @@ func NewKurinEventLayerCamera() *event.KurinEventLayer {
 	}
 }
 
-func LoadKurinEventLayerCamera(manager *event.KurinEventManager, layer *event.KurinEventLayer) *error {
+func LoadKurinEventLayerCamera(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerCamera(manager *event.KurinEventManager, layer *event.KurinEventLayer, game *gameplay.KurinGame) *error {
+func ProcessKurinEventLayerCamera(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
 	if manager.Keyboard.InputMode {
 		return nil
 	}
 
 	switch manager.Renderer.Context.CameraMode {
 	case gfx.KurinRendererCameraModeCharacter:
-		manager.Renderer.Context.CameraPosition = game.SelectedCharacter.PositionRender
+		manager.Renderer.Context.CameraPosition = gameplay.KurinGameInstance.SelectedCharacter.PositionRender
 		manager.Renderer.Context.CameraPositionDestination = manager.Renderer.Context.CameraPosition
 	case gfx.KurinRendererCameraModeFree:
 		delay := float32(60)

@@ -22,12 +22,12 @@ type KurinSpeciesGraphic struct {
 	Textures map[string][]sdlutils.TextureWithSize
 }
 
-func NewKurinSpeciesGraphicContainer(renderer *gfx.KurinRenderer, speciesId string) (*KurinSpeciesGraphicContainer, *error) {
+func NewKurinSpeciesGraphicContainer(renderer *gfx.KurinRenderer, speciesId string) (*KurinSpeciesGraphicContainer, error) {
 	container := KurinSpeciesGraphicContainer{
 		Types: map[string]*KurinSpeciesGraphic{},
 	}
 
-	var err *error
+	var err error
 	if container.Types[gameplay.KurinDefaultType], err = NewKurinSpeciesGraphic(renderer, speciesId, gameplay.KurinDefaultType); err != nil {
 		return &container, err
 	}
@@ -35,20 +35,19 @@ func NewKurinSpeciesGraphicContainer(renderer *gfx.KurinRenderer, speciesId stri
 	return &container, nil
 }
 
-func NewKurinSpeciesGraphic(renderer *gfx.KurinRenderer, speciesId string, speciesType string) (*KurinSpeciesGraphic, *error) {
+func NewKurinSpeciesGraphic(renderer *gfx.KurinRenderer, speciesId string, speciesType string) (*KurinSpeciesGraphic, error) {
 	graphic := KurinSpeciesGraphic{
 		Textures: map[string][]sdlutils.TextureWithSize{},
 	}
 
-	templateBytes, templateErr := os.ReadFile(path.Join(constants.DataPath, "templates", "species", fmt.Sprintf("%s.json", speciesId)))
-	if templateErr != nil {
-		return &graphic, &templateErr
+	templateBytes, err := os.ReadFile(path.Join(constants.DataPath, "templates", "species", fmt.Sprintf("%s.json", speciesId)))
+	if err != nil {
+		return &graphic, err
 	}
 	if err := json.Unmarshal(templateBytes, &graphic.Template); err != nil {
-		return &graphic, &err
+		return &graphic, err
 	}
 
-	var err *error
 	for _, part := range graphic.Template.Parts {
 		partDirectory := constants.TexturesPath
 		if part.Path != nil {

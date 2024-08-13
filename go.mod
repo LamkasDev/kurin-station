@@ -16,6 +16,7 @@ require (
 require (
 	github.com/aws/aws-sdk-go v1.55.2 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/kelindar/binary v1.0.19
 	github.com/mandelsoft/filepath v0.0.0-20240223090642-3e2777258aa3 // indirect
 	github.com/u2takey/go-utils v0.3.1 // indirect
 	golang.org/x/net v0.27.0 // indirect

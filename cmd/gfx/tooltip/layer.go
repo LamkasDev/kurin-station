@@ -1,7 +1,6 @@
 package tooltip
 
 import (
-	"github.com/LamkasDev/kurin/cmd/gameplay"
 	"github.com/LamkasDev/kurin/cmd/gfx"
 )
 
@@ -15,10 +14,10 @@ func NewKurinRendererLayerTooltip() *gfx.KurinRendererLayer {
 	}
 }
 
-func LoadKurinRendererLayerTooltip(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) *error {
+func LoadKurinRendererLayerTooltip(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
 	return nil
 }
 
-func RenderKurinRendererLayerTooltip(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame) *error {
+func RenderKurinRendererLayerTooltip(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
 	return nil
 }

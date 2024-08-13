@@ -15,15 +15,15 @@ func NewKurinRendererLayerRunechat() *gfx.KurinRendererLayer {
 	}
 }
 
-func LoadKurinRendererLayerRunechat(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) *error {
+func LoadKurinRendererLayerRunechat(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
 	return nil
 }
 
-func RenderKurinRendererLayerRunechat(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame) *error {
-	if len(game.RunechatController.Messages) > 0 {
+func RenderKurinRendererLayerRunechat(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
+	if len(gameplay.KurinGameInstance.RunechatController.Messages) > 0 {
 		characterTally := map[*gameplay.KurinCharacter]int32{}
-		for i := len(game.RunechatController.Messages) - 1; i >= 0; i-- {
-			runechat := game.RunechatController.Messages[i]
+		for i := len(gameplay.KurinGameInstance.RunechatController.Messages) - 1; i >= 0; i-- {
+			runechat := gameplay.KurinGameInstance.RunechatController.Messages[i]
 			switch val := runechat.Data.(type) {
 			case gameplay.KurinRunechatCharacterData:
 				if err := RenderKurinRunechatCharacter(renderer, layer, runechat, characterTally[val.Character]); err != nil {
@@ -32,7 +32,7 @@ func RenderKurinRendererLayerRunechat(renderer *gfx.KurinRenderer, layer *gfx.Ku
 				characterTally[val.Character]++
 			}
 
-			gameplay.ProcessKurinRunechat(&game.RunechatController, runechat)
+			gameplay.ProcessKurinRunechat(&gameplay.KurinGameInstance.RunechatController, runechat)
 		}
 	}
 

@@ -8,22 +8,22 @@ import (
 type KurinHUDElement struct {
 	Path        string
 	Hovered     bool
-	GetPosition KurinHUDElementGetPosition
+	GetPosition KurinHUDElementGetRect
 	Click       KurinHUDElementClick
 }
 
-type KurinHUDElementGetPosition func(window sdl.Point) sdl.Point
-type KurinHUDElementClick func(game *gameplay.KurinGame)
+type KurinHUDElementGetRect func(window sdl.Point) sdl.Point
+type KurinHUDElementClick func()
 
 var KurinHUDElementHandLeft = KurinHUDElement{
 	GetPosition: func(windowSize sdl.Point) sdl.Point {
 		return sdl.Point{X: int32(float32(windowSize.X) / 2), Y: windowSize.Y - 72}
 	},
-	Click: func(game *gameplay.KurinGame) {
-		if game.SelectedCharacter == nil {
+	Click: func() {
+		if gameplay.KurinGameInstance.SelectedCharacter == nil {
 			return
 		}
-		game.SelectedCharacter.ActiveHand = gameplay.KurinHandLeft
+		gameplay.KurinGameInstance.SelectedCharacter.ActiveHand = gameplay.KurinHandLeft
 	},
 }
 
@@ -31,11 +31,11 @@ var KurinHUDElementHandRight = KurinHUDElement{
 	GetPosition: func(windowSize sdl.Point) sdl.Point {
 		return sdl.Point{X: int32(float32(windowSize.X)/2) - 64, Y: windowSize.Y - 72}
 	},
-	Click: func(game *gameplay.KurinGame) {
-		if game.SelectedCharacter == nil {
+	Click: func() {
+		if gameplay.KurinGameInstance.SelectedCharacter == nil {
 			return
 		}
-		game.SelectedCharacter.ActiveHand = gameplay.KurinHandRight
+		gameplay.KurinGameInstance.SelectedCharacter.ActiveHand = gameplay.KurinHandRight
 	},
 }
 
@@ -43,7 +43,25 @@ var KurinHUDElementPDA = KurinHUDElement{
 	GetPosition: func(windowSize sdl.Point) sdl.Point {
 		return sdl.Point{X: windowSize.X - 72, Y: 8}
 	},
-	Click: func(game *gameplay.KurinGame) {
+	Click: func() {
+
+	},
+}
+
+var KurinHUDElementCredit = KurinHUDElement{
+	GetPosition: func(windowSize sdl.Point) sdl.Point {
+		return sdl.Point{X: 0, Y: 76}
+	},
+	Click: func() {
+
+	},
+}
+
+var KurinHUDElementGoals = KurinHUDElement{
+	GetPosition: func(windowSize sdl.Point) sdl.Point {
+		return sdl.Point{X: 8, Y: 8}
+	},
+	Click: func() {
 
 	},
 }

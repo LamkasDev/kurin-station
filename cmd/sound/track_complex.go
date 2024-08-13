@@ -19,7 +19,7 @@ type KurinTrackComplex struct {
 	FinalStream *sdl.RWops
 }
 
-func NewKurinTrackComplex(manager *KurinSoundManager, trackId string, pitch float32) (*KurinTrackComplex, *error) {
+func NewKurinTrackComplex(manager *KurinSoundManager, trackId string, pitch float32) (*KurinTrackComplex, error) {
 	track := KurinTrackComplex{
 		Base: &KurinTrack{
 			Path: path.Join(constants.SoundsPath, "effects", fmt.Sprintf("%s.ogg", trackId)),
@@ -33,21 +33,21 @@ func NewKurinTrackComplex(manager *KurinSoundManager, trackId string, pitch floa
 	}).WithOutput(track.Buffer)
 	err := track.Stream.Run()
 	if err != nil {
-		return &track, &err
+		return &track, err
 	}
 	track.FinalStream, err = sdl.RWFromMem(track.Buffer.Bytes())
 	if err != nil {
-		return &track, &err
+		return &track, err
 	}
-	track.Base.Data, err = mix.LoadMUSRW(track.FinalStream, 0)
+	track.Base.Data, err = mix.LoadWAVRW(track.FinalStream, false)
 	if err != nil {
-		return &track, &err
+		return &track, err
 	}
 
 	return &track, nil
 }
 
-func ConcatKurinTrackComplex(manager *KurinSoundManager, paths []string) (*KurinTrackComplex, *error) {
+func ConcatKurinTrackComplex(manager *KurinSoundManager, paths []string) (*KurinTrackComplex, error) {
 	track := KurinTrackComplex{
 		Base: &KurinTrack{},
 	}
@@ -66,15 +66,15 @@ func ConcatKurinTrackComplex(manager *KurinSoundManager, paths []string) (*Kurin
 	}).WithOutput(track.Buffer)
 	err := track.Stream.Run()
 	if err != nil {
-		return &track, &err
+		return &track, err
 	}
 	track.FinalStream, err = sdl.RWFromMem(track.Buffer.Bytes())
 	if err != nil {
-		return &track, &err
+		return &track, err
 	}
-	track.Base.Data, err = mix.LoadMUSRW(track.FinalStream, 0)
+	track.Base.Data, err = mix.LoadWAVRW(track.FinalStream, false)
 	if err != nil {
-		return &track, &err
+		return &track, err
 	}
 
 	return &track, nil

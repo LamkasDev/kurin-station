@@ -11,30 +11,28 @@ const KurinDefaultSpecies = "human"
 const KurinDefaultType = "f"
 
 type KurinCharacter struct {
-	Map     *KurinMap
-	Species string
+	Id uint32
 	Type    string
-
-	ActiveHand KurinHand
-	Fatigue    int32
-
+	Species string
 	Position       sdlutils.Vector3
+	Direction      KurinDirection
+	Fatigue    int32
+	ActiveHand KurinHand
+	Inventory           KurinInventory
+
 	PositionRender sdl.FPoint
 	Movement       sdl.FPoint
 	Moving         bool
-	Direction      KurinDirection
-
-	Inventory           KurinInventory
 	Thinktree           KurinCharacterThinktree
 	JobTracker          KurinJobTracker
 	AnimationController KurinAnimationController
 }
 
-func NewKurinCharacterRandom(kmap *KurinMap) *KurinCharacter {
-	character := &KurinCharacter{
-		Map:                 kmap,
-		Species:             KurinDefaultSpecies,
+func NewKurinCharacter() *KurinCharacter {
+	return &KurinCharacter{
+		Id: GetNextId(),
 		Type:                KurinDefaultType,
+		Species:             KurinDefaultSpecies,
 		ActiveHand:          KurinHandLeft,
 		Fatigue:             0,
 		Position:            sdlutils.Vector3{},
@@ -46,11 +44,15 @@ func NewKurinCharacterRandom(kmap *KurinMap) *KurinCharacter {
 		JobTracker:          NewKurinJobTracker(),
 		AnimationController: NewKurinAnimationController(),
 	}
-	character.Inventory.Hands[KurinHandLeft] = NewKurinItem("survivalknife", nil)
-	character.Inventory.Hands[KurinHandRight] = NewKurinItem("welder", nil)
+}
+
+func NewKurinCharacterRandom() *KurinCharacter {
+	character := NewKurinCharacter()
+	character.Inventory.Hands[KurinHandLeft] = NewKurinItem("survivalknife")
+	character.Inventory.Hands[KurinHandRight] = NewKurinItem("welder")
 
 	for {
-		position := sdlutils.Vector3{Base: sdl.Point{X: int32(rand.Float32() * float32(kmap.Size.Base.X)), Y: int32(rand.Float32() * float32(kmap.Size.Base.Y))}, Z: 0}
+		position := sdlutils.Vector3{Base: sdl.Point{X: int32(rand.Float32() * float32(KurinGameInstance.Map.Size.Base.X)), Y: int32(rand.Float32() * float32(KurinGameInstance.Map.Size.Base.Y))}, Z: 0}
 		if MoveKurinCharacter(character, position) {
 			character.PositionRender = sdlutils.PointToFPoint(position.Base)
 			break
@@ -100,7 +102,7 @@ func MoveKurinCharacterDirection(character *KurinCharacter, direction KurinDirec
 }
 
 func MoveKurinCharacter(character *KurinCharacter, position sdlutils.Vector3) bool {
-	if !CanEnterPosition(character.Map, position) {
+	if !CanEnterPosition(&KurinGameInstance.Map, position) {
 		return false
 	}
 
@@ -139,7 +141,7 @@ func CanKurinCharacterInteractWithCharacter(character *KurinCharacter, other *Ku
 	return sdlutils.GetDistanceSimple(character.Position.Base, other.Position.Base) <= 1
 }
 
-func InteractKurinCharacter(character *KurinCharacter, game *KurinGame, position sdl.Point) {
+func InteractKurinCharacter(character *KurinCharacter, position sdl.Point) {
 	if !character.Moving {
 		TurnKurinCharacterTo(character, position)
 	}
@@ -147,35 +149,47 @@ func InteractKurinCharacter(character *KurinCharacter, game *KurinGame, position
 		return
 	}
 
-	tile := GetTileAt(character.Map, sdlutils.Vector3{Base: position, Z: character.Position.Z})
+	tile := GetTileAt(&KurinGameInstance.Map, sdlutils.Vector3{Base: position, Z: character.Position.Z})
 	if tile == nil || !CanKurinCharacterInteractWithTile(character, tile) {
 		return
 	}
-	if len(tile.Objects) > 0 {
-		HitObject(game, character, tile, tile.Objects[0])
-		return
+	item := character.Inventory.Hands[character.ActiveHand]
+
+	hit := true
+	if item != nil {
+		hit = item.CanHit
+		if len(tile.Objects) > 0 {
+			object := tile.Objects[0]
+			if object.OnItemInteraction(object, item) {
+				hit = false
+			}
+		} else if item.OnTileInteraction(item, tile) {
+			hit = false
+		}
+	}
+	if hit && len(tile.Objects) > 0 {
+		KurinCharacterHitObject(character, tile.Objects[0])
 	}
 
-	if game.HoveredItem != nil {
-		if RawTransferKurinItemToCharacter(game.HoveredItem, &game.Map, character) {
+	if KurinGameInstance.HoveredItem != nil {
+		if TransferKurinItemToCharacterRaw(KurinGameInstance.HoveredItem, &KurinGameInstance.Map, character) {
 			character.Fatigue += 20
 		}
 	}
 }
 
-func HitObject(game *KurinGame, character *KurinCharacter, tile *KurinTile, object *KurinObject) {
+func KurinCharacterHitObject(character *KurinCharacter, object *KurinObject) {
 	PlayKurinCharacterAnimation(character, "hit")
-	PlaySound(&game.SoundController, "grillehit")
-	CreateKurinParticle(&game.ParticleController, NewKurinParticleCross(game, sdlutils.Vector3ToFVector3Center(tile.Position)))
 	character.Fatigue += 60
+	HitKurinObject(object)
 }
 
-func ProcessKurinCharacter(game *KurinGame, character *KurinCharacter) {
+func ProcessKurinCharacter(character *KurinCharacter) {
 	if character.Fatigue > 0 {
 		character.Fatigue--
 	}
-	if game.SelectedCharacter != character {
-		if !ProcessKurinJobTracker(game, character) {
+	if KurinGameInstance.SelectedCharacter != character {
+		if !ProcessKurinJobTracker(character) {
 			ProcessKurinCharacterThinktree(character)
 		}
 	}

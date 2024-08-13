@@ -19,21 +19,27 @@ func NewKurinRendererLayerItem() *gfx.KurinRendererLayer {
 	}
 }
 
-func LoadKurinRendererLayerItem(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) *error {
-	var err *error
+func LoadKurinRendererLayerItem(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
+	var err error
 	if layer.Data.(KurinRendererLayerItemData).Items["survivalknife"], err = NewKurinItemGraphic(renderer, "survivalknife"); err != nil {
 		return err
 	}
 	if layer.Data.(KurinRendererLayerItemData).Items["welder"], err = NewKurinItemGraphic(renderer, "welder"); err != nil {
 		return err
 	}
+	if layer.Data.(KurinRendererLayerItemData).Items["credit"], err = NewKurinItemGraphic(renderer, "credit"); err != nil {
+		return err
+	}
+	if layer.Data.(KurinRendererLayerItemData).Items["rod"], err = NewKurinItemGraphic(renderer, "rod"); err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func RenderKurinRendererLayerItem(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame) *error {
-	for _, item := range game.Map.Items {
-		RenderKurinItem(renderer, layer, game, item)
+func RenderKurinRendererLayerItem(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
+	for _, item := range gameplay.KurinGameInstance.Map.Items {
+		RenderKurinItem(renderer, layer, item)
 	}
 
 	return nil

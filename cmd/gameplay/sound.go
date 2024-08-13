@@ -1,11 +1,13 @@
 package gameplay
 
 type KurinSound struct {
-	Type string
+	Type   string
+	Volume float32
 }
 
-func NewKurinSound(stype string) *KurinSound {
+func NewKurinSound(soundType string, volume float32) *KurinSound {
 	return &KurinSound{
-		Type: stype,
+		Type:   soundType,
+		Volume: volume,
 	}
 }

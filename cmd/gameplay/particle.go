@@ -10,17 +10,19 @@ import (
 type KurinParticle struct {
 	Type     string
 	Position sdlutils.FVector3
+	Scale float32
 	Movement sdl.FPoint
 	Color    sdl.Color
 	Ticks    uint32
 }
 
-func NewKurinParticleCross(game *KurinGame, position sdlutils.FVector3) *KurinParticle {
+func NewKurinParticleCross(position sdlutils.FVector3, scale float32, color sdl.Color) *KurinParticle {
 	return &KurinParticle{
 		Type:     "cross",
 		Position: position,
+		Scale: scale,
 		Movement: sdl.FPoint{X: (rand.Float32() - 0.5) * 0.05, Y: (rand.Float32() - 0.5) * 0.05},
-		Color:    sdl.Color{R: 210, G: 210, B: 210},
+		Color:    color,
 		Ticks:    20,
 	}
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-func GetKurinItemRect(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame, item *gameplay.KurinItem) sdl.Rect {
+func GetKurinItemRect(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, item *gameplay.KurinItem) sdl.Rect {
 	graphic := layer.Data.(KurinRendererLayerItemData).Items[item.Type]
 	return render.WorldToScreenRect(renderer, sdl.FRect{
 		X: float32(item.Transform.Position.Base.X) - 0.5, Y: float32(item.Transform.Position.Base.Y) - 0.5,
@@ -15,18 +15,18 @@ func GetKurinItemRect(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer
 	})
 }
 
-func RenderKurinItem(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame, item *gameplay.KurinItem) *error {
+func RenderKurinItem(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, item *gameplay.KurinItem) error {
 	graphic := layer.Data.(KurinRendererLayerItemData).Items[item.Type]
-	rect := GetKurinItemRect(renderer, layer, game, item)
+	rect := GetKurinItemRect(renderer, layer, item)
 
-	if game.HoveredItem == item && graphic.Outline != nil {
+	if gameplay.KurinGameInstance.HoveredItem == item && graphic.Outline != nil {
 		if err := renderer.Renderer.CopyEx(graphic.Outline.Texture, nil, &rect, item.Transform.Rotation, nil, sdl.RendererFlip(0)); err != nil {
-			return &err
+			return err
 		}
 	}
-	for _, i := range item.GetTextures(item, game) {
+	for _, i := range item.GetTextures(item) {
 		if err := renderer.Renderer.CopyEx(graphic.Textures[i].Base.Texture, nil, &rect, item.Transform.Rotation, nil, sdl.RendererFlip(0)); err != nil {
-			return &err
+			return err
 		}
 	}
 

@@ -32,6 +32,7 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx/turf"
 	"github.com/LamkasDev/kurin/cmd/sound"
 	"github.com/LamkasDev/kurin/cmd/sound/ambient"
+	"github.com/LamkasDev/kurin/cmd/sound/music"
 	"github.com/LamkasDev/kurin/cmd/sound/voice"
 )
 
@@ -42,12 +43,12 @@ type KurinInstance struct {
 	SoundManager sound.KurinSoundManager
 }
 
-func NewKurinInstance() (KurinInstance, *error) {
+func NewKurinInstance() (KurinInstance, error) {
 	instance := KurinInstance{
 		Game: gameplay.NewKurinGame(),
 	}
 
-	var err *error
+	var err error
 	if instance.Renderer, err = gfx.NewKurinRenderer(); err != nil {
 		return instance, err
 	}
@@ -99,6 +100,7 @@ func NewKurinInstance() (KurinInstance, *error) {
 	}
 	instance.SoundManager.Layers = append(instance.SoundManager.Layers, ambient.NewKurinSoundLayerAmbient())
 	instance.SoundManager.Layers = append(instance.SoundManager.Layers, voice.NewKurinSoundLayerVoice())
+	instance.SoundManager.Layers = append(instance.SoundManager.Layers, music.NewKurinSoundLayerMusic())
 	if err := sound.LoadKurinSoundManager(&instance.SoundManager); err != nil {
 		return instance, err
 	}
@@ -106,21 +108,21 @@ func NewKurinInstance() (KurinInstance, *error) {
 	return instance, nil
 }
 
-func RunKurinInstance(instance *KurinInstance) *error {
-	if err := event.ProcessKurinEventManager(&instance.EventManager, &instance.Game); err != nil {
+func RunKurinInstance(instance *KurinInstance) error {
+	if err := event.ProcessKurinEventManager(&instance.EventManager); err != nil {
 		return err
 	}
 	instance.Renderer.Context.CameraTileSize = render.GetCameraTileSize(instance.Renderer)
 	instance.Renderer.Context.CameraOffset = render.GetCameraOffset(instance.Renderer)
 
-	if err := sound.ProcessKurinSoundManager(&instance.SoundManager, &instance.Game); err != nil {
+	if err := sound.ProcessKurinSoundManager(&instance.SoundManager); err != nil {
 		return err
 	}
 
 	if err := gfx.ClearKurinRenderer(instance.Renderer); err != nil {
 		return err
 	}
-	if err := gfx.RenderKurinRenderer(instance.Renderer, &instance.Game); err != nil {
+	if err := gfx.RenderKurinRenderer(instance.Renderer); err != nil {
 		return err
 	}
 	gfx.PresentKurinRenderer(instance.Renderer)
@@ -128,7 +130,7 @@ func RunKurinInstance(instance *KurinInstance) *error {
 	return nil
 }
 
-func FreeKurinInstance(instance *KurinInstance) *error {
+func FreeKurinInstance(instance *KurinInstance) error {
 	if err := gfx.FreeKurinRenderer(instance.Renderer); err != nil {
 		return err
 	}

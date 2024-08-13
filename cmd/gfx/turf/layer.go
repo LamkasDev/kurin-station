@@ -19,8 +19,8 @@ func NewKurinRendererLayerTile() *gfx.KurinRendererLayer {
 	}
 }
 
-func LoadKurinRendererLayerTile(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) *error {
-	var err *error
+func LoadKurinRendererLayerTile(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
+	var err error
 	if layer.Data.(KurinRendererLayerTileData).Turfs["floor"], err = NewKurinTurfGraphic(renderer, "floor"); err != nil {
 		return err
 	}
@@ -28,10 +28,10 @@ func LoadKurinRendererLayerTile(renderer *gfx.KurinRenderer, layer *gfx.KurinRen
 	return nil
 }
 
-func RenderKurinRendererLayerTile(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame) *error {
-	for x := int32(0); x < game.Map.Size.Base.X; x++ {
-		for y := int32(0); y < game.Map.Size.Base.Y; y++ {
-			RenderKurinTile(renderer, layer, game.Map.Tiles[x][y][0])
+func RenderKurinRendererLayerTile(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
+	for x := int32(0); x < gameplay.KurinGameInstance.Map.Size.Base.X; x++ {
+		for y := int32(0); y < gameplay.KurinGameInstance.Map.Size.Base.Y; y++ {
+			RenderKurinTile(renderer, layer, gameplay.KurinGameInstance.Map.Tiles[x][y][0])
 		}
 	}
 

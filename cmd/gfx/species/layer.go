@@ -21,8 +21,8 @@ func NewKurinRendererLayerCharacter(itemLayer *gfx.KurinRendererLayer) *gfx.Kuri
 	}
 }
 
-func LoadKurinRendererLayerCharacter(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) *error {
-	var err *error
+func LoadKurinRendererLayerCharacter(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
+	var err error
 	if layer.Data.(KurinRendererLayerCharacterData).Species[gameplay.KurinDefaultSpecies], err = NewKurinSpeciesGraphicContainer(renderer, gameplay.KurinDefaultSpecies); err != nil {
 		return err
 	}
@@ -30,10 +30,10 @@ func LoadKurinRendererLayerCharacter(renderer *gfx.KurinRenderer, layer *gfx.Kur
 	return nil
 }
 
-func RenderKurinRendererLayerCharacter(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame) *error {
-	for _, character := range game.Characters {
-		gameplay.ProcessKurinCharacter(game, character)
-		RenderKurinCharacter(renderer, layer, game, character)
+func RenderKurinRendererLayerCharacter(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
+	for _, character := range gameplay.KurinGameInstance.Characters {
+		gameplay.ProcessKurinCharacter(character)
+		RenderKurinCharacter(renderer, layer, character)
 	}
 
 	return nil

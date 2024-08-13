@@ -10,6 +10,10 @@ func NewKurinSoundController() KurinSoundController {
 	}
 }
 
-func PlaySound(controller *KurinSoundController, stype string) {
-	controller.Pending = append(controller.Pending, NewKurinSound(stype))
+func PlaySound(controller *KurinSoundController, soundType string) {
+	controller.Pending = append(controller.Pending, NewKurinSound(soundType, 1))
+}
+
+func PlaySoundVolume(controller *KurinSoundController, soundType string, volume float32) {
+	controller.Pending = append(controller.Pending, NewKurinSound(soundType, volume))
 }

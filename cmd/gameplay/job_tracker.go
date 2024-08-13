@@ -1,6 +1,9 @@
 package gameplay
 
-import "math/rand"
+import (
+	"math/rand"
+	"slices"
+)
 
 type KurinJobTracker struct {
 	Job *KurinJobDriver
@@ -12,32 +15,34 @@ func NewKurinJobTracker() KurinJobTracker {
 	}
 }
 
-func ProcessKurinJobTracker(game *KurinGame, character *KurinCharacter) bool {
+func ProcessKurinJobTracker(character *KurinCharacter) bool {
 	if character.JobTracker.Job == nil {
-		character.JobTracker.Job = PopKurinJobFromController(&game.JobController)
+		character.JobTracker.Job = PopKurinJobFromController(&KurinGameInstance.JobController)
 		if character.JobTracker.Job == nil {
 			return false
 		}
-		if character.JobTracker.Job.Assign != nil {
-			character.JobTracker.Job.Assign(character.JobTracker.Job, game, character)
-		}
+		character.JobTracker.Job.Character = character
+		character.JobTracker.Job.Toils[0].Start(character.JobTracker.Job, character.JobTracker.Job.Toils[0])
 		if rand.Intn(10) < 4 {
-			switch character.JobTracker.Job.Data.(type) {
-			case KurinJobDriverBuildData:
-				CreateKurinRunechatMessage(&game.RunechatController, NewKurinRunechatCharacter(character, "Work, work."))
+			switch character.JobTracker.Job.Type {
+			case "build":
+				CreateKurinRunechatMessage(&KurinGameInstance.RunechatController, NewKurinRunechatCharacter(character, "Work, work."))
 			}
 		}
 	}
-	if character.JobTracker.Job != nil {
-		if character.JobTracker.Job.Process(character.JobTracker.Job, game, character) {
+	toil := character.JobTracker.Job.Toils[0]
+	if toil.Process(character.JobTracker.Job, toil) {
+		character.JobTracker.Job.Toils = slices.Delete(character.JobTracker.Job.Toils, 0, 1)
+		if len(character.JobTracker.Job.Toils) == 0 {
 			if character.JobTracker.Job.Tile.Job == character.JobTracker.Job {
 				character.JobTracker.Job.Tile.Job = nil
 			}
 			character.JobTracker.Job = nil
 			return true
 		}
-		character.JobTracker.Job.Ticks++
+		character.JobTracker.Job.Toils[0].Start(character.JobTracker.Job, character.JobTracker.Job.Toils[0])
 	}
+	toil.Ticks++
 
 	return true
 }

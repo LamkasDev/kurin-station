@@ -5,10 +5,14 @@ import (
 
 	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
 	"github.com/veandco/go-sdl2/sdl"
-	"golang.org/x/exp/slices"
 )
 
 var KurinTileSize = sdl.Point{
+	X: 32,
+	Y: 32,
+}
+
+var KurinTileSizeF = sdl.FPoint{
 	X: 32,
 	Y: 32,
 }
@@ -28,17 +32,6 @@ func NewKurinTile(ttype string, position sdlutils.Vector3) *KurinTile {
 		Position: position,
 		Job:      nil,
 		Objects:  []*KurinObject{},
-	}
-}
-
-func CreateKurinObject(tile *KurinTile, otype string) {
-	tile.Objects = append(tile.Objects, NewKurinObject(otype))
-}
-
-func DestroyKurinObject(tile *KurinTile, obj *KurinObject) {
-	i := slices.Index(tile.Objects, obj)
-	if i >= 0 {
-		tile.Objects = slices.Delete(tile.Objects, i, i+1)
 	}
 }
 

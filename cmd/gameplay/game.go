@@ -5,39 +5,42 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
+var KurinGameInstance *KurinGame 
+
 type KurinGame struct {
 	Map KurinMap
 	Ticks uint64
+	Credits uint32
 	Characters        []*KurinCharacter
-
 	SelectedCharacter *KurinCharacter
-	HoveredCharacter  *KurinCharacter
-	HoveredItem *KurinItem
 
 	JobController      KurinJobController
 	ParticleController KurinParticleController
 	RunechatController KurinRunechatController
 	SoundController    KurinSoundController
 	ForceController KurinForceController
-}
-
-type KurinGameMarshal struct {
-	Map KurinMapMarshal
+	Narrator KurinNarrator
+	
+	HoveredCharacter  *KurinCharacter
+	HoveredItem *KurinItem
 }
 
 func NewKurinGame() KurinGame {
-	kmap := NewKurinMap(sdlutils.Vector3{Base: sdl.Point{X: 25, Y: 25}, Z: 1})
 	game := KurinGame{
-		Map:                kmap,
+		Map:                NewKurinMap(sdlutils.Vector3{Base: sdl.Point{X: 25, Y: 25}, Z: 1}),
 		Ticks: 0,
 		Characters:         []*KurinCharacter{},
 		JobController:      NewKurinJobController(),
 		ParticleController: NewKurinParticleController(),
+		RunechatController: NewKurinRunechatController(),
 		SoundController:    NewKurinSoundController(),
 		ForceController: NewKurinForceController(),
+		Narrator: NewKurinNarrator(),
 	}
+	KurinGameInstance = &game
+	PopulateKurinMap(&game.Map)
 	for i := 0; i < 2; i++ {
-		character := NewKurinCharacterRandom(&kmap)
+		character := NewKurinCharacterRandom()
 		game.Characters = append(game.Characters, character)
 		game.SelectedCharacter = character
 	}
@@ -45,43 +48,46 @@ func NewKurinGame() KurinGame {
 	return game
 }
 
-func ProcessKurinGame(game *KurinGame) {
-	for _, character := range game.Characters {
-		ProcessKurinCharacter(game, character)
+func ProcessKurinGame() {
+	for _, character := range KurinGameInstance.Characters {
+		ProcessKurinCharacter(character)
 	}
-	game.Ticks++
+	ProcessKurinNarrator()
+	KurinGameInstance.Ticks++
 }
 
-func TransferKurinItemToCharacter(game *KurinGame, item *KurinItem, character *KurinCharacter) bool {
-	if RawIsKurinCharacterHandEmpty(character) {
+func TransferKurinItemToCharacter(item *KurinItem, character *KurinCharacter) bool {
+	if IsKurinCharacterHandEmptyRaw(character) {
 		return false
 	}
-	if RawTransferKurinItemFromCharacter(item, &game.Map, character) {
-		delete(game.ForceController.Forces, item)
+	if TransferKurinItemFromCharacterRaw(item, &KurinGameInstance.Map, character) {
+		delete(KurinGameInstance.ForceController.Forces, item)
 		return true
 	}
 
 	return false
 }
 
-func TransferKurinItemFromCharacter(game *KurinGame, item *KurinItem, character *KurinCharacter) bool {
-	if RawIsKurinCharacterHandEmpty(character) {
+func TransferKurinItemFromCharacter(item *KurinItem, character *KurinCharacter) bool {
+	if IsKurinCharacterHandEmptyRaw(character) {
 		return false
 	}
 
-	return RawTransferKurinItemFromCharacter(item, &game.Map, character)
+	return TransferKurinItemFromCharacterRaw(item, &KurinGameInstance.Map, character)
 }
 
-func DropKurinItemFromCharacter(game *KurinGame, character *KurinCharacter) bool {
-	return TransferKurinItemFromCharacter(game, character.Inventory.Hands[character.ActiveHand], character)
+func DropKurinItemFromCharacter(character *KurinCharacter) bool {
+	return TransferKurinItemFromCharacter(character.Inventory.Hands[character.ActiveHand], character)
 }
 
-func MarshalKurinGame(game *KurinGame) (KurinGameMarshal, *error) {
-	mgame := KurinGameMarshal{}
-	var err *error
-	if mgame.Map, err = MarshalKurinMap(&game.Map); err != nil {
-		return mgame, err
-	}
+func CreateKurinObject(tile *KurinTile, objectType string) {
+	obj := CreateKurinObjectRaw(&KurinGameInstance.Map, tile, objectType)
+	obj.OnCreate(obj)
+	KurinNarratorOnCreateObject(obj)
+}
 
-	return mgame, nil
+func DestroyKurinObject(obj *KurinObject) {
+	DestroyKurinObjectRaw(&KurinGameInstance.Map, obj)
+	obj.OnDestroy(obj)
+	KurinNarratorOnDestroyObject(obj)
 }

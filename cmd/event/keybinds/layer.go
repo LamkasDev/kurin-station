@@ -1,7 +1,6 @@
 package keybinds
 
 import (
-	"encoding/json"
 	"os"
 	"path"
 
@@ -9,6 +8,7 @@ import (
 	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
 	"github.com/LamkasDev/kurin/cmd/event"
 	"github.com/LamkasDev/kurin/cmd/gameplay"
+	"github.com/LamkasDev/kurin/cmd/gameplay/serialization"
 	"github.com/LamkasDev/kurin/cmd/gfx"
 	"github.com/LamkasDev/kurin/cmd/gfx/render"
 	"github.com/veandco/go-sdl2/sdl"
@@ -25,34 +25,34 @@ func NewKurinEventLayerKeybinds() *event.KurinEventLayer {
 	}
 }
 
-func LoadKurinEventLayerKeybinds(manager *event.KurinEventManager, layer *event.KurinEventLayer) *error {
+func LoadKurinEventLayerKeybinds(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerKeybinds(manager *event.KurinEventManager, layer *event.KurinEventLayer, game *gameplay.KurinGame) *error {
+func ProcessKurinEventLayerKeybinds(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
 	if manager.Keyboard.Pending != nil {
 		switch *manager.Keyboard.Pending {
 		case sdl.K_x:
-			if game.SelectedCharacter == nil {
+			if gameplay.KurinGameInstance.SelectedCharacter == nil {
 				return nil
 			}
-			switch game.SelectedCharacter.ActiveHand {
+			switch gameplay.KurinGameInstance.SelectedCharacter.ActiveHand {
 			case gameplay.KurinHandLeft:
-				game.SelectedCharacter.ActiveHand = gameplay.KurinHandRight
+				gameplay.KurinGameInstance.SelectedCharacter.ActiveHand = gameplay.KurinHandRight
 			case gameplay.KurinHandRight:
-				game.SelectedCharacter.ActiveHand = gameplay.KurinHandLeft
+				gameplay.KurinGameInstance.SelectedCharacter.ActiveHand = gameplay.KurinHandLeft
 			}
 		case sdl.K_q:
-			if game.SelectedCharacter == nil {
+			if gameplay.KurinGameInstance.SelectedCharacter == nil {
 				return nil
 			}
-			gameplay.DropKurinItemFromCharacter(game, game.SelectedCharacter)
+			gameplay.DropKurinItemFromCharacter(gameplay.KurinGameInstance.SelectedCharacter)
 		case sdl.K_r:
-			if game.SelectedCharacter == nil {
+			if gameplay.KurinGameInstance.SelectedCharacter == nil {
 				return nil
 			}
-			item := game.SelectedCharacter.Inventory.Hands[game.SelectedCharacter.ActiveHand]
-			if !gameplay.DropKurinItemFromCharacter(game, game.SelectedCharacter) {
+			item := gameplay.KurinGameInstance.SelectedCharacter.Inventory.Hands[gameplay.KurinGameInstance.SelectedCharacter.ActiveHand]
+			if !gameplay.DropKurinItemFromCharacter(gameplay.KurinGameInstance.SelectedCharacter) {
 				return nil
 			}
 			wpos := render.ScreenToWorldPosition(manager.Renderer, manager.Renderer.Context.MousePosition)
@@ -60,23 +60,28 @@ func ProcessKurinEventLayerKeybinds(manager *event.KurinEventManager, layer *eve
 				Item: item,
 				Target: sdlutils.PointToFPointCenter(wpos),
 			}
-			game.ForceController.Forces[item] = &force
+			gameplay.KurinGameInstance.ForceController.Forces[item] = &force
 		case sdl.K_f:
 			switch manager.Renderer.Context.CameraMode {
 			case gfx.KurinRendererCameraModeCharacter:
 				manager.Renderer.Context.CameraMode = gfx.KurinRendererCameraModeFree
-				game.SelectedCharacter = nil
+				gameplay.KurinGameInstance.SelectedCharacter = nil
 			case gfx.KurinRendererCameraModeFree:
 				manager.Renderer.Context.CameraMode = gfx.KurinRendererCameraModeCharacter
-				game.SelectedCharacter = game.Characters[0]
+				gameplay.KurinGameInstance.SelectedCharacter = gameplay.KurinGameInstance.Characters[0]
 			}
 		case sdl.K_s:
 			if manager.Keyboard.Pressed[sdl.K_LCTRL] {
-				gameJson, err := json.Marshal(game)
-				if err != nil {
-					return &err
+				data := serialization.EncodeKurinGame(gameplay.KurinGameInstance)
+				if _, err := os.Stat(path.Join(constants.TempSavesPath, "save.dat")); err == nil {
+					os.Remove(path.Join(constants.TempSavesPath, "save.dat"))
 				}
-				os.WriteFile(path.Join(constants.TempSavesPath, "save.json"), gameJson, 777)
+				os.WriteFile(path.Join(constants.TempSavesPath, "save.dat"), data, 777)
+			}
+		case sdl.K_l:
+			if manager.Keyboard.Pressed[sdl.K_LCTRL] {
+				data, _ := os.ReadFile(path.Join(constants.TempSavesPath, "save.dat"))
+				serialization.DecodeKurinGame(data, gameplay.KurinGameInstance)
 			}
 		default:
 			return nil

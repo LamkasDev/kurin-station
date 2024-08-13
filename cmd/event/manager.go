@@ -1,7 +1,6 @@
 package event
 
 import (
-	"github.com/LamkasDev/kurin/cmd/gameplay"
 	"github.com/LamkasDev/kurin/cmd/gfx"
 	"github.com/veandco/go-sdl2/sdl"
 )
@@ -11,9 +10,10 @@ type KurinEventManager struct {
 	Renderer *gfx.KurinRenderer
 	Mouse    KurinMouse
 	Keyboard KurinKeyboard
+	Close bool
 }
 
-func NewKurinEventManager(renderer *gfx.KurinRenderer) (KurinEventManager, *error) {
+func NewKurinEventManager(renderer *gfx.KurinRenderer) (KurinEventManager, error) {
 	manager := KurinEventManager{
 		Layers:   []*KurinEventLayer{},
 		Renderer: renderer,
@@ -24,7 +24,7 @@ func NewKurinEventManager(renderer *gfx.KurinRenderer) (KurinEventManager, *erro
 	return manager, nil
 }
 
-func LoadKurinEventManager(manager *KurinEventManager) *error {
+func LoadKurinEventManager(manager *KurinEventManager) error {
 	for _, layer := range manager.Layers {
 		if err := layer.Load(manager, layer); err != nil {
 			return err
@@ -34,9 +34,9 @@ func LoadKurinEventManager(manager *KurinEventManager) *error {
 	return nil
 }
 
-func ProcessKurinEventManager(manager *KurinEventManager, game *gameplay.KurinGame) *error {
+func ProcessKurinEventManager(manager *KurinEventManager) error {
 	for _, layer := range manager.Layers {
-		if err := layer.Process(manager, layer, game); err != nil {
+		if err := layer.Process(manager, layer); err != nil {
 			return err
 		}
 	}
@@ -51,6 +51,6 @@ func ProcessKurinEventManager(manager *KurinEventManager, game *gameplay.KurinGa
 	return nil
 }
 
-func FreeKurinEventManager(manager *KurinEventManager) *error {
+func FreeKurinEventManager(manager *KurinEventManager) error {
 	return nil
 }

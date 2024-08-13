@@ -18,18 +18,18 @@ type KurinStructureGraphic struct {
 	Blueprint *sdlutils.TextureWithSize
 }
 
-func NewKurinStructureGraphic(renderer *gfx.KurinRenderer, structureId string) (*KurinStructureGraphic, *error) {
+func NewKurinStructureGraphic(renderer *gfx.KurinRenderer, structureId string) (*KurinStructureGraphic, error) {
 	graphicDirectory := path.Join(constants.TexturesPath, "structures", structureId)
 	graphic := KurinStructureGraphic{
 		Textures: make([]sdlutils.TextureWithSize, 4),
 	}
 
-	templateBytes, templateErr := os.ReadFile(path.Join(constants.DataPath, "templates", "structures", fmt.Sprintf("%s.json", structureId)))
-	if templateErr != nil {
-		return &graphic, &templateErr
+	templateBytes, err := os.ReadFile(path.Join(constants.DataPath, "templates", "structures", fmt.Sprintf("%s.json", structureId)))
+	if err != nil {
+		return &graphic, err
 	}
 	if err := json.Unmarshal(templateBytes, &graphic.Template); err != nil {
-		return &graphic, &err
+		return &graphic, err
 	}
 
 	num := 4
@@ -37,7 +37,6 @@ func NewKurinStructureGraphic(renderer *gfx.KurinRenderer, structureId string) (
 		num = 1
 	}
 
-	var err *error
 	for i := 0; i < num; i++ {
 		partPath := path.Join(graphicDirectory, fmt.Sprintf("%s_%d.png", structureId, i))
 		if graphic.Textures[i], err = sdlutils.LoadTexture(renderer.Renderer, partPath); err != nil {

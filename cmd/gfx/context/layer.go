@@ -1,8 +1,9 @@
 package context
 
 import (
+	"fmt"
+
 	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
-	"github.com/LamkasDev/kurin/cmd/gameplay"
 	"github.com/LamkasDev/kurin/cmd/gfx"
 	"github.com/veandco/go-sdl2/sdl"
 )
@@ -34,11 +35,11 @@ func NewKurinRendererLayerContext() *gfx.KurinRendererLayer {
 	}
 }
 
-func LoadKurinRendererLayerContext(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) *error {
+func LoadKurinRendererLayerContext(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
 	return nil
 }
 
-func RenderKurinRendererLayerContext(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, game *gameplay.KurinGame) *error {
+func RenderKurinRendererLayerContext(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
 	data := layer.Data.(KurinRendererLayerContextData)
 	if data.Position == nil {
 		return nil
@@ -48,13 +49,13 @@ func RenderKurinRendererLayerContext(renderer *gfx.KurinRenderer, layer *gfx.Kur
 		rect := sdl.Rect{X: data.Position.X, Y: y, W: KurinRendererLayerContextDataItemWidth, H: KurinRendererLayerContextDataItemHeight}
 		renderer.Renderer.SetDrawColor(255, 255, 255, 0)
 		if err := renderer.Renderer.FillRect(&rect); err != nil {
-			return &err
+			return err
 		}
 		renderer.Renderer.SetDrawColor(233, 233, 233, 0)
 		if err := renderer.Renderer.DrawRect(&rect); err != nil {
-			return &err
+			return err
 		}
-		_, text := sdlutils.RenderUTF8SolidTexture(renderer.Renderer, renderer.Fonts.Container[gfx.KurinRendererFontDefault], item.Text, sdl.Color{R: 0, G: 0, B: 0}, sdl.Point{X: data.Position.X + 12, Y: y + 10}, sdl.FPoint{X: 1, Y: 1})
+		_, text := sdlutils.RenderLabel(renderer.Renderer, fmt.Sprintf("context.%d", i), renderer.Fonts.Default, sdl.Color{R: 0, G: 0, B: 0}, item.Text, sdl.Point{X: data.Position.X + 12, Y: y + 10}, sdl.FPoint{X: 1, Y: 1})
 		if data.HoveredItem == i {
 			renderer.Renderer.SetDrawColor(0, 0, 0, 0)
 			renderer.Renderer.DrawLine(text.X, text.Y + text.H + 2, text.X + text.W, text.Y + text.H + 2)

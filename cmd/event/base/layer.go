@@ -20,16 +20,17 @@ func NewKurinEventLayerBase() *event.KurinEventLayer {
 	}
 }
 
-func LoadKurinEventLayerBase(manager *event.KurinEventManager, layer *event.KurinEventLayer) *error {
+func LoadKurinEventLayerBase(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerBase(manager *event.KurinEventManager, layer *event.KurinEventLayer, game *gameplay.KurinGame) *error {
+func ProcessKurinEventLayerBase(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 		switch val := event.(type) {
 		case sdl.QuitEvent:
 			err := errors.New("time to bounce")
-			return &err
+			manager.Close = true
+			return err
 		case sdl.WindowEvent:
 			switch val.Event {
 			case sdl.WINDOWEVENT_RESIZED:
@@ -67,7 +68,7 @@ func ProcessKurinEventLayerBase(manager *event.KurinEventManager, layer *event.K
 			manager.Keyboard.Input = val.GetText()
 		}
 	}
-	gameplay.ProcessKurinGame(game)
+	gameplay.ProcessKurinGame()
 
 	return nil
 }

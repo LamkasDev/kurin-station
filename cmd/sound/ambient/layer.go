@@ -1,8 +1,15 @@
 package ambient
 
 import (
+	"io/fs"
+	"path"
+	"path/filepath"
+	"strings"
+
+	"github.com/LamkasDev/kurin/cmd/common/constants"
 	"github.com/LamkasDev/kurin/cmd/gameplay"
 	"github.com/LamkasDev/kurin/cmd/sound"
+	"github.com/veandco/go-sdl2/mix"
 )
 
 type KurinSoundLayerAmbientData struct {
@@ -19,24 +26,31 @@ func NewKurinSoundLayerAmbient() *sound.KurinSoundLayer {
 	}
 }
 
-func LoadKurinSoundLayerAmbient(manager *sound.KurinSoundManager, layer *sound.KurinSoundLayer) *error {
-	var err *error
-	if layer.Data.(KurinSoundLayerAmbientData).Tracks["grillehit"], err = sound.NewKurinTrack(manager, "grillehit"); err != nil {
-		return err
-	}
+func LoadKurinSoundLayerAmbient(manager *sound.KurinSoundManager, layer *sound.KurinSoundLayer) error {
+	return filepath.WalkDir(path.Join(constants.SoundsPath, "effects"), func(path string, d fs.DirEntry, err error) error {
+		if d.IsDir() {
+			return nil
+		}
+		name := strings.TrimSuffix(d.Name(), filepath.Ext(d.Name()))
+		if layer.Data.(KurinSoundLayerAmbientData).Tracks[name], err = sound.NewKurinTrack(manager, "effects", name); err != nil {
+			return err
+		}
 
-	return nil
+		return nil
+	})
 }
 
-func ProcessKurinSoundLayerAmbient(manager *sound.KurinSoundManager, layer *sound.KurinSoundLayer, game *gameplay.KurinGame) *error {
-	if len(game.SoundController.Pending) > 0 {
-		for _, sound := range game.SoundController.Pending {
+func ProcessKurinSoundLayerAmbient(manager *sound.KurinSoundManager, layer *sound.KurinSoundLayer) error {
+	if len(gameplay.KurinGameInstance.SoundController.Pending) > 0 {
+		for _, sound := range gameplay.KurinGameInstance.SoundController.Pending {
 			track := layer.Data.(KurinSoundLayerAmbientData).Tracks[sound.Type]
-			if err := track.Data.Play(1); err != nil {
-				return &err
+			c, err := track.Data.Play(-1, 0)
+			if err != nil {
+				return err
 			}
+			mix.Volume(c, int(sound.Volume * 128))
 		}
-		game.SoundController.Pending = []*gameplay.KurinSound{}
+		gameplay.KurinGameInstance.SoundController.Pending = []*gameplay.KurinSound{}
 	}
 
 	return nil

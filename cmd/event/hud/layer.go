@@ -31,36 +31,40 @@ func NewKurinEventLayerHUD(hudLayer *gfx.KurinRendererLayer, itemLayer *gfx.Kuri
 	}
 }
 
-func LoadKurinEventLayerHUD(manager *event.KurinEventManager, layer *event.KurinEventLayer) *error {
+func LoadKurinEventLayerHUD(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerHUD(manager *event.KurinEventManager, layer *event.KurinEventLayer, game *gameplay.KurinGame) *error {
+func ProcessKurinEventLayerHUD(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
+	if gameplay.KurinGameInstance.SelectedCharacter == nil {
+		return nil
+	}
+	
 	data := layer.Data.(KurinEventLayerHUDData)
 	itemData := data.ItemLayer.Data.(item.KurinRendererLayerItemData)
 
 	hudData := data.HudLayer.Data.(hud.KurinRendererLayerHUDData)
 	hudData.HoveredItem = nil
-	lhand := game.SelectedCharacter.Inventory.Hands[gameplay.KurinHandLeft]
+	lhand := gameplay.KurinGameInstance.SelectedCharacter.Inventory.Hands[gameplay.KurinHandLeft]
 	if lhand != nil {
 		hoveredOffset := sdlutils.DividePoints(gfx.GetHoveredOffsetUnscaled(&manager.Renderer.Context, hud.KurinHUDElementHandLeft.GetPosition(manager.Renderer.Context.WindowSize)), sdl.Point{X: 2, Y: 2})
 		if gfx.IsHoveredOffsetSolid(itemData.Items[lhand.Type].Textures[0], hoveredOffset) {
 			manager.Mouse.Cursor = sdl.SYSTEM_CURSOR_HAND
 			hudData.HoveredItem = lhand
 			if manager.Mouse.PendingLeft != nil {
-				lhand.Interact(lhand, game);
+				lhand.OnHandInteraction(lhand);
 				manager.Mouse.PendingLeft = nil;
 			}
 		}
 	}
-	rhand := game.SelectedCharacter.Inventory.Hands[gameplay.KurinHandRight]
+	rhand := gameplay.KurinGameInstance.SelectedCharacter.Inventory.Hands[gameplay.KurinHandRight]
 	if rhand != nil {
 		hoveredOffset := sdlutils.DividePoints(gfx.GetHoveredOffsetUnscaled(&manager.Renderer.Context, hud.KurinHUDElementHandRight.GetPosition(manager.Renderer.Context.WindowSize)), sdl.Point{X: 2, Y: 2})
 		if gfx.IsHoveredOffsetSolid(itemData.Items[rhand.Type].Textures[0], hoveredOffset) {
 			manager.Mouse.Cursor = sdl.SYSTEM_CURSOR_HAND
 			hudData.HoveredItem = rhand
 			if manager.Mouse.PendingLeft != nil {
-				rhand.Interact(rhand, game);
+				rhand.OnHandInteraction(rhand);
 				manager.Mouse.PendingLeft = nil;
 			}
 		}
@@ -72,7 +76,7 @@ func ProcessKurinEventLayerHUD(manager *event.KurinEventManager, layer *event.Ku
 		if manager.Renderer.Context.MousePosition.InRect(&sdl.Rect{X: pos.X, Y: pos.Y, W: 64, H: 64}) {
 			element.Hovered = true
 			if manager.Mouse.PendingLeft != nil {
-				element.Click(game)
+				element.Click()
 				manager.Mouse.PendingLeft = nil
 			}
 		} else {
