@@ -6,15 +6,17 @@ import (
 )
 
 type KurinRendererFonts struct {
-	Container map[string]*ttf.Font
-	Default *ttf.Font
+	Container    map[string]*ttf.Font
+	Default      *ttf.Font
 	DefaultSmall *ttf.Font
 }
 
-const KurinRendererFontDefault = "default"
-const KurinRendererFontDefaultSmall = "default.small"
-const KurinRendererFontPixeled = "pixeled"
-const KurinRendererFontOutline = "outline"
+const (
+	KurinRendererFontDefault      = "default"
+	KurinRendererFontDefaultSmall = "default.small"
+	KurinRendererFontPixeled      = "pixeled"
+	KurinRendererFontOutline      = "outline"
+)
 
 func NewKurinRendererFonts() (KurinRendererFonts, error) {
 	fonts := KurinRendererFonts{

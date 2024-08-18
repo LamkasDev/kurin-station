@@ -5,116 +5,146 @@ import (
 	"path"
 
 	"github.com/LamkasDev/kurin/cmd/common/constants"
+	"github.com/LamkasDev/kurin/cmd/common/mathutils"
 	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
+	"github.com/LamkasDev/kurin/cmd/gameplay/templates"
 	"github.com/LamkasDev/kurin/cmd/gfx"
+	"github.com/LamkasDev/kurin/cmd/gfx/structure"
+	"github.com/LamkasDev/kurin/cmd/gfx/turf"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinRendererLayerActionsData struct {
+type RendererLayerActionsData struct {
 	Input      string
-	Mode       KurinActionMode
+	Mode       ActionMode
 	Index      int
-	UseTexture sdlutils.TextureWithSize
+	UseTexture *sdlutils.TextureWithSize
 
-	ObjectLayer *gfx.KurinRendererLayer
+	TurfLayer   *gfx.RendererLayer
+	ObjectLayer *gfx.RendererLayer
+	ItemLayer   *gfx.RendererLayer
 }
 
-type KurinActionMode uint8
+type ActionMode uint8
 
-const KurinActionModeSay = KurinActionMode(0)
-const KurinActionModeBuild = KurinActionMode(1)
+const (
+	ActionModeSay   = ActionMode(0)
+	ActionModeBuild = ActionMode(1)
+)
 
-func NewKurinRendererLayerActions(objectLayer *gfx.KurinRendererLayer) *gfx.KurinRendererLayer {
-	return &gfx.KurinRendererLayer{
+func NewKurinRendererLayerActions(turfLayer *gfx.RendererLayer, objectLayer *gfx.RendererLayer, itemLayer *gfx.RendererLayer) *gfx.RendererLayer {
+	return &gfx.RendererLayer{
 		Load:   LoadKurinRendererLayerActions,
 		Render: RenderKurinRendererLayerActions,
-		Data: KurinRendererLayerActionsData{
+		Data: &RendererLayerActionsData{
 			Input:       "",
-			Mode:        KurinActionModeSay,
+			Mode:        ActionModeSay,
 			Index:       0,
+			TurfLayer:   turfLayer,
 			ObjectLayer: objectLayer,
+			ItemLayer:   itemLayer,
 		},
 	}
 }
 
-func LoadKurinRendererLayerActions(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
-	data := layer.Data.(KurinRendererLayerActionsData)
+func LoadKurinRendererLayerActions(layer *gfx.RendererLayer) error {
+	data := layer.Data.(*RendererLayerActionsData)
 	var err error
-	if data.UseTexture, err = sdlutils.LoadTexture(renderer.Renderer, path.Join(constants.TexturesPath, "icons", "radial_use_0.png")); err != nil {
+	if data.UseTexture, err = sdlutils.LoadTexture(gfx.RendererInstance.Renderer, path.Join(constants.TexturesPath, "icons", "radial_use.png")); err != nil {
 		return err
 	}
-	layer.Data = data
 
 	return nil
 }
 
-func RenderKurinRendererLayerActions(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
-	if renderer.Context.State != gfx.KurinRendererContextStateActions {
+func RenderKurinRendererLayerActions(layer *gfx.RendererLayer) error {
+	if gfx.RendererInstance.Context.State != gfx.RendererContextStateActions {
 		return nil
 	}
 
-	actionsData := layer.Data.(KurinRendererLayerActionsData)
-	name := GetKurinActionModeName(actionsData.Mode)
-	nameWidth, _, _ := renderer.Fonts.Default.SizeUTF8(name)
+	data := layer.Data.(*RendererLayerActionsData)
+	name := GetKurinActionModeName(data.Mode)
+	nameWidth, _, _ := gfx.RendererInstance.Fonts.Default.SizeUTF8(name)
 
-	blue := sdl.Color{R: 66, G: 135, B: 245}
-	gray := sdl.Color{R: 36, G: 36, B: 36}
 	size := &sdl.Rect{W: 312, H: 36}
-	half := gfx.GetHalfWindowSize(&renderer.Context)
+	half := gfx.GetHalfWindowSize(&gfx.RendererInstance.Context)
 	rect := &sdl.Rect{X: int32(float32(half.X) - (float32(size.W) / 2)), Y: int32(float32(half.Y)-(float32(size.H)/2)) - 92, W: size.W, H: size.H}
 	irect := sdl.Rect{X: rect.X + 4, Y: rect.Y + 4, W: int32(nameWidth) + 16, H: size.H - 8}
 
-	sdlutils.SetDrawColor(renderer.Renderer, blue)
-	renderer.Renderer.FillRect(&sdl.Rect{X: rect.X - 2, Y: rect.Y - 2, W: rect.W + 4, H: rect.H + 4})
+	sdlutils.SetDrawColor(gfx.RendererInstance.Renderer, sdlutils.Blue)
+	gfx.RendererInstance.Renderer.FillRect(&sdl.Rect{X: rect.X - 2, Y: rect.Y - 2, W: rect.W + 4, H: rect.H + 4})
 
-	input := actionsData.Input
+	input := data.Input
 
-	sdlutils.SetDrawColor(renderer.Renderer, gray)
-	renderer.Renderer.FillRect(rect)
-	sdlutils.RenderLabel(renderer.Renderer, "actions.input", renderer.Fonts.Default, sdlutils.White, input, sdl.Point{X: rect.X + 10 + irect.W, Y: rect.Y + 10}, sdl.FPoint{X: 1, Y: 1})
+	sdlutils.SetDrawColor(gfx.RendererInstance.Renderer, sdlutils.DarkGray)
+	gfx.RendererInstance.Renderer.FillRect(rect)
+	sdlutils.RenderLabel(gfx.RendererInstance.Renderer, "actions.input", gfx.RendererInstance.Fonts.Default, sdlutils.White, input, sdl.Point{X: rect.X + 10 + irect.W, Y: rect.Y + 10}, sdl.FPoint{X: 1, Y: 1})
 
-	sdlutils.SetDrawColor(renderer.Renderer, blue)
-	renderer.Renderer.DrawRect(&irect)
-	sdlutils.RenderLabel(renderer.Renderer, "actions.name", renderer.Fonts.Default, sdl.Color{R: 66, G: 135, B: 245}, name, sdl.Point{X: rect.X + 12, Y: rect.Y + 10}, sdl.FPoint{X: 1, Y: 1})
+	sdlutils.SetDrawColor(gfx.RendererInstance.Renderer, sdlutils.Blue)
+	gfx.RendererInstance.Renderer.DrawRect(&irect)
+	sdlutils.RenderLabel(gfx.RendererInstance.Renderer, "actions.name", gfx.RendererInstance.Fonts.Default, sdl.Color{R: 66, G: 135, B: 245}, name, sdl.Point{X: rect.X + 12, Y: rect.Y + 10}, sdl.FPoint{X: 1, Y: 1})
 
-	if actionsData.Mode == KurinActionModeBuild {
-		structures := GetMenuStructureGraphics(&actionsData)
-		structuresLength := len(structures)
-		if structuresLength == 0 {
+	switch data.Mode {
+	case ActionModeBuild:
+		structures := GetMenuGraphics(data)
+		if len(structures) == 0 {
 			return nil
 		}
 
-		menurect := &sdl.Rect{X: rect.X, Y: rect.Y + rect.H + 8, W: rect.W, H: int32(structuresLength)*72 + int32(structuresLength-1)*2}
-		sdlutils.SetDrawColor(renderer.Renderer, blue)
-		renderer.Renderer.FillRect(&sdl.Rect{X: menurect.X - 2, Y: menurect.Y - 2, W: menurect.W + 4, H: menurect.H + 4})
-		sdlutils.SetDrawColor(renderer.Renderer, gray)
-		renderer.Renderer.FillRect(menurect)
+		min := data.Index
+		if min >= len(structures)-4 {
+			min = mathutils.MaxInt(0, len(structures)-4)
+		}
+		max := mathutils.MinInt(min+4, len(structures))
+		displayed := max - min
 
-		for i, structureGraphic := range structures {
-			if actionsData.Index == i {
-				sdlutils.SetDrawColor(renderer.Renderer, blue)
-				renderer.Renderer.FillRect(&sdl.Rect{X: menurect.X + 8, Y: menurect.Y + 8, W: 4, H: 56})
+		menurect := &sdl.Rect{X: rect.X, Y: rect.Y + rect.H + 8, W: rect.W, H: int32(displayed)*72 + int32(displayed-1)*2}
+		sdlutils.SetDrawColor(gfx.RendererInstance.Renderer, sdlutils.Blue)
+		gfx.RendererInstance.Renderer.FillRect(&sdl.Rect{X: menurect.X - 2, Y: menurect.Y - 2, W: menurect.W + 4, H: menurect.H + 4})
+		sdlutils.SetDrawColor(gfx.RendererInstance.Renderer, sdlutils.DarkGray)
+		gfx.RendererInstance.Renderer.FillRect(menurect)
+
+		for i := min; i < max; i++ {
+			structureGraphic := structures[i]
+			if data.Index == i {
+				sdlutils.SetDrawColor(gfx.RendererInstance.Renderer, sdlutils.Blue)
+				gfx.RendererInstance.Renderer.FillRect(&sdl.Rect{X: menurect.X + 8, Y: menurect.Y + 8, W: 4, H: 56})
 				menurect.X += 16
 			}
 
-			structureTexture := structureGraphic.Textures[0]
-			structurePoint := sdl.Point{X: menurect.X + 12, Y: menurect.Y + 12}
-			sdlutils.RenderTexture(renderer.Renderer, structureTexture, structurePoint, sdl.FPoint{X: 1.5, Y: 1.5})
-			if structureGraphic.Template.Name != nil {
-				sdlutils.RenderLabel(renderer.Renderer, fmt.Sprintf("actions.name.%d", i), renderer.Fonts.Default, blue, *structureGraphic.Template.Name, sdl.Point{X: menurect.X + 72, Y: menurect.Y + 12}, sdl.FPoint{X: 1, Y: 1})
-			}
-			if structureGraphic.Template.Description != nil {
-				sdlutils.RenderLabel(renderer.Renderer, fmt.Sprintf("actions.description.%d", i), renderer.Fonts.Default, blue, *structureGraphic.Template.Description, sdl.Point{X: menurect.X + 72, Y: menurect.Y + 36}, sdl.FPoint{X: 1, Y: 1})
+			var structureTexture *sdlutils.TextureWithSize
+			var structureName string
+			var structureRequirements *[]templates.KurinItemRequirementTemplate
+			switch data := structureGraphic.(type) {
+			case *structure.KurinStructureGraphic:
+				structureTexture = data.Textures[0][0]
+				structureName = data.Template.Name
+				structureRequirements = data.Template.Requirements
+				break
+			case *turf.KurinTurfGraphic:
+				structureTexture = data.Textures[0]
+				structureName = data.Template.Name
+				structureRequirements = data.Template.Requirements
+				break
 			}
 
-			if actionsData.Index == i {
+			structurePoint := sdl.Point{X: menurect.X + 12, Y: menurect.Y + 12}
+			sdlutils.RenderTexture(gfx.RendererInstance.Renderer, structureTexture, structurePoint, sdl.FPoint{X: 1.5, Y: 1.5})
+			sdlutils.RenderLabel(gfx.RendererInstance.Renderer, fmt.Sprintf("actions.%d.name", i), gfx.RendererInstance.Fonts.Default, sdlutils.Blue, structureName, sdl.Point{X: menurect.X + 72, Y: menurect.Y + 12}, sdl.FPoint{X: 1, Y: 1})
+			if structureRequirements != nil {
+				for j, requirement := range *structureRequirements {
+					sdlutils.RenderLabel(gfx.RendererInstance.Renderer, fmt.Sprintf("actions.%d.requirements.%d", j), gfx.RendererInstance.Fonts.Default, sdlutils.Blue, requirement.Type, sdl.Point{X: menurect.X + 72, Y: menurect.Y + 36}, sdl.FPoint{X: 1, Y: 1})
+				}
+			}
+
+			if data.Index == i {
 				menurect.X -= 16
 			}
 
 			menurect.Y += 72
-			if i+1 < structuresLength {
-				sdlutils.SetDrawColor(renderer.Renderer, blue)
-				renderer.Renderer.FillRect(&sdl.Rect{X: menurect.X + 12, Y: menurect.Y, W: menurect.W - 24, H: 1})
+			if i+1 < max {
+				sdlutils.SetDrawColor(gfx.RendererInstance.Renderer, sdlutils.Blue)
+				gfx.RendererInstance.Renderer.FillRect(&sdl.Rect{X: menurect.X + 12, Y: menurect.Y, W: menurect.W - 24, H: 1})
 				menurect.Y += 2
 			}
 		}
@@ -123,11 +153,11 @@ func RenderKurinRendererLayerActions(renderer *gfx.KurinRenderer, layer *gfx.Kur
 	return nil
 }
 
-func GetKurinActionModeName(mode KurinActionMode) string {
+func GetKurinActionModeName(mode ActionMode) string {
 	switch mode {
-	case KurinActionModeSay:
+	case ActionModeSay:
 		return "Say"
-	case KurinActionModeBuild:
+	case ActionModeBuild:
 		return "Build"
 	}
 

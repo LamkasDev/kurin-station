@@ -1,0 +1,12 @@
+{
+  "id": "wall",
+  "name": "Wall",
+  "description": "h",
+  "requirements": [
+    {
+      "type": "rod",
+      "count": 1
+    }
+  ],
+  "smooth": true
+}

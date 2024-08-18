@@ -6,15 +6,28 @@ import (
 )
 
 type KurinMapData struct {
-	Size sdlutils.Vector3
+	Size    sdlutils.Vector3
+	Tiles   []KurinTileData
 	Objects []KurinObjectData
-	Items []KurinItemData
+	Items   []KurinItemData
 }
 
 func EncodeKurinMap(kmap *gameplay.KurinMap) KurinMapData {
 	data := KurinMapData{
-		Size: kmap.Size,
+		Size:  kmap.Size,
+		Tiles: []KurinTileData{},
 		Items: []KurinItemData{},
+	}
+	for x := range kmap.Size.Base.X {
+		for y := range kmap.Size.Base.Y {
+			for z := range kmap.Size.Z {
+				tile := kmap.Tiles[x][y][z]
+				if tile == nil {
+					continue
+				}
+				data.Tiles = append(data.Tiles, EncodeKurinTile(tile))
+			}
+		}
 	}
 	for _, obj := range kmap.Objects {
 		data.Objects = append(data.Objects, EncodeKurinObject(obj))
@@ -28,6 +41,9 @@ func EncodeKurinMap(kmap *gameplay.KurinMap) KurinMapData {
 
 func DecodeKurinMap(data KurinMapData) gameplay.KurinMap {
 	kmap := gameplay.NewKurinMap(data.Size)
+	for _, tileData := range data.Tiles {
+		DecodeKurinTile(&kmap, tileData)
+	}
 	for _, objData := range data.Objects {
 		DecodeKurinObject(&kmap, objData)
 	}

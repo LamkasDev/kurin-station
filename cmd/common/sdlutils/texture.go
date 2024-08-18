@@ -11,7 +11,7 @@ type TextureWithSize struct {
 }
 
 type TextureWithSizeAndSurface struct {
-	Base    TextureWithSize
+	Base    *TextureWithSize
 	Surface *sdl.Surface
 }
 
@@ -28,26 +28,26 @@ func LoadTextureRaw(renderer *sdl.Renderer, path string) (*sdl.Surface, *sdl.Tex
 	return icon, iconTexture, nil
 }
 
-func LoadTexture(renderer *sdl.Renderer, path string) (TextureWithSize, error) {
+func LoadTexture(renderer *sdl.Renderer, path string) (*TextureWithSize, error) {
 	surface, texture, err := LoadTextureRaw(renderer, path)
 	if err != nil {
-		return TextureWithSize{}, err
+		return &TextureWithSize{}, err
 	}
 
-	return TextureWithSize{
+	return &TextureWithSize{
 		Texture: texture,
 		Size:    sdl.Rect{W: surface.W, H: surface.H},
 	}, nil
 }
 
-func LoadTextureWithSurface(renderer *sdl.Renderer, path string) (TextureWithSizeAndSurface, error) {
+func LoadTextureWithSurface(renderer *sdl.Renderer, path string) (*TextureWithSizeAndSurface, error) {
 	surface, texture, err := LoadTextureRaw(renderer, path)
 	if err != nil {
-		return TextureWithSizeAndSurface{}, err
+		return &TextureWithSizeAndSurface{}, err
 	}
 
-	return TextureWithSizeAndSurface{
-		Base: TextureWithSize{
+	return &TextureWithSizeAndSurface{
+		Base: &TextureWithSize{
 			Texture: texture,
 			Size:    sdl.Rect{W: surface.W, H: surface.H},
 		},
@@ -55,7 +55,7 @@ func LoadTextureWithSurface(renderer *sdl.Renderer, path string) (TextureWithSiz
 	}, nil
 }
 
-func GetTextureRect(renderer *sdl.Renderer, texture TextureWithSize, position sdl.Point, scale sdl.FPoint) sdl.Rect {
+func GetTextureRect(renderer *sdl.Renderer, texture *TextureWithSize, position sdl.Point, scale sdl.FPoint) sdl.Rect {
 	return sdl.Rect{
 		X: position.X,
 		Y: position.Y,
@@ -64,7 +64,7 @@ func GetTextureRect(renderer *sdl.Renderer, texture TextureWithSize, position sd
 	}
 }
 
-func RenderTexture(renderer *sdl.Renderer, texture TextureWithSize, position sdl.Point, scale sdl.FPoint) error {
+func RenderTexture(renderer *sdl.Renderer, texture *TextureWithSize, position sdl.Point, scale sdl.FPoint) error {
 	rect := GetTextureRect(renderer, texture, position, scale)
 	if err := renderer.Copy(texture.Texture, nil, &rect); err != nil {
 		return err
@@ -73,7 +73,15 @@ func RenderTexture(renderer *sdl.Renderer, texture TextureWithSize, position sdl
 	return nil
 }
 
-func GetPixelAt(texture TextureWithSizeAndSurface, position sdl.Point) *sdl.Color {
+func RenderTextureRect(renderer *sdl.Renderer, texture *TextureWithSize, rect sdl.Rect) error {
+	if err := renderer.Copy(texture.Texture, nil, &rect); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func GetPixelAt(texture *TextureWithSizeAndSurface, position sdl.Point) *sdl.Color {
 	pixels := texture.Surface.Pixels()
 	i := int(position.Y*texture.Surface.Pitch + position.X*int32(texture.Surface.BytesPerPixel()))
 	if len(pixels) <= i {

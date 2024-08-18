@@ -61,8 +61,8 @@ func LoadKurinSoundLayerVoice(manager *sound.KurinSoundManager, layer *sound.Kur
 
 func ProcessKurinSoundLayerVoice(manager *sound.KurinSoundManager, layer *sound.KurinSoundLayer) error {
 	data := layer.Data.(KurinSoundLayerVoiceData)
-	if len(gameplay.KurinGameInstance.RunechatController.Sounds) > 0 {
-		for _, runechatSound := range gameplay.KurinGameInstance.RunechatController.Sounds {
+	if len(gameplay.GameInstance.RunechatController.Sounds) > 0 {
+		for _, runechatSound := range gameplay.GameInstance.RunechatController.Sounds {
 			paths := []string{}
 			for _, rune := range runechatSound.Runechat.Message {
 				switch rune {
@@ -84,7 +84,7 @@ func ProcessKurinSoundLayerVoice(manager *sound.KurinSoundManager, layer *sound.
 			}
 			mix.Volume(c, 128)
 		}
-		gameplay.KurinGameInstance.RunechatController.Sounds = []*gameplay.KurinRunechatSound{}
+		gameplay.GameInstance.RunechatController.Sounds = []*gameplay.KurinRunechatSound{}
 	}
 
 	return nil

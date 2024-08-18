@@ -6,32 +6,36 @@ import (
 )
 
 type KurinJobToilBuildData struct {
-	Prefab *KurinObject
+	Prefab string
 }
 
-func NewKurinJobToilBuild(prefab *KurinObject) *KurinJobToil {
-	return &KurinJobToil{
-		Data: KurinJobToilBuildData{
-			Prefab: prefab,
-		},
-		Start:   func(driver *KurinJobDriver, toil *KurinJobToil) {},
-		Process: ProcessKurinJobToilBuild,
+func NewKurinJobToilBuild(prefab string) *KurinJobToil {
+	toil := NewKurinJobToilRaw[KurinJobToilBuildData]("build")
+	toil.Start = ProcessKurinJobToilBuild
+	toil.Process = ProcessKurinJobToilBuild
+	toil.Data = &KurinJobToilBuildData{
+		Prefab: prefab,
 	}
+
+	return toil
 }
 
-func ProcessKurinJobToilBuild(driver *KurinJobDriver, toil *KurinJobToil) bool {
-	data := toil.Data.(KurinJobToilBuildData)
+func ProcessKurinJobToilBuild(driver *KurinJobDriver, toil *KurinJobToil) KurinJobToilStatus {
+	data := toil.Data.(*KurinJobToilBuildData)
 	if toil.Ticks >= 180 {
-		PlaySoundVolume(&KurinGameInstance.SoundController, "welder2", 0.35)
-		CreateKurinObject(driver.Tile, data.Prefab.Type)
-		return true
+		PlaySoundVolume(&GameInstance.SoundController, "welder2", 0.35)
+		CreateKurinObject(driver.Tile, data.Prefab)
+		if item := FindItemInInventory(&driver.Character.Inventory, "rod"); item != nil {
+			RemoveKurinItemFromCharacterRaw(item, driver.Character)
+		}
+		return KurinJobToilStatusComplete
 	}
 	if toil.Ticks%10 == 0 {
-		CreateKurinParticle(&KurinGameInstance.ParticleController, NewKurinParticleCross(sdlutils.Vector3ToFVector3Center(driver.Tile.Position), 0.35, sdl.Color{R: 210, G: 210, B: 210}))
+		CreateKurinParticle(&GameInstance.ParticleController, NewKurinParticleCross(sdlutils.Vector3ToFVector3Center(driver.Tile.Position), 0.35, sdl.Color{R: 210, G: 210, B: 210}))
 	}
 	if toil.Ticks%90 == 0 {
-		PlaySoundVolume(&KurinGameInstance.SoundController, "welder", 0.5)
+		PlaySoundVolume(&GameInstance.SoundController, "welder", 0.5)
 	}
 
-	return false
+	return KurinJobToilStatusWorking
 }

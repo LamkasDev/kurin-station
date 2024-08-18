@@ -13,14 +13,15 @@ import (
 )
 
 type KurinTurfGraphic struct {
-	Template templates.KurinTurfTemplate
-	Textures []sdlutils.TextureWithSize
+	Template  templates.KurinTurfTemplate
+	Textures  []*sdlutils.TextureWithSize
+	Blueprint *sdlutils.TextureWithSize
 }
 
-func NewKurinTurfGraphic(renderer *gfx.KurinRenderer, tileId string) (*KurinTurfGraphic, error) {
+func NewKurinTurfGraphic(tileId string) (*KurinTurfGraphic, error) {
 	graphicDirectory := path.Join(constants.TexturesPath, "turfs", tileId)
 	graphic := KurinTurfGraphic{
-		Textures: make([]sdlutils.TextureWithSize, 4),
+		Textures: make([]*sdlutils.TextureWithSize, 4),
 	}
 
 	templateBytes, err := os.ReadFile(path.Join(constants.DataPath, "templates", "turfs", fmt.Sprintf("%s.json", tileId)))
@@ -31,16 +32,13 @@ func NewKurinTurfGraphic(renderer *gfx.KurinRenderer, tileId string) (*KurinTurf
 		return &graphic, err
 	}
 
-	num := 4
-	if graphic.Template.Rotate != nil && !*graphic.Template.Rotate {
-		num = 1
+	partPath := path.Join(graphicDirectory, fmt.Sprintf("%s.png", tileId))
+	if graphic.Textures[0], err = sdlutils.LoadTexture(gfx.RendererInstance.Renderer, partPath); err != nil {
+		return &graphic, err
 	}
 
-	for i := 0; i < num; i++ {
-		partPath := path.Join(graphicDirectory, fmt.Sprintf("%s_%d.png", tileId, i))
-		if graphic.Textures[i], err = sdlutils.LoadTexture(renderer.Renderer, partPath); err != nil {
-			return &graphic, err
-		}
+	if blueprint, err := sdlutils.LoadTexture(gfx.RendererInstance.Renderer, path.Join(graphicDirectory, fmt.Sprintf("%s_blueprint.png", tileId))); err == nil {
+		graphic.Blueprint = blueprint
 	}
 
 	return &graphic, nil

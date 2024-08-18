@@ -3,6 +3,7 @@ package species
 import (
 	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
 	"github.com/LamkasDev/kurin/cmd/gameplay"
+	"github.com/LamkasDev/kurin/cmd/gameplay/common"
 	"github.com/LamkasDev/kurin/cmd/gameplay/templates"
 	"github.com/LamkasDev/kurin/cmd/gfx"
 	"github.com/LamkasDev/kurin/cmd/gfx/item"
@@ -10,28 +11,28 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-func GetKurinCharacterRect(renderer *gfx.KurinRenderer, character *gameplay.KurinCharacter) sdl.Rect {
+func GetKurinCharacterRect(character *gameplay.KurinCharacter) sdl.Rect {
 	position := sdlutils.AddFPoints(character.PositionRender, gameplay.GetAnimationOffset(character))
-	return render.WorldToScreenRect(renderer, sdl.FRect{
+	return render.WorldToScreenRect(sdl.FRect{
 		X: position.X, Y: position.Y,
 		W: gameplay.KurinTileSizeF.X, H: gameplay.KurinTileSizeF.Y,
 	})
 }
 
-func RenderKurinCharacter(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, character *gameplay.KurinCharacter) error {
-	graphic := layer.Data.(KurinRendererLayerCharacterData).Species[character.Species].Types[character.Type]
-	rect := GetKurinCharacterRect(renderer, character)
+func RenderKurinCharacter(layer *gfx.RendererLayer, character *gameplay.KurinCharacter) error {
+	graphic := layer.Data.(*KurinRendererLayerCharacterData).Species[character.Species].Types[character.Type]
+	rect := GetKurinCharacterRect(character)
 
 	switch character.Direction {
-	case gameplay.KurinDirectionNorth:
-		RenderKurinCharacterHand(renderer, layer, character, gameplay.KurinHandLeft, rect)
-		RenderKurinCharacterHand(renderer, layer, character, gameplay.KurinHandRight, rect)
-	case gameplay.KurinDirectionEast:
-		RenderKurinCharacterHand(renderer, layer, character, gameplay.KurinHandLeft, rect)
-	case gameplay.KurinDirectionSouth:
+	case common.KurinDirectionNorth:
+		RenderKurinCharacterHand(layer, character, gameplay.KurinHandLeft, rect)
+		RenderKurinCharacterHand(layer, character, gameplay.KurinHandRight, rect)
+	case common.KurinDirectionEast:
+		RenderKurinCharacterHand(layer, character, gameplay.KurinHandLeft, rect)
+	case common.KurinDirectionSouth:
 		break
-	case gameplay.KurinDirectionWest:
-		RenderKurinCharacterHand(renderer, layer, character, gameplay.KurinHandRight, rect)
+	case common.KurinDirectionWest:
+		RenderKurinCharacterHand(layer, character, gameplay.KurinHandRight, rect)
 	}
 
 	for _, part := range graphic.Template.Parts {
@@ -41,32 +42,37 @@ func RenderKurinCharacter(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererL
 		}
 
 		texture := graphic.Textures[part.Id][character.Direction]
-		prect := sdlutils.AddRectAndPoint(rect, sdl.Point{X: int32(float32(offset.X) * renderer.Context.CameraZoom.X), Y: int32(float32(offset.Y) * renderer.Context.CameraZoom.Y)})
-		if err := renderer.Renderer.Copy(texture.Texture, nil, &prect); err != nil {
+		prect := sdlutils.AddRectAndPoint(rect, sdl.Point{X: int32(float32(offset.X) * gfx.RendererInstance.Context.CameraZoom.X), Y: int32(float32(offset.Y) * gfx.RendererInstance.Context.CameraZoom.Y)})
+		if err := gfx.RendererInstance.Renderer.Copy(texture.Texture, nil, &prect); err != nil {
 			return err
 		}
 	}
 
 	switch character.Direction {
-	case gameplay.KurinDirectionNorth:
+	case common.KurinDirectionNorth:
 		break
-	case gameplay.KurinDirectionEast:
-		RenderKurinCharacterHand(renderer, layer, character, gameplay.KurinHandRight, rect)
-	case gameplay.KurinDirectionSouth:
-		RenderKurinCharacterHand(renderer, layer, character, gameplay.KurinHandLeft, rect)
-		RenderKurinCharacterHand(renderer, layer, character, gameplay.KurinHandRight, rect)
-	case gameplay.KurinDirectionWest:
-		RenderKurinCharacterHand(renderer, layer, character, gameplay.KurinHandLeft, rect)
+	case common.KurinDirectionEast:
+		RenderKurinCharacterHand(layer, character, gameplay.KurinHandRight, rect)
+	case common.KurinDirectionSouth:
+		RenderKurinCharacterHand(layer, character, gameplay.KurinHandLeft, rect)
+		RenderKurinCharacterHand(layer, character, gameplay.KurinHandRight, rect)
+	case common.KurinDirectionWest:
+		RenderKurinCharacterHand(layer, character, gameplay.KurinHandLeft, rect)
 	}
 
 	return nil
 }
 
-func RenderKurinCharacterHand(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, character *gameplay.KurinCharacter, hand gameplay.KurinHand, rect sdl.Rect) error {
+func RenderKurinCharacterHand(layer *gfx.RendererLayer, character *gameplay.KurinCharacter, hand gameplay.KurinHand, rect sdl.Rect) error {
 	handItem := character.Inventory.Hands[hand]
 	if handItem != nil {
-		graphicDirections := layer.Data.(KurinRendererLayerCharacterData).ItemLayer.Data.(item.KurinRendererLayerItemData).Items[handItem.Type].Hands[hand][handItem.GetTextureHand(handItem)]
-		if err := renderer.Renderer.Copy(graphicDirections[character.Direction].Texture, nil, &rect); err != nil {
+		graphic := layer.Data.(*KurinRendererLayerCharacterData).ItemLayer.Data.(*item.KurinRendererLayerItemData).Items[handItem.Type]
+		if graphic.Template.Hand == nil || !*graphic.Template.Hand {
+			return nil
+		}
+
+		graphicDirections := graphic.Hands[hand][handItem.GetTextureHand(handItem)]
+		if err := gfx.RendererInstance.Renderer.Copy(graphicDirections[character.Direction].Texture, nil, &rect); err != nil {
 			return err
 		}
 	}

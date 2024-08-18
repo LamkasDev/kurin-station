@@ -7,33 +7,33 @@ import (
 
 type KurinRendererLayerCharacterData struct {
 	Species   map[string]*KurinSpeciesGraphicContainer
-	ItemLayer *gfx.KurinRendererLayer
+	ItemLayer *gfx.RendererLayer
 }
 
-func NewKurinRendererLayerCharacter(itemLayer *gfx.KurinRendererLayer) *gfx.KurinRendererLayer {
-	return &gfx.KurinRendererLayer{
+func NewKurinRendererLayerCharacter(itemLayer *gfx.RendererLayer) *gfx.RendererLayer {
+	return &gfx.RendererLayer{
 		Load:   LoadKurinRendererLayerCharacter,
 		Render: RenderKurinRendererLayerCharacter,
-		Data: KurinRendererLayerCharacterData{
+		Data: &KurinRendererLayerCharacterData{
 			Species:   map[string]*KurinSpeciesGraphicContainer{},
 			ItemLayer: itemLayer,
 		},
 	}
 }
 
-func LoadKurinRendererLayerCharacter(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
+func LoadKurinRendererLayerCharacter(layer *gfx.RendererLayer) error {
 	var err error
-	if layer.Data.(KurinRendererLayerCharacterData).Species[gameplay.KurinDefaultSpecies], err = NewKurinSpeciesGraphicContainer(renderer, gameplay.KurinDefaultSpecies); err != nil {
+	if layer.Data.(*KurinRendererLayerCharacterData).Species[gameplay.KurinDefaultSpecies], err = NewKurinSpeciesGraphicContainer(gameplay.KurinDefaultSpecies); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func RenderKurinRendererLayerCharacter(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
-	for _, character := range gameplay.KurinGameInstance.Characters {
+func RenderKurinRendererLayerCharacter(layer *gfx.RendererLayer) error {
+	for _, character := range gameplay.GameInstance.Characters {
 		gameplay.ProcessKurinCharacter(character)
-		RenderKurinCharacter(renderer, layer, character)
+		RenderKurinCharacter(layer, character)
 	}
 
 	return nil

@@ -1,32 +1,31 @@
 package event
 
 import (
-	"github.com/LamkasDev/kurin/cmd/gfx"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinEventManager struct {
-	Layers   []*KurinEventLayer
-	Renderer *gfx.KurinRenderer
-	Mouse    KurinMouse
-	Keyboard KurinKeyboard
-	Close bool
+var EventManagerInstance *EventManager
+
+type EventManager struct {
+	Layers   []*EventLayer
+	Mouse    Mouse
+	Keyboard Keyboard
+	Close    bool
 }
 
-func NewKurinEventManager(renderer *gfx.KurinRenderer) (KurinEventManager, error) {
-	manager := KurinEventManager{
-		Layers:   []*KurinEventLayer{},
-		Renderer: renderer,
-		Mouse:    NewKurinMouse(),
-		Keyboard: NewKurinKeyboard(),
+func InitializeEventManager() error {
+	EventManagerInstance = &EventManager{
+		Layers:   []*EventLayer{},
+		Mouse:    NewMouse(),
+		Keyboard: NewKeyboard(),
 	}
 
-	return manager, nil
+	return nil
 }
 
-func LoadKurinEventManager(manager *KurinEventManager) error {
-	for _, layer := range manager.Layers {
-		if err := layer.Load(manager, layer); err != nil {
+func LoadEventManager() error {
+	for _, layer := range EventManagerInstance.Layers {
+		if err := layer.Load(layer); err != nil {
 			return err
 		}
 	}
@@ -34,23 +33,23 @@ func LoadKurinEventManager(manager *KurinEventManager) error {
 	return nil
 }
 
-func ProcessKurinEventManager(manager *KurinEventManager) error {
-	for _, layer := range manager.Layers {
-		if err := layer.Process(manager, layer); err != nil {
+func ProcessEventManager() error {
+	for _, layer := range EventManagerInstance.Layers {
+		if err := layer.Process(layer); err != nil {
 			return err
 		}
 	}
-	sdl.SetCursor(manager.Mouse.Cursors[manager.Mouse.Cursor])
-	manager.Mouse.Cursor = sdl.SYSTEM_CURSOR_ARROW
-	manager.Mouse.PendingLeft = nil
-	manager.Mouse.PendingRight = nil
-	manager.Mouse.Scroll = 0
-	manager.Keyboard.Pending = nil
-	manager.Keyboard.Input = ""
+	sdl.SetCursor(EventManagerInstance.Mouse.Cursors[EventManagerInstance.Mouse.Cursor])
+	EventManagerInstance.Mouse.Cursor = sdl.SYSTEM_CURSOR_ARROW
+	EventManagerInstance.Mouse.PendingLeft = nil
+	EventManagerInstance.Mouse.PendingRight = nil
+	EventManagerInstance.Mouse.PendingScroll = 0
+	EventManagerInstance.Keyboard.Pending = nil
+	EventManagerInstance.Keyboard.Input = ""
 
 	return nil
 }
 
-func FreeKurinEventManager(manager *KurinEventManager) error {
+func FreeEventManager() error {
 	return nil
 }

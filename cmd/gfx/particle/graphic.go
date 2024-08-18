@@ -10,17 +10,21 @@ import (
 )
 
 type KurinParticleGraphic struct {
-	Texture sdlutils.TextureWithSize
+	Textures []*sdlutils.TextureWithSize
 }
 
-func NewKurinParticleGraphic(renderer *gfx.KurinRenderer, particleId string) (*KurinParticleGraphic, error) {
-	graphic := KurinParticleGraphic{}
+func NewKurinParticleGraphic(particleId string, states uint8) (*KurinParticleGraphic, error) {
+	graphic := KurinParticleGraphic{
+		Textures: make([]*sdlutils.TextureWithSize, states),
+	}
 	graphicDirectory := path.Join(constants.TexturesPath, "particles")
 
 	var err error
-	graphicPath := path.Join(graphicDirectory, fmt.Sprintf("%s_0.png", particleId))
-	if graphic.Texture, err = sdlutils.LoadTexture(renderer.Renderer, graphicPath); err != nil {
-		return &graphic, err
+	for i := range states {
+		graphicPath := path.Join(graphicDirectory, fmt.Sprintf("%s_%d.png", particleId, i))
+		if graphic.Textures[i], err = sdlutils.LoadTexture(gfx.RendererInstance.Renderer, graphicPath); err != nil {
+			return &graphic, err
+		}
 	}
 
 	return &graphic, nil

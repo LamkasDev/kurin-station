@@ -5,67 +5,81 @@ import (
 
 	"github.com/LamkasDev/kurin/cmd/event"
 	"github.com/LamkasDev/kurin/cmd/gameplay"
+	"github.com/LamkasDev/kurin/cmd/gfx"
 	"github.com/LamkasDev/kurin/cmd/gfx/render"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinEventLayerBaseData struct {
-}
+type KurinEventLayerBaseData struct{}
 
-func NewKurinEventLayerBase() *event.KurinEventLayer {
-	return &event.KurinEventLayer{
+func NewKurinEventLayerBase() *event.EventLayer {
+	return &event.EventLayer{
 		Load:    LoadKurinEventLayerBase,
 		Process: ProcessKurinEventLayerBase,
-		Data: KurinEventLayerBaseData{},
+		Data:    &KurinEventLayerBaseData{},
 	}
 }
 
-func LoadKurinEventLayerBase(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
+func LoadKurinEventLayerBase(layer *event.EventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerBase(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
-	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-		switch val := event.(type) {
+func ProcessKurinEventLayerBase(layer *event.EventLayer) error {
+	event.EventManagerInstance.Mouse.Delta = sdl.Point{}
+	for sdlEvent := sdl.PollEvent(); sdlEvent != nil; sdlEvent = sdl.PollEvent() {
+		switch val := sdlEvent.(type) {
 		case sdl.QuitEvent:
 			err := errors.New("time to bounce")
-			manager.Close = true
+			event.EventManagerInstance.Close = true
 			return err
 		case sdl.WindowEvent:
 			switch val.Event {
 			case sdl.WINDOWEVENT_RESIZED:
-				w, h := manager.Renderer.Window.GetSize()
-				manager.Renderer.Context.WindowSize = sdl.Point{X: w, Y: h}
+				w, h := gfx.RendererInstance.Window.GetSize()
+				gfx.RendererInstance.Context.WindowSize = sdl.Point{X: w, Y: h}
 			}
 		case sdl.MouseMotionEvent:
-			manager.Renderer.Context.MousePosition = sdl.Point{
+			event.EventManagerInstance.Mouse.Delta = sdl.Point{
+				X: val.XRel,
+				Y: val.YRel,
+			}
+			gfx.RendererInstance.Context.MousePosition = sdl.Point{
 				X: val.X,
 				Y: val.Y,
 			}
 		case sdl.MouseWheelEvent:
-			manager.Mouse.Scroll = val.Y
+			event.EventManagerInstance.Mouse.PendingScroll = val.Y
 		case sdl.KeyboardEvent:
 			key := val.Keysym.Sym
 			switch val.Type {
 			case sdl.KEYDOWN:
-				manager.Keyboard.Pressed[key] = true
-				manager.Keyboard.Pending = &key
+				event.EventManagerInstance.Keyboard.Pressed[key] = true
+				event.EventManagerInstance.Keyboard.Pending = &key
 			case sdl.KEYUP:
-				manager.Keyboard.Pressed[key] = false
+				event.EventManagerInstance.Keyboard.Pressed[key] = false
 			}
 		case sdl.MouseButtonEvent:
 			switch val.Type {
 			case sdl.MOUSEBUTTONDOWN:
-				wpos := render.ScreenToWorldPosition(manager.Renderer, manager.Renderer.Context.MousePosition)
+				wpos := render.ScreenToWorldPosition(gfx.RendererInstance.Context.MousePosition)
 				switch val.Button {
 				case sdl.ButtonLeft:
-					manager.Mouse.PendingLeft = &wpos
+					event.EventManagerInstance.Mouse.PressedLeft = true
+					event.EventManagerInstance.Mouse.PendingLeft = &wpos
 				case sdl.ButtonRight:
-					manager.Mouse.PendingRight = &wpos
+					event.EventManagerInstance.Mouse.PressedRight = true
+					event.EventManagerInstance.Mouse.PendingRight = &wpos
+				}
+			case sdl.MOUSEBUTTONUP:
+				switch val.Button {
+				case sdl.ButtonLeft:
+					event.EventManagerInstance.Mouse.PressedLeft = false
+				case sdl.ButtonRight:
+					event.EventManagerInstance.Mouse.PressedRight = false
 				}
 			}
 		case sdl.TextInputEvent:
-			manager.Keyboard.Input = val.GetText()
+			event.EventManagerInstance.Keyboard.Input = val.GetText()
 		}
 	}
 	gameplay.ProcessKurinGame()

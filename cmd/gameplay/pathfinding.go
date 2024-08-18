@@ -9,16 +9,16 @@ import (
 )
 
 type KurinPathfindingNode struct {
-	Tile   *KurinTile
-	Parent *KurinPathfindingNode
-	Cost   float32
-	Rank   float32
-	Index  int
+	Position sdlutils.Vector3
+	Parent   *KurinPathfindingNode
+	Cost     float32
+	Rank     float32
+	Index    int
 }
 
-func NewKurinPathfindingNode(tile *KurinTile) *KurinPathfindingNode {
+func NewKurinPathfindingNode(position sdlutils.Vector3) *KurinPathfindingNode {
 	return &KurinPathfindingNode{
-		Tile: tile,
+		Position: position,
 	}
 }
 
@@ -27,7 +27,7 @@ func GetKurinPathfindingNodeNeighbourCost(from *KurinPathfindingNode, to *KurinP
 }
 
 func GetKurinPathfindingNodeEstimatedCost(from *KurinPathfindingNode, to *KurinPathfindingNode) float32 {
-	return float32(sdlutils.GetDistance(from.Tile.Position.Base, to.Tile.Position.Base))
+	return float32(sdlutils.GetDistance(from.Position.Base, to.Position.Base))
 }
 
 type KurinPathfindingGrid struct {
@@ -40,10 +40,10 @@ func NewKurinPathfindingGrid(kmap *KurinMap) KurinPathfindingGrid {
 		Size:  kmap.Size.Base,
 		Nodes: make([][]*KurinPathfindingNode, kmap.Size.Base.X),
 	}
-	for x := int32(0); x < kmap.Size.Base.X; x++ {
+	for x := range kmap.Size.Base.X {
 		grid.Nodes[x] = make([]*KurinPathfindingNode, kmap.Size.Base.Y)
-		for y := int32(0); y < kmap.Size.Base.Y; y++ {
-			grid.Nodes[x][y] = NewKurinPathfindingNode(kmap.Tiles[x][y][0])
+		for y := range kmap.Size.Base.Y {
+			grid.Nodes[x][y] = NewKurinPathfindingNode(sdlutils.Vector3{Base: sdl.Point{X: x, Y: y}, Z: 0})
 		}
 	}
 
@@ -51,15 +51,11 @@ func NewKurinPathfindingGrid(kmap *KurinMap) KurinPathfindingGrid {
 }
 
 func GetNodeAt(grid *KurinPathfindingGrid, position sdl.Point) *KurinPathfindingNode {
-	if position.X < 0 || position.Y < 0 || position.X >= grid.Size.X || position.Y >= grid.Size.Y {
-		return nil
-	}
-	tile := grid.Nodes[position.X][position.Y]
-	if !CanEnterKurinTile(tile.Tile) {
+	if !CanEnterMapPosition(&GameInstance.Map, sdlutils.Vector3{Base: position, Z: 0}) {
 		return nil
 	}
 
-	return tile
+	return grid.Nodes[position.X][position.Y]
 }
 
 type KurinPath struct {
@@ -81,7 +77,7 @@ func FindKurinPathAdjacent(grid *KurinPathfindingGrid, from sdlutils.Vector3, to
 		return nil
 	}
 
-	return FindKurinPath(grid, from, neighbours[0].Tile.Position)
+	return FindKurinPath(grid, from, neighbours[0].Position)
 }
 
 func FindKurinPath(grid *KurinPathfindingGrid, from sdlutils.Vector3, to sdlutils.Vector3) *KurinPath {

@@ -1,6 +1,9 @@
 package gameplay
 
-import "github.com/veandco/go-sdl2/sdl"
+import (
+	"github.com/LamkasDev/kurin/cmd/gameplay/common"
+	"github.com/veandco/go-sdl2/sdl"
+)
 
 type KurinAnimation struct {
 	Type  string
@@ -19,19 +22,19 @@ func NewKurinAnimation(animationType string) *KurinAnimation {
 func GetAnimationOffset(character *KurinCharacter) sdl.FPoint {
 	if character.AnimationController.Direction {
 		switch character.Direction {
-		case KurinDirectionNorth:
+		case common.KurinDirectionNorth:
 			return sdl.FPoint{
 				X: -character.AnimationController.Position.X,
 				Y: -character.AnimationController.Position.Y,
 			}
-		case KurinDirectionSouth:
+		case common.KurinDirectionSouth:
 			return character.AnimationController.Position
-		case KurinDirectionEast:
+		case common.KurinDirectionEast:
 			return sdl.FPoint{
 				X: character.AnimationController.Position.Y,
 				Y: character.AnimationController.Position.X,
 			}
-		case KurinDirectionWest:
+		case common.KurinDirectionWest:
 			return sdl.FPoint{
 				X: -character.AnimationController.Position.Y,
 				Y: -character.AnimationController.Position.X,

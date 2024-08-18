@@ -1,5 +1,6 @@
 {
   "id": "welder",
   "states": 3,
+  "hand": true,
   "statesHand": 2
 }

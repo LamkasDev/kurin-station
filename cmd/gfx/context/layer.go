@@ -8,57 +8,59 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-const KurinRendererLayerContextDataItemWidth = 164
-const KurinRendererLayerContextDataItemHeight = 36
+const (
+	KurinRendererLayerContextDataItemWidth  = 164
+	KurinRendererLayerContextDataItemHeight = 36
+)
 
 type KurinRendererLayerContextData struct {
-	Position *sdl.Point
-	Items []KurinRendererLayerContextDataItem
+	Position    *sdl.Point
+	Items       []KurinRendererLayerContextDataItem
 	HoveredItem int
 }
 
 type KurinRendererLayerContextDataItem struct {
-	Text string
+	Text     string
 	Disabled bool
-	OnClick func()
+	OnClick  func()
 }
 
-func NewKurinRendererLayerContext() *gfx.KurinRendererLayer {
-	return &gfx.KurinRendererLayer{
+func NewKurinRendererLayerContext() *gfx.RendererLayer {
+	return &gfx.RendererLayer{
 		Load:   LoadKurinRendererLayerContext,
 		Render: RenderKurinRendererLayerContext,
-		Data:   KurinRendererLayerContextData{
-			Position: nil,
-			Items: []KurinRendererLayerContextDataItem{},
+		Data: &KurinRendererLayerContextData{
+			Position:    nil,
+			Items:       []KurinRendererLayerContextDataItem{},
 			HoveredItem: -1,
 		},
 	}
 }
 
-func LoadKurinRendererLayerContext(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
+func LoadKurinRendererLayerContext(layer *gfx.RendererLayer) error {
 	return nil
 }
 
-func RenderKurinRendererLayerContext(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
-	data := layer.Data.(KurinRendererLayerContextData)
+func RenderKurinRendererLayerContext(layer *gfx.RendererLayer) error {
+	data := layer.Data.(*KurinRendererLayerContextData)
 	if data.Position == nil {
 		return nil
 	}
 	for i, item := range data.Items {
-		y := data.Position.Y + int32(i) * KurinRendererLayerContextDataItemHeight
+		y := data.Position.Y + int32(i)*KurinRendererLayerContextDataItemHeight
 		rect := sdl.Rect{X: data.Position.X, Y: y, W: KurinRendererLayerContextDataItemWidth, H: KurinRendererLayerContextDataItemHeight}
-		renderer.Renderer.SetDrawColor(255, 255, 255, 0)
-		if err := renderer.Renderer.FillRect(&rect); err != nil {
+		gfx.RendererInstance.Renderer.SetDrawColor(255, 255, 255, 0)
+		if err := gfx.RendererInstance.Renderer.FillRect(&rect); err != nil {
 			return err
 		}
-		renderer.Renderer.SetDrawColor(233, 233, 233, 0)
-		if err := renderer.Renderer.DrawRect(&rect); err != nil {
+		gfx.RendererInstance.Renderer.SetDrawColor(233, 233, 233, 0)
+		if err := gfx.RendererInstance.Renderer.DrawRect(&rect); err != nil {
 			return err
 		}
-		_, text := sdlutils.RenderLabel(renderer.Renderer, fmt.Sprintf("context.%d", i), renderer.Fonts.Default, sdl.Color{R: 0, G: 0, B: 0}, item.Text, sdl.Point{X: data.Position.X + 12, Y: y + 10}, sdl.FPoint{X: 1, Y: 1})
+		_, text := sdlutils.RenderLabel(gfx.RendererInstance.Renderer, fmt.Sprintf("context.%d", i), gfx.RendererInstance.Fonts.Default, sdl.Color{R: 0, G: 0, B: 0}, item.Text, sdl.Point{X: data.Position.X + 12, Y: y + 10}, sdl.FPoint{X: 1, Y: 1})
 		if data.HoveredItem == i {
-			renderer.Renderer.SetDrawColor(0, 0, 0, 0)
-			renderer.Renderer.DrawLine(text.X, text.Y + text.H + 2, text.X + text.W, text.Y + text.H + 2)
+			gfx.RendererInstance.Renderer.SetDrawColor(0, 0, 0, 0)
+			gfx.RendererInstance.Renderer.DrawLine(text.X, text.Y+text.H+2, text.X+text.W, text.Y+text.H+2)
 		}
 	}
 

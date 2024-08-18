@@ -10,41 +10,40 @@ import (
 )
 
 type KurinEventLayerDebugData struct {
-	Layer *gfx.KurinRendererLayer
+	Layer *gfx.RendererLayer
 }
 
-func NewKurinEventLayerDebug(layer *gfx.KurinRendererLayer) *event.KurinEventLayer {
-	return &event.KurinEventLayer{
+func NewKurinEventLayerDebug(layer *gfx.RendererLayer) *event.EventLayer {
+	return &event.EventLayer{
 		Load:    LoadKurinEventLayerDebug,
 		Process: ProcessKurinEventLayerDebug,
-		Data: KurinEventLayerDebugData{
+		Data: &KurinEventLayerDebugData{
 			Layer: layer,
 		},
 	}
 }
 
-func LoadKurinEventLayerDebug(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
+func LoadKurinEventLayerDebug(layer *event.EventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerDebug(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
-	if manager.Keyboard.Pending == nil {
+func ProcessKurinEventLayerDebug(layer *event.EventLayer) error {
+	if event.EventManagerInstance.Keyboard.Pending == nil {
 		return nil
 	}
-	data := layer.Data.(KurinEventLayerDebugData).Layer.Data.(debug.KurinRendererLayerDebugData)
-	switch *manager.Keyboard.Pending {
+	data := layer.Data.(*KurinEventLayerDebugData).Layer.Data.(*debug.KurinRendererLayerDebugData)
+	switch *event.EventManagerInstance.Keyboard.Pending {
 	case sdl.K_p:
-		data.Path = gameplay.FindKurinPath(&gameplay.KurinGameInstance.Map.Pathfinding, gameplay.KurinGameInstance.SelectedCharacter.Position, sdlutils.Vector3{Base: sdl.Point{X: 0, Y: 0}, Z: 0})
-		manager.Keyboard.Pending = nil
+		data.Path = gameplay.FindKurinPath(&gameplay.GameInstance.Map.Pathfinding, gameplay.GameInstance.SelectedCharacter.Position, sdlutils.Vector3{Base: sdl.Point{X: 0, Y: 0}, Z: 0})
+		event.EventManagerInstance.Keyboard.Pending = nil
 	case sdl.K_o:
-		if len(gameplay.KurinGameInstance.Narrator.Objectives) > 0 {
-			gameplay.CompleteKurinNarratorObjective()
+		if len(gameplay.GameInstance.Narrator.Objectives) > 0 {
+			gameplay.CompleteKurinNarratorObjective(gameplay.GameInstance.Narrator)
 		}
-		manager.Keyboard.Pending = nil
+		event.EventManagerInstance.Keyboard.Pending = nil
 	default:
 		return nil
 	}
-	layer.Data.(KurinEventLayerDebugData).Layer.Data = data
 
 	return nil
 }

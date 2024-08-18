@@ -6,39 +6,39 @@ type KurinNarrator struct {
 	Objectives []*KurinNarratorObjective
 }
 
-func NewKurinNarrator() KurinNarrator {
-	return KurinNarrator{
+func NewKurinNarrator() *KurinNarrator {
+	return &KurinNarrator{
 		Objectives: []*KurinNarratorObjective{},
 	}
 }
 
-func AddKurinNarratorObjective(objective *KurinNarratorObjective) {
-	KurinGameInstance.Narrator.Objectives = append(KurinGameInstance.Narrator.Objectives, objective)
-	if len(KurinGameInstance.Narrator.Objectives) == 1 {
-		StartKurinNarratorObjective(objective)
+func AddKurinNarratorObjective(narrator *KurinNarrator, objective *KurinNarratorObjective) {
+	narrator.Objectives = append(narrator.Objectives, objective)
+	if len(narrator.Objectives) == 1 {
+		StartKurinNarratorObjective(narrator, objective)
 	}
 }
 
-func StartKurinNarratorObjective(objective *KurinNarratorObjective) {
-	CreateKurinRunechatMessage(&KurinGameInstance.RunechatController, NewKurinRunechat(objective.Text))
+func StartKurinNarratorObjective(narrator *KurinNarrator, objective *KurinNarratorObjective) {
+	CreateKurinRunechatMessage(&GameInstance.RunechatController, NewKurinRunechat(objective.Text))
 }
 
-func CompleteKurinNarratorObjective() {
-	KurinGameInstance.Narrator.Objectives = slices.Delete(KurinGameInstance.Narrator.Objectives, 0, 1)
-	if len(KurinGameInstance.Narrator.Objectives) > 0 {
-		StartKurinNarratorObjective(KurinGameInstance.Narrator.Objectives[0])
+func CompleteKurinNarratorObjective(narrator *KurinNarrator) {
+	narrator.Objectives = slices.Delete(narrator.Objectives, 0, 1)
+	if len(narrator.Objectives) > 0 {
+		StartKurinNarratorObjective(narrator, narrator.Objectives[0])
 	}
 }
 
 func ProcessKurinNarrator() {
-	if KurinGameInstance.Ticks == 120 {
-		AddKurinNarratorObjective(NewKurinNarratorObjectiveGettingStarted())
-		AddKurinNarratorObjective(NewKurinNarratorObjectiveCleaningUp())
-		AddKurinNarratorObjective(NewKurinNarratorObjectiveFreshStart())
-		AddKurinNarratorObjective(NewKurinNarratorObjectiveToTheMoon())
+	if GameInstance.Ticks == 120 {
+		AddKurinNarratorObjective(GameInstance.Narrator, NewKurinNarratorObjectiveGettingStarted())
+		AddKurinNarratorObjective(GameInstance.Narrator, NewKurinNarratorObjectiveCleaningUp())
+		AddKurinNarratorObjective(GameInstance.Narrator, NewKurinNarratorObjectiveFreshStart())
+		AddKurinNarratorObjective(GameInstance.Narrator, NewKurinNarratorObjectiveToTheMoon())
 	}
-	if len(KurinGameInstance.Narrator.Objectives) > 0 {
-		objective := KurinGameInstance.Narrator.Objectives[0]
+	if len(GameInstance.Narrator.Objectives) > 0 {
+		objective := GameInstance.Narrator.Objectives[0]
 		objective.Ticks++
 		done := true
 		for _, requirement := range objective.Requirements {
@@ -48,13 +48,13 @@ func ProcessKurinNarrator() {
 			}
 		}
 		if done {
-			CompleteKurinNarratorObjective()
+			CompleteKurinNarratorObjective(GameInstance.Narrator)
 		}
 	}
 }
 
 func KurinNarratorOnCreateObject(object *KurinObject) {
-	for _, objective := range KurinGameInstance.Narrator.Objectives {
+	for _, objective := range GameInstance.Narrator.Objectives {
 		for _, requirement := range objective.Requirements {
 			switch data := requirement.Data.(type) {
 			case KurinNarratorObjectiveRequirementDataCreate:
@@ -69,7 +69,7 @@ func KurinNarratorOnCreateObject(object *KurinObject) {
 }
 
 func KurinNarratorOnDestroyObject(object *KurinObject) {
-	for _, objective := range KurinGameInstance.Narrator.Objectives {
+	for _, objective := range GameInstance.Narrator.Objectives {
 		for _, requirement := range objective.Requirements {
 			switch data := requirement.Data.(type) {
 			case KurinNarratorObjectiveRequirementDataDestroy:

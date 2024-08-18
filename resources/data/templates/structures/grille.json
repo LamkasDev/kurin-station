@@ -1,6 +1,5 @@
 {
-	"id": "grille",
-	"name": "Grille",
-	"description": "h",
-	"rotate": false
+  "id": "grille",
+  "name": "Grille",
+  "description": "h"
 }

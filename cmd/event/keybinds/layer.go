@@ -14,79 +14,89 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinEventLayerKeybindsData struct {
-}
+type KurinEventLayerKeybindsData struct{}
 
-func NewKurinEventLayerKeybinds() *event.KurinEventLayer {
-	return &event.KurinEventLayer{
+func NewKurinEventLayerKeybinds() *event.EventLayer {
+	return &event.EventLayer{
 		Load:    LoadKurinEventLayerKeybinds,
 		Process: ProcessKurinEventLayerKeybinds,
-		Data:    KurinEventLayerKeybindsData{},
+		Data:    &KurinEventLayerKeybindsData{},
 	}
 }
 
-func LoadKurinEventLayerKeybinds(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
+func LoadKurinEventLayerKeybinds(layer *event.EventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerKeybinds(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
-	if manager.Keyboard.Pending != nil {
-		switch *manager.Keyboard.Pending {
+func ProcessKurinEventLayerKeybinds(layer *event.EventLayer) error {
+	if event.EventManagerInstance.Keyboard.Pending != nil {
+		switch *event.EventManagerInstance.Keyboard.Pending {
 		case sdl.K_x:
-			if gameplay.KurinGameInstance.SelectedCharacter == nil {
+			if gameplay.GameInstance.SelectedCharacter == nil {
 				return nil
 			}
-			switch gameplay.KurinGameInstance.SelectedCharacter.ActiveHand {
+			switch gameplay.GameInstance.SelectedCharacter.ActiveHand {
 			case gameplay.KurinHandLeft:
-				gameplay.KurinGameInstance.SelectedCharacter.ActiveHand = gameplay.KurinHandRight
+				gameplay.GameInstance.SelectedCharacter.ActiveHand = gameplay.KurinHandRight
 			case gameplay.KurinHandRight:
-				gameplay.KurinGameInstance.SelectedCharacter.ActiveHand = gameplay.KurinHandLeft
+				gameplay.GameInstance.SelectedCharacter.ActiveHand = gameplay.KurinHandLeft
 			}
 		case sdl.K_q:
-			if gameplay.KurinGameInstance.SelectedCharacter == nil {
+			if gameplay.GameInstance.SelectedCharacter == nil {
 				return nil
 			}
-			gameplay.DropKurinItemFromCharacter(gameplay.KurinGameInstance.SelectedCharacter)
+			gameplay.DropKurinItemFromCharacter(gameplay.GameInstance.SelectedCharacter)
 		case sdl.K_r:
-			if gameplay.KurinGameInstance.SelectedCharacter == nil {
+			if gameplay.GameInstance.SelectedCharacter == nil {
 				return nil
 			}
-			item := gameplay.KurinGameInstance.SelectedCharacter.Inventory.Hands[gameplay.KurinGameInstance.SelectedCharacter.ActiveHand]
-			if !gameplay.DropKurinItemFromCharacter(gameplay.KurinGameInstance.SelectedCharacter) {
+			item := gameplay.GameInstance.SelectedCharacter.Inventory.Hands[gameplay.GameInstance.SelectedCharacter.ActiveHand]
+			if !gameplay.DropKurinItemFromCharacter(gameplay.GameInstance.SelectedCharacter) {
 				return nil
 			}
-			wpos := render.ScreenToWorldPosition(manager.Renderer, manager.Renderer.Context.MousePosition)
+			// this shit is trash
+			position := render.ScreenToWorldPosition(gfx.RendererInstance.Context.MousePosition)
 			force := gameplay.KurinForce{
-				Item: item,
-				Target: sdlutils.PointToFPointCenter(wpos),
+				Item:   item,
+				Target: sdlutils.PointToFPointCenter(position),
 			}
-			gameplay.KurinGameInstance.ForceController.Forces[item] = &force
+			force.Delta = sdlutils.SubtractFPoints(force.Target, item.Transform.Position.Base)
+			distance := sdlutils.GetDistanceF(item.Transform.Position.Base, force.Target)
+			if distance != 0 {
+				force.Delta.X /= distance * 3
+				force.Delta.Y /= distance * 3
+			}
+			if gameplay.GetKurinTileAt(&gameplay.GameInstance.Map, sdlutils.Vector3{Base: position, Z: 0}) == nil {
+				force.Target.X += force.Delta.X * 100
+				force.Target.Y += force.Delta.Y * 100
+			}
+			gameplay.GameInstance.ForceController.Forces[item] = &force
 		case sdl.K_f:
-			switch manager.Renderer.Context.CameraMode {
+			switch gfx.RendererInstance.Context.CameraMode {
 			case gfx.KurinRendererCameraModeCharacter:
-				manager.Renderer.Context.CameraMode = gfx.KurinRendererCameraModeFree
-				gameplay.KurinGameInstance.SelectedCharacter = nil
+				gfx.RendererInstance.Context.CameraMode = gfx.KurinRendererCameraModeFree
+				gameplay.GameInstance.SelectedCharacter = nil
 			case gfx.KurinRendererCameraModeFree:
-				manager.Renderer.Context.CameraMode = gfx.KurinRendererCameraModeCharacter
-				gameplay.KurinGameInstance.SelectedCharacter = gameplay.KurinGameInstance.Characters[0]
+				gfx.RendererInstance.Context.CameraMode = gfx.KurinRendererCameraModeCharacter
+				gameplay.GameInstance.SelectedCharacter = gameplay.GameInstance.Characters[0]
 			}
 		case sdl.K_s:
-			if manager.Keyboard.Pressed[sdl.K_LCTRL] {
-				data := serialization.EncodeKurinGame(gameplay.KurinGameInstance)
+			if event.EventManagerInstance.Keyboard.Pressed[sdl.K_LCTRL] {
+				data := serialization.EncodeKurinGame(gameplay.GameInstance)
 				if _, err := os.Stat(path.Join(constants.TempSavesPath, "save.dat")); err == nil {
 					os.Remove(path.Join(constants.TempSavesPath, "save.dat"))
 				}
 				os.WriteFile(path.Join(constants.TempSavesPath, "save.dat"), data, 777)
 			}
 		case sdl.K_l:
-			if manager.Keyboard.Pressed[sdl.K_LCTRL] {
+			if event.EventManagerInstance.Keyboard.Pressed[sdl.K_LCTRL] {
 				data, _ := os.ReadFile(path.Join(constants.TempSavesPath, "save.dat"))
-				serialization.DecodeKurinGame(data, gameplay.KurinGameInstance)
+				serialization.DecodeKurinGame(data, gameplay.GameInstance)
 			}
 		default:
 			return nil
 		}
-		manager.Keyboard.Pending = nil
+		event.EventManagerInstance.Keyboard.Pending = nil
 	}
 
 	return nil

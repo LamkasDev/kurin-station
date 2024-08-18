@@ -7,18 +7,19 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-func GetKurinParticleRect(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, particle *gameplay.KurinParticle) sdl.Rect {
-	return render.WorldToScreenRect(renderer, sdl.FRect{
-		X: particle.Position.Base.X - 0.5 * particle.Scale, Y: particle.Position.Base.Y - 0.5 * particle.Scale,
+func GetKurinParticleRect(layer *gfx.RendererLayer, particle *gameplay.KurinParticle) sdl.Rect {
+	return render.WorldToScreenRect(sdl.FRect{
+		X: particle.Position.Base.X - 0.5*particle.Scale, Y: particle.Position.Base.Y - 0.5*particle.Scale,
 		W: gameplay.KurinTileSizeF.X * particle.Scale, H: gameplay.KurinTileSizeF.Y * particle.Scale,
 	})
 }
 
-func RenderKurinParticle(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, particle *gameplay.KurinParticle) error {
-	graphic := layer.Data.(KurinRendererLayerParticleData).Particles[particle.Type]
-	rect := GetKurinParticleRect(renderer, layer, particle)
-	graphic.Texture.Texture.SetColorMod(particle.Color.R, particle.Color.G, particle.Color.B)
-	if err := renderer.Renderer.Copy(graphic.Texture.Texture, nil, &rect); err != nil {
+func RenderKurinParticle(layer *gfx.RendererLayer, particle *gameplay.KurinParticle) error {
+	graphic := layer.Data.(*KurinRendererLayerParticleData).Particles[particle.Type]
+	texture := graphic.Textures[particle.Index]
+	texture.Texture.SetColorMod(particle.Color.R, particle.Color.G, particle.Color.B)
+	rect := GetKurinParticleRect(layer, particle)
+	if err := gfx.RendererInstance.Renderer.CopyEx(texture.Texture, nil, &rect, particle.Rotation, nil, sdl.FLIP_NONE); err != nil {
 		return err
 	}
 

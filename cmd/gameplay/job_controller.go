@@ -1,33 +1,38 @@
 package gameplay
 
-import (
-	"github.com/phf/go-queue/queue"
-)
+import "slices"
 
 type KurinJobController struct {
-	Jobs *queue.Queue
+	Jobs []*KurinJobDriver
 }
 
-func NewKurinJobController() KurinJobController {
-	return KurinJobController{
-		Jobs: queue.New(),
+func NewKurinJobController() *KurinJobController {
+	return &KurinJobController{
+		Jobs: []*KurinJobDriver{},
 	}
 }
 
 func PushKurinJobToController(controller *KurinJobController, job *KurinJobDriver) bool {
-	if job.Tile.Job != nil {
-		return false
+	if job.Tile != nil {
+		if job.Tile.Job != nil {
+			return false
+		}
+		job.Tile.Job = job
 	}
 
-	controller.Jobs.PushBack(job)
+	controller.Jobs = append(controller.Jobs, job)
 	return true
 }
 
 func PopKurinJobFromController(controller *KurinJobController) *KurinJobDriver {
-	job := controller.Jobs.PopFront()
-	if job == nil {
-		return nil
+	for i, job := range controller.Jobs {
+		if GameInstance.Ticks < job.TimeoutTicks {
+			continue
+		}
+
+		controller.Jobs = slices.Delete(controller.Jobs, i, i+1)
+		return job
 	}
 
-	return job.(*KurinJobDriver)
+	return nil
 }

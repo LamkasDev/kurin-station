@@ -20,6 +20,12 @@ linters:
   disable:
     - goimports
     - depguard
+    - wsl
+    - forcetypeassert
+    - nlreturn
+    - mnd
 linters-settings:
   gofmt:
     simplify: false
+  wsl:
+    allow-assign-and-anything: true

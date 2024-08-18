@@ -1,10 +1,10 @@
 package gameplay
 
 func NewKurinJobDriverPanic() *KurinJobDriver {
-	return &KurinJobDriver{
-		Type: "panic",
-		Toils: []*KurinJobToil{
-			NewKurinJobToilPanic(),
-		},
+	job := NewKurinJobDriverRaw[interface{}]("panic")
+	job.Toils = []*KurinJobToil{
+		NewKurinJobToilPanic(),
 	}
+
+	return job
 }

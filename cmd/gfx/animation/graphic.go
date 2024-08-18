@@ -8,14 +8,13 @@ import (
 
 	"github.com/LamkasDev/kurin/cmd/common/constants"
 	"github.com/LamkasDev/kurin/cmd/gameplay/templates"
-	"github.com/LamkasDev/kurin/cmd/gfx"
 )
 
 type KurinAnimationGraphic struct {
 	Template templates.KurinAnimationTemplate
 }
 
-func NewKurinAnimationGraphic(_ *gfx.KurinRenderer, animationId string) (*KurinAnimationGraphic, error) {
+func NewKurinAnimationGraphic(animationId string) (*KurinAnimationGraphic, error) {
 	graphic := KurinAnimationGraphic{}
 
 	templateBytes, err := os.ReadFile(path.Join(constants.DataPath, "templates", "animations", fmt.Sprintf("%s.json", animationId)))

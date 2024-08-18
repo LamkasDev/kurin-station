@@ -13,66 +13,65 @@ import (
 )
 
 type KurinEventLayerContextData struct {
-	ContextLayer *gfx.KurinRendererLayer
+	ContextLayer *gfx.RendererLayer
 }
 
-func NewKurinEventLayerContext(contextLayer *gfx.KurinRendererLayer) *event.KurinEventLayer {
-	return &event.KurinEventLayer{
+func NewKurinEventLayerContext(contextLayer *gfx.RendererLayer) *event.EventLayer {
+	return &event.EventLayer{
 		Load:    LoadKurinEventLayerContext,
 		Process: ProcessKurinEventLayerContext,
-		Data: KurinEventLayerContextData{
+		Data: &KurinEventLayerContextData{
 			ContextLayer: contextLayer,
 		},
 	}
 }
 
-func LoadKurinEventLayerContext(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
+func LoadKurinEventLayerContext(layer *event.EventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerContext(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
-	if manager.Renderer.Context.State != gfx.KurinRendererContextStateNone {
+func ProcessKurinEventLayerContext(layer *event.EventLayer) error {
+	if gfx.RendererInstance.Context.State != gfx.RendererContextStateNone {
 		return nil
 	}
-	
-	data := layer.Data.(KurinEventLayerContextData).ContextLayer.Data.(context.KurinRendererLayerContextData)
-	if data.Position != nil {
-		data.HoveredItem = -1
-		if manager.Renderer.Context.MousePosition.InRect(&sdl.Rect{X: data.Position.X, Y: data.Position.Y, W: context.KurinRendererLayerContextDataItemWidth, H: int32(len(data.Items))*context.KurinRendererLayerContextDataItemHeight}) {
-			hovered := int(math.Floor((float64(manager.Renderer.Context.MousePosition.Y)-float64(data.Position.Y))/context.KurinRendererLayerContextDataItemHeight))
-			if hovered >= 0 && hovered < len(data.Items) && !data.Items[hovered].Disabled {
-				data.HoveredItem = hovered
+	data := layer.Data.(*KurinEventLayerContextData)
+	contextData := data.ContextLayer.Data.(*context.KurinRendererLayerContextData)
+	if contextData.Position != nil {
+		contextData.HoveredItem = -1
+		if gfx.RendererInstance.Context.MousePosition.InRect(&sdl.Rect{X: contextData.Position.X, Y: contextData.Position.Y, W: context.KurinRendererLayerContextDataItemWidth, H: int32(len(contextData.Items)) * context.KurinRendererLayerContextDataItemHeight}) {
+			hovered := int(math.Floor((float64(gfx.RendererInstance.Context.MousePosition.Y) - float64(contextData.Position.Y)) / context.KurinRendererLayerContextDataItemHeight))
+			if hovered >= 0 && hovered < len(contextData.Items) && !contextData.Items[hovered].Disabled {
+				contextData.HoveredItem = hovered
 			}
 		}
 	}
-	if manager.Mouse.PendingRight != nil {
-		tile := gameplay.GetTileAt(&gameplay.KurinGameInstance.Map, sdlutils.Vector3{Base: *manager.Mouse.PendingRight, Z: gameplay.KurinGameInstance.SelectedCharacter.Position.Z})
+	if event.EventManagerInstance.Mouse.PendingRight != nil {
+		tile := gameplay.GetKurinTileAt(&gameplay.GameInstance.Map, sdlutils.Vector3{Base: *event.EventManagerInstance.Mouse.PendingRight, Z: gameplay.GameInstance.SelectedCharacter.Position.Z})
 		if tile != nil {
-			position := manager.Renderer.Context.MousePosition
-			data.Position = &position
-			data.Items = []context.KurinRendererLayerContextDataItem{
+			position := gfx.RendererInstance.Context.MousePosition
+			contextData.Position = &position
+			contextData.Items = []context.KurinRendererLayerContextDataItem{
 				{
-					Text: fmt.Sprintf("Tile %d_%d", tile.Position.Base.X, tile.Position.Base.Y),
+					Text:     fmt.Sprintf("Tile %d_%d", tile.Position.Base.X, tile.Position.Base.Y),
 					Disabled: true,
 				},
 				{
-					Text: "Inspect",
+					Text:    "Inspect",
 					OnClick: func() {},
 				},
 			}
-			manager.Mouse.PendingRight = nil
+			event.EventManagerInstance.Mouse.PendingRight = nil
 		}
 	}
-	if manager.Mouse.PendingLeft != nil {
-		if data.HoveredItem != -1 {
-			data.Items[data.HoveredItem].OnClick()
-			manager.Mouse.PendingLeft = nil
+	if event.EventManagerInstance.Mouse.PendingLeft != nil {
+		if contextData.HoveredItem != -1 {
+			contextData.Items[contextData.HoveredItem].OnClick()
+			event.EventManagerInstance.Mouse.PendingLeft = nil
 		}
-		data.Position = nil
-		data.Items = []context.KurinRendererLayerContextDataItem{}
-		data.HoveredItem = -1
+		contextData.Position = nil
+		contextData.Items = []context.KurinRendererLayerContextDataItem{}
+		contextData.HoveredItem = -1
 	}
-	layer.Data.(KurinEventLayerContextData).ContextLayer.Data = data
 
 	return nil
 }

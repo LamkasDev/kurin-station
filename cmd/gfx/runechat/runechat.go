@@ -8,9 +8,9 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-func GetKurinRunechatCharacterRect(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, runechat *gameplay.KurinRunechat, offset int32) sdl.Rect {
-	w, h, _ := renderer.Fonts.Container[gfx.KurinRendererFontPixeled].SizeUTF8(runechat.Message)
-	rect := render.WorldToScreenRect(renderer, sdl.FRect{
+func GetKurinRunechatCharacterRect(layer *gfx.RendererLayer, runechat *gameplay.KurinRunechat, offset int32) sdl.Rect {
+	w, h, _ := gfx.RendererInstance.Fonts.Container[gfx.KurinRendererFontPixeled].SizeUTF8(runechat.Message)
+	rect := render.WorldToScreenRect(sdl.FRect{
 		X: runechat.Data.(gameplay.KurinRunechatCharacterData).Character.PositionRender.X + 0.5, Y: runechat.Data.(gameplay.KurinRunechatCharacterData).Character.PositionRender.Y - 0.35,
 		W: float32(w) / 3, H: float32(h) / 3,
 	})
@@ -23,12 +23,12 @@ func GetKurinRunechatCharacterRect(renderer *gfx.KurinRenderer, layer *gfx.Kurin
 	}
 }
 
-func RenderKurinRunechatCharacter(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer, runechat *gameplay.KurinRunechat, offset int32) error {
-	rect := GetKurinRunechatCharacterRect(renderer, layer, runechat, offset)
+func RenderKurinRunechatCharacter(layer *gfx.RendererLayer, runechat *gameplay.KurinRunechat, offset int32) error {
+	rect := GetKurinRunechatCharacterRect(layer, runechat, offset)
 	if runechat.Texture == nil {
-		runechat.Texture, _ = sdlutils.CreateUTF8SolidTexture(renderer.Renderer, renderer.Fonts.Container[gfx.KurinRendererFontPixeled], sdlutils.White, runechat.Message)
+		runechat.Texture, _ = sdlutils.CreateUTF8SolidTexture(gfx.RendererInstance.Renderer, gfx.RendererInstance.Fonts.Container[gfx.KurinRendererFontPixeled], sdlutils.White, runechat.Message)
 	}
-	sdlutils.RenderUTF8SolidTextureRect(renderer.Renderer, runechat.Texture, rect)
+	sdlutils.RenderTextureRect(gfx.RendererInstance.Renderer, runechat.Texture, rect)
 
 	return nil
 }

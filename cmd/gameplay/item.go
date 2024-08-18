@@ -1,45 +1,49 @@
 package gameplay
 
 import (
-	"math/rand"
+	"sort"
 
 	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
-	"github.com/veandco/go-sdl2/sdl"
-	"golang.org/x/exp/slices"
+	"robpike.io/filter"
 )
 
 type KurinItem struct {
-	Id uint32
-	Type     string
+	Id        uint32
+	Type      string
+	Count     uint16
+	Reserved  bool
 	Transform *sdlutils.Transform
 	Character *KurinCharacter
 
-	GetTextures KurinItemGetTextures
-	GetTextureHand KurinItemGetTextureHand
+	Process           KurinItemProcess
+	GetTextures       KurinItemGetTextures
+	GetTextureHand    KurinItemGetTextureHand
 	OnHandInteraction KurinItemOnHandInteraction
 	OnTileInteraction KurinItemOnTileInteraction
-	EncodeData KurinItemEncodeData
-	DecodeData KurinItemDecodeData
-	CanHit bool
-	Process  KurinItemProcess
-	Data interface{}
+	EncodeData        KurinItemEncodeData
+	DecodeData        KurinItemDecodeData
+	CanHit            bool
+	MaxCount          uint16
+	Data              interface{}
 }
 
-type KurinItemGetTextures func(item *KurinItem) []int
-type KurinItemGetTextureHand func(item *KurinItem) int
-type KurinItemOnHandInteraction func(item *KurinItem)
-type KurinItemOnTileInteraction func(item *KurinItem, tile *KurinTile) bool
-type KurinItemEncodeData func(item *KurinItem) []byte
-type KurinItemDecodeData func(item *KurinItem, data []byte)
-type KurinItemProcess func(item *KurinItem)
+type (
+	KurinItemProcess           func(item *KurinItem)
+	KurinItemGetTextures       func(item *KurinItem) []int
+	KurinItemGetTextureHand    func(item *KurinItem) int
+	KurinItemOnHandInteraction func(item *KurinItem)
+	KurinItemOnTileInteraction func(item *KurinItem, tile *KurinTile) bool
+	KurinItemEncodeData        func(item *KurinItem) []byte
+	KurinItemDecodeData        func(item *KurinItem, data []byte)
+)
 
-func NewKurinItemRandom(itemType string, kmap *KurinMap) *KurinItem {
-	item := NewKurinItem(itemType)
+func NewKurinItemRandom(kmap *KurinMap, itemType string, count uint16) *KurinItem {
+	item := NewKurinItem(itemType, count)
 	for {
-		position := sdlutils.Vector3{Base: sdl.Point{X: int32(rand.Float32() * float32(kmap.Size.Base.X)), Y: int32(rand.Float32() * float32(kmap.Size.Base.Y))}, Z: 0}
-		if CanEnterPosition(kmap, position) {
+		position := GetRandomMapPosition(kmap)
+		if CanEnterMapPosition(kmap, position) {
 			item.Transform = &sdlutils.Transform{
-				Position:  sdlutils.Vector3ToFVector3Center(position),
+				Position: sdlutils.Vector3ToFVector3Center(position),
 				Rotation: 0,
 			}
 			break
@@ -49,66 +53,29 @@ func NewKurinItemRandom(itemType string, kmap *KurinMap) *KurinItem {
 	return item
 }
 
-func RemoveKurinItemFromMapRaw(item *KurinItem, kmap *KurinMap) bool {
-	i := slices.Index(kmap.Items, item)
-	if i == -1 {
-		return false
-	}
-
-    kmap.Items[i] = kmap.Items[len(kmap.Items)-1]
-    kmap.Items = kmap.Items[:len(kmap.Items)-1]
-	return true
+func FindItemsOfType(kmap *KurinMap, itemType string, reservation bool) []*KurinItem {
+	return filter.Choose(kmap.Items, func(item *KurinItem) bool {
+		return item.Type == itemType && (!reservation || !item.Reserved)
+	}).([]*KurinItem)
 }
 
-func RemoveKurinItemFromCharacterRaw(item *KurinItem, character *KurinCharacter) bool {
-	for hand := range character.Inventory.Hands {
-		if character.Inventory.Hands[hand] == item {
-			item.Character = nil
-			character.Inventory.Hands[hand] = nil
-			return true
-		}
-	}
-
-	return false
-}
-
-func AddKurinItemToMapRaw(item *KurinItem, kmap *KurinMap, transform *sdlutils.Transform) {
-	item.Transform = transform
-    kmap.Items = append(kmap.Items, item)
-}
-
-func AddKurinItemToCharacterRaw(item *KurinItem, character *KurinCharacter) bool {
-	if !IsKurinCharacterHandEmptyRaw(character) {
-		return false
-	}
-
-	character.Inventory.Hands[character.ActiveHand] = item
-	item.Character = character
-	return true
-}
-
-func IsKurinCharacterHandEmptyRaw(character *KurinCharacter) bool {
-	return character.Inventory.Hands[character.ActiveHand] == nil
-}
-
-func TransferKurinItemToCharacterRaw(item *KurinItem, kmap *KurinMap, character *KurinCharacter) bool {
-	if !AddKurinItemToCharacterRaw(item, character) {
-		return false
-	}
-
-	item.Transform = nil
-	RemoveKurinItemFromMapRaw(item, kmap)
-	return true
-}
-
-func TransferKurinItemFromCharacterRaw(item *KurinItem, kmap *KurinMap, character *KurinCharacter) bool {
-	if !RemoveKurinItemFromCharacterRaw(item, character) {
-		return false
-	}
-
-	AddKurinItemToMapRaw(item, kmap, &sdlutils.Transform{
-		Position:  sdlutils.Vector3ToFVector3Center(character.Position),
-		Rotation: 0,
+func FindClosestItemOfType(kmap *KurinMap, position sdlutils.Vector3, itemType string, reservation bool) *KurinItem {
+	items := FindItemsOfType(kmap, itemType, reservation)
+	start := sdlutils.PointToFPoint(position.Base)
+	sort.Slice(items, func(i, j int) bool {
+		return sdlutils.GetDistanceSimpleF(start, items[i].Transform.Position.Base) < sdlutils.GetDistanceSimpleF(start, items[j].Transform.Position.Base)
 	})
-	return true
+	if len(items) == 0 {
+		return nil
+	}
+
+	return items[0]
+}
+
+func ReserveKurinItem(item *KurinItem) {
+	item.Reserved = true
+}
+
+func UnreserveKurinItem(item *KurinItem) {
+	item.Reserved = false
 }

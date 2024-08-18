@@ -11,56 +11,72 @@ import (
 )
 
 type KurinEventLayerToolData struct {
-	Layer *gfx.KurinRendererLayer
+	Layer *gfx.RendererLayer
 }
 
-func NewKurinEventLayerTool(layer *gfx.KurinRendererLayer) *event.KurinEventLayer {
-	return &event.KurinEventLayer{
+func NewKurinEventLayerTool(layer *gfx.RendererLayer) *event.EventLayer {
+	return &event.EventLayer{
 		Load:    LoadKurinEventLayerTool,
 		Process: ProcessKurinEventLayerTool,
-		Data: KurinEventLayerToolData{
+		Data: &KurinEventLayerToolData{
 			Layer: layer,
 		},
 	}
 }
 
-func LoadKurinEventLayerTool(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
+func LoadKurinEventLayerTool(layer *event.EventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerTool(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
-	if manager.Renderer.Context.State == gfx.KurinRendererContextStateTool {
-		ProcessKurinEventLayerToolInput(manager, layer)
+func ProcessKurinEventLayerTool(layer *event.EventLayer) error {
+	if gfx.RendererInstance.Context.State != gfx.KurinRendererContextStateTool {
+		return nil
 	}
 
+	ProcessKurinEventLayerToolInput(layer)
 	return nil
 }
 
-func ProcessKurinEventLayerToolInput(manager *event.KurinEventManager, layer *event.KurinEventLayer) {
-	data := layer.Data.(KurinEventLayerToolData)
-	toolData := data.Layer.Data.(tool.KurinRendererLayerToolData)
-	if manager.Keyboard.Pending != nil {
-		switch *manager.Keyboard.Pending {
+func ProcessKurinEventLayerToolInput(layer *event.EventLayer) {
+	data := layer.Data.(*KurinEventLayerToolData)
+	toolData := data.Layer.Data.(*tool.KurinRendererLayerToolData)
+	if event.EventManagerInstance.Keyboard.Pending != nil {
+		switch *event.EventManagerInstance.Keyboard.Pending {
 		case sdl.K_ESCAPE:
-			manager.Renderer.Context.State = gfx.KurinRendererContextStateNone
-			manager.Keyboard.Pending = nil
+			gfx.RendererInstance.Context.State = gfx.RendererContextStateNone
+			event.EventManagerInstance.Keyboard.Pending = nil
 			return
 		}
 	}
-	if manager.Mouse.PendingRight != nil {
-		manager.Renderer.Context.State = gfx.KurinRendererContextStateNone
-		manager.Mouse.PendingRight = nil
+	if event.EventManagerInstance.Mouse.PendingRight != nil {
+		gfx.RendererInstance.Context.State = gfx.RendererContextStateNone
+		event.EventManagerInstance.Mouse.PendingRight = nil
 	}
-	wrect := render.ScreenToWorldRect(manager.Renderer, sdl.Rect{X: manager.Renderer.Context.MousePosition.X, Y: manager.Renderer.Context.MousePosition.Y, W: gameplay.KurinTileSize.X, H: gameplay.KurinTileSize.Y})
-	tile := gameplay.GetTileAt(&gameplay.KurinGameInstance.Map, sdlutils.Vector3{Base: sdl.Point{X: wrect.X, Y: wrect.Y}, Z: 0})
-	toolData.Prefab.Tile = tile
-	if toolData.Prefab.Tile == nil {
-		return
-	}
-	if manager.Mouse.PendingLeft != nil {
-		prefabCopy := *toolData.Prefab
-		gameplay.PushKurinJobToController(&gameplay.KurinGameInstance.JobController, gameplay.NewKurinJobDriverBuild(gameplay.KurinJobDriverBuildData{
-			Prefab: &prefabCopy,
-		}))
+
+	mouseRect := render.ScreenToWorldRect(sdl.Rect{X: gfx.RendererInstance.Context.MousePosition.X, Y: gfx.RendererInstance.Context.MousePosition.Y, W: gameplay.KurinTileSize.X, H: gameplay.KurinTileSize.Y})
+	mousePosition := sdlutils.Vector3{Base: sdl.Point{X: mouseRect.X, Y: mouseRect.Y}, Z: 0}
+	tile := gameplay.GetKurinTileAt(&gameplay.GameInstance.Map, mousePosition)
+	switch realPrefab := toolData.Prefab.(type) {
+	case *gameplay.KurinObject:
+		realPrefab.Tile = tile
+		if realPrefab.Tile == nil || !gameplay.CanBuildKurinObjectAtMapPosition(&gameplay.GameInstance.Map, tile.Position) {
+			return
+		}
+		if event.EventManagerInstance.Mouse.PendingLeft != nil {
+			job := gameplay.NewKurinJobDriverBuild()
+			job.Tile = realPrefab.Tile
+			job.Initialize(job, &gameplay.KurinJobDriverBuildData{
+				Prefab: realPrefab.Type,
+			})
+			gameplay.PushKurinJobToController(gameplay.GameInstance.JobController, job)
+		}
+	case *gameplay.KurinTile:
+		realPrefab.Position = mousePosition
+		if !gameplay.CanBuildKurinTileAtMapPosition(&gameplay.GameInstance.Map, mousePosition) {
+			return
+		}
+		if event.EventManagerInstance.Mouse.PendingLeft != nil {
+			gameplay.CreateKurinTile(realPrefab.Position, realPrefab.Type)
+		}
 	}
 }

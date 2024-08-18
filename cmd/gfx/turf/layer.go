@@ -9,29 +9,36 @@ type KurinRendererLayerTileData struct {
 	Turfs map[string]*KurinTurfGraphic
 }
 
-func NewKurinRendererLayerTile() *gfx.KurinRendererLayer {
-	return &gfx.KurinRendererLayer{
+func NewKurinRendererLayerTile() *gfx.RendererLayer {
+	return &gfx.RendererLayer{
 		Load:   LoadKurinRendererLayerTile,
 		Render: RenderKurinRendererLayerTile,
-		Data: KurinRendererLayerTileData{
+		Data: &KurinRendererLayerTileData{
 			Turfs: map[string]*KurinTurfGraphic{},
 		},
 	}
 }
 
-func LoadKurinRendererLayerTile(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
+func LoadKurinRendererLayerTile(layer *gfx.RendererLayer) error {
 	var err error
-	if layer.Data.(KurinRendererLayerTileData).Turfs["floor"], err = NewKurinTurfGraphic(renderer, "floor"); err != nil {
+	if layer.Data.(*KurinRendererLayerTileData).Turfs["floor"], err = NewKurinTurfGraphic("floor"); err != nil {
+		return err
+	}
+	if layer.Data.(*KurinRendererLayerTileData).Turfs["blank"], err = NewKurinTurfGraphic("blank"); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func RenderKurinRendererLayerTile(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
-	for x := int32(0); x < gameplay.KurinGameInstance.Map.Size.Base.X; x++ {
-		for y := int32(0); y < gameplay.KurinGameInstance.Map.Size.Base.Y; y++ {
-			RenderKurinTile(renderer, layer, gameplay.KurinGameInstance.Map.Tiles[x][y][0])
+func RenderKurinRendererLayerTile(layer *gfx.RendererLayer) error {
+	for x := range gameplay.GameInstance.Map.Size.Base.X {
+		for y := range gameplay.GameInstance.Map.Size.Base.Y {
+			tile := gameplay.GameInstance.Map.Tiles[x][y][0]
+			if tile == nil {
+				continue
+			}
+			RenderKurinTile(layer, tile)
 		}
 	}
 

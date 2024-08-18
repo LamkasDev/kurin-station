@@ -1,38 +1,28 @@
 package gameplay
 
-import "github.com/kelindar/binary"
-
 type KurinObjectPodData struct {
 	Enabled bool
 }
 
 func NewKurinObjectPod(tile *KurinTile) *KurinObject {
-	obj := NewKurinObjectRaw(tile, "pod")
-	obj.OnItemInteraction = func(object *KurinObject, item *KurinItem) bool {
-		if item.Type == "credit" {
+	obj := NewKurinObjectRaw[*KurinObjectPodData](tile, "pod")
+	obj.Health = 0
+	obj.OnInteraction = func(object *KurinObject, item *KurinItem) bool {
+		if item != nil && item.Type == "credit" {
 			if !RemoveKurinItemFromCharacterRaw(item, item.Character) {
 				return false
 			}
-			PlaySound(&KurinGameInstance.SoundController, "jingle")
-			KurinGameInstance.Credits++
+			PlaySound(&GameInstance.SoundController, "jingle")
+			GameInstance.Credits++
 			return true
 		}
 
-		return false
+		OpenKurinDialog(&KurinDialogRequest{Type: "pod", Data: &KurinDialogPodData{Pod: object}})
+		return true
 	}
-	obj.EncodeData = func(object *KurinObject) []byte {
-		objData := object.Data.(KurinObjectPodData)
-		data, _ := binary.Marshal(&objData)
-		return data
-	}
-	obj.DecodeData = func(object *KurinObject, data []byte) {
-		var objData KurinObjectPodData 
-		binary.Unmarshal(data, &objData)
-		object.Data = objData
-	}
-	obj.Data = KurinObjectPodData{
+	obj.Data = &KurinObjectPodData{
 		Enabled: false,
 	}
-	
+
 	return obj
 }

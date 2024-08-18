@@ -48,7 +48,7 @@ func ProcessKurinSoundLayerMusic(manager *sound.KurinSoundManager, layer *sound.
 		if err != nil {
 			return err
 		}
-		mix.Volume(c, int(0.5 * 128))
+		mix.Volume(c, int(0.5*128))
 	}
 
 	return nil

@@ -3,22 +3,22 @@ package gameplay
 import "github.com/LamkasDev/kurin/cmd/common/sdlutils"
 
 func NewKurinObjectBrokenGrille(tile *KurinTile) *KurinObject {
-	obj := NewKurinObjectRaw(tile, "broken_grille")
+	obj := NewKurinObjectRaw[interface{}](tile, "broken_grille")
 	obj.Health = 1
-	obj.OnItemInteraction = func(object *KurinObject, item *KurinItem) bool {
-		if item.Type == "rod" {
+	obj.OnInteraction = func(object *KurinObject, item *KurinItem) bool {
+		if item != nil && item.Type == "rod" {
 			if !RemoveKurinItemFromCharacterRaw(item, item.Character) {
 				return false
 			}
-			DestroyKurinObjectRaw(&KurinGameInstance.Map, object)
-			CreateKurinObjectRaw(&KurinGameInstance.Map, object.Tile, "grille")
+			DestroyKurinObjectRaw(&GameInstance.Map, object)
+			CreateKurinObjectRaw(&GameInstance.Map, object.Tile, "grille")
 			return true
 		}
 
 		return false
 	}
 	obj.OnDestroy = func(object *KurinObject) {
-		AddKurinItemToMapRaw(NewKurinItem("rod"), &KurinGameInstance.Map, &sdlutils.Transform{Position: sdlutils.Vector3ToFVector3Center(object.Tile.Position)})
+		AddKurinItemToMapRaw(NewKurinItem("rod", 1), &GameInstance.Map, &sdlutils.Transform{Position: sdlutils.Vector3ToFVector3Center(object.Tile.Position)})
 	}
 
 	return obj

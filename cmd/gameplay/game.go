@@ -5,63 +5,70 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-var KurinGameInstance *KurinGame 
+var GameInstance *KurinGame
 
 type KurinGame struct {
-	Map KurinMap
-	Ticks uint64
-	Credits uint32
+	Map               KurinMap
+	Ticks             uint64
+	Credits           uint32
 	Characters        []*KurinCharacter
 	SelectedCharacter *KurinCharacter
 
-	JobController      KurinJobController
+	JobController      *KurinJobController
 	ParticleController KurinParticleController
 	RunechatController KurinRunechatController
 	SoundController    KurinSoundController
-	ForceController KurinForceController
-	Narrator KurinNarrator
-	
-	HoveredCharacter  *KurinCharacter
-	HoveredItem *KurinItem
+	ForceController    KurinForceController
+	DialogController   KurinDialogController
+	Narrator           *KurinNarrator
+
+	HoveredCharacter *KurinCharacter
+	HoveredItem      *KurinItem
 }
 
 func NewKurinGame() KurinGame {
 	game := KurinGame{
-		Map:                NewKurinMap(sdlutils.Vector3{Base: sdl.Point{X: 25, Y: 25}, Z: 1}),
-		Ticks: 0,
+		Map:                NewKurinMap(sdlutils.Vector3{Base: sdl.Point{X: 32, Y: 32}, Z: 1}),
+		Ticks:              0,
 		Characters:         []*KurinCharacter{},
 		JobController:      NewKurinJobController(),
 		ParticleController: NewKurinParticleController(),
 		RunechatController: NewKurinRunechatController(),
 		SoundController:    NewKurinSoundController(),
-		ForceController: NewKurinForceController(),
-		Narrator: NewKurinNarrator(),
+		ForceController:    NewKurinForceController(),
+		DialogController:   NewKurinDialogController(),
+		Narrator:           NewKurinNarrator(),
 	}
-	KurinGameInstance = &game
+	GameInstance = &game
 	PopulateKurinMap(&game.Map)
-	for i := 0; i < 2; i++ {
-		character := NewKurinCharacterRandom()
-		game.Characters = append(game.Characters, character)
-		game.SelectedCharacter = character
-	}
+
+	playerCharacter := NewKurinCharacter()
+	PopulateKurinCharacter(playerCharacter)
+	TeleportRandomlyKurinCharacter(playerCharacter)
+	game.Characters = append(game.Characters, playerCharacter)
+	game.SelectedCharacter = playerCharacter
+
+	npcCharacter := NewKurinCharacter()
+	TeleportRandomlyKurinCharacter(npcCharacter)
+	game.Characters = append(game.Characters, npcCharacter)
 
 	return game
 }
 
 func ProcessKurinGame() {
-	for _, character := range KurinGameInstance.Characters {
+	for _, object := range GameInstance.Map.Objects {
+		object.Process(object)
+	}
+	for _, character := range GameInstance.Characters {
 		ProcessKurinCharacter(character)
 	}
 	ProcessKurinNarrator()
-	KurinGameInstance.Ticks++
+	GameInstance.Ticks++
 }
 
 func TransferKurinItemToCharacter(item *KurinItem, character *KurinCharacter) bool {
-	if IsKurinCharacterHandEmptyRaw(character) {
-		return false
-	}
-	if TransferKurinItemFromCharacterRaw(item, &KurinGameInstance.Map, character) {
-		delete(KurinGameInstance.ForceController.Forces, item)
+	if TransferKurinItemToCharacterRaw(item, &GameInstance.Map, character) {
+		delete(GameInstance.ForceController.Forces, item)
 		return true
 	}
 
@@ -69,25 +76,35 @@ func TransferKurinItemToCharacter(item *KurinItem, character *KurinCharacter) bo
 }
 
 func TransferKurinItemFromCharacter(item *KurinItem, character *KurinCharacter) bool {
-	if IsKurinCharacterHandEmptyRaw(character) {
-		return false
-	}
-
-	return TransferKurinItemFromCharacterRaw(item, &KurinGameInstance.Map, character)
+	return TransferKurinItemFromCharacterRaw(item, &GameInstance.Map, character)
 }
 
 func DropKurinItemFromCharacter(character *KurinCharacter) bool {
 	return TransferKurinItemFromCharacter(character.Inventory.Hands[character.ActiveHand], character)
 }
 
-func CreateKurinObject(tile *KurinTile, objectType string) {
-	obj := CreateKurinObjectRaw(&KurinGameInstance.Map, tile, objectType)
+func CreateKurinTile(position sdlutils.Vector3, tileType string) *KurinTile {
+	if !CanBuildKurinTileAtMapPosition(&GameInstance.Map, position) {
+		return nil
+	}
+	tile := CreateKurinTileRaw(&GameInstance.Map, position, tileType)
+
+	return tile
+}
+
+func CreateKurinObject(tile *KurinTile, objectType string) *KurinObject {
+	if !CanBuildKurinObjectAtMapPosition(&GameInstance.Map, tile.Position) {
+		return nil
+	}
+	obj := CreateKurinObjectRaw(&GameInstance.Map, tile, objectType)
 	obj.OnCreate(obj)
 	KurinNarratorOnCreateObject(obj)
+
+	return obj
 }
 
 func DestroyKurinObject(obj *KurinObject) {
-	DestroyKurinObjectRaw(&KurinGameInstance.Map, obj)
+	DestroyKurinObjectRaw(&GameInstance.Map, obj)
 	obj.OnDestroy(obj)
 	KurinNarratorOnDestroyObject(obj)
 }

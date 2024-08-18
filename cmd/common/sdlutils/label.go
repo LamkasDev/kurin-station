@@ -7,16 +7,16 @@ import (
 
 type RendererLabel struct {
 	Text    string
-	Font *ttf.Font
-	Color sdl.Color
+	Font    *ttf.Font
+	Color   sdl.Color
 	Texture *TextureWithSize
 }
 
 func NewLabel(renderer *sdl.Renderer, font *ttf.Font, color sdl.Color) *RendererLabel {
 	return &RendererLabel{
 		Text:    "",
-		Font: font,
-		Color: color,
+		Font:    font,
+		Color:   color,
 		Texture: nil,
 	}
 }
@@ -35,6 +35,6 @@ func RenderLabelRaw(renderer *sdl.Renderer, label *RendererLabel, text string, p
 	if label.Texture != nil {
 		return RenderUTF8SolidTexture(renderer, label.Texture, position, scale)
 	}
-	
+
 	return nil, nil
 }

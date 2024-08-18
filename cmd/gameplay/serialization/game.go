@@ -10,20 +10,24 @@ import (
 type KurinGameData struct {
 	NextId uint32
 
-	Map KurinMapData
-	Ticks uint64
-	Credits uint32
-	Characters []KurinCharacterData
+	Map               KurinMapData
+	Ticks             uint64
+	Credits           uint32
+	Characters        []KurinCharacterData
 	SelectedCharacter uint32
+	Narrator          KurinNarratorData
+	JobController     KurinJobControllerData
 }
 
 func EncodeKurinGame(game *gameplay.KurinGame) []byte {
 	data := &KurinGameData{
-		NextId: gameplay.NextId,
-		Map: EncodeKurinMap(&game.Map),
-		Ticks: game.Ticks,
-		Credits: game.Credits,
-		Characters: []KurinCharacterData{},
+		NextId:        gameplay.NextId,
+		Map:           EncodeKurinMap(&game.Map),
+		Ticks:         game.Ticks,
+		Credits:       game.Credits,
+		Characters:    []KurinCharacterData{},
+		Narrator:      EncodeKurinNarrator(game.Narrator),
+		JobController: EncodeKurinJobController(game.JobController),
 	}
 	for _, character := range game.Characters {
 		data.Characters = append(data.Characters, EncodeKurinCharacter(character))
@@ -62,11 +66,11 @@ func DecodeKurinGame(buffer []byte, game *gameplay.KurinGame) {
 	}
 	game.HoveredCharacter = nil
 	game.HoveredItem = nil
-	game.JobController = gameplay.NewKurinJobController()
+	game.JobController = DecodeKurinJobController(data.JobController)
 	game.ParticleController = gameplay.NewKurinParticleController()
 	game.RunechatController = gameplay.NewKurinRunechatController()
 	game.SoundController = gameplay.NewKurinSoundController()
 	game.ForceController = gameplay.NewKurinForceController()
-	game.Narrator = gameplay.NewKurinNarrator()
+	game.Narrator = DecodeKurinNarrator(data.Narrator)
 	gameplay.NextId = data.NextId
 }

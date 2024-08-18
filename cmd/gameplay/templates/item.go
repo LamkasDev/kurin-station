@@ -6,3 +6,8 @@ type KurinItemTemplate struct {
 	States     *int   `json:"states"`
 	StatesHand *int   `json:"statesHand"`
 }
+
+type KurinItemRequirementTemplate struct {
+	Type  string `json:"type"`
+	Count uint16 `json:"count"`
+}

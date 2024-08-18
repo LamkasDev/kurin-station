@@ -1,11 +1,11 @@
 package event
 
-type KurinEventLayer struct {
-	Load    KurinEventLayerLoad
-	Process KurinEventLayerProcess
+type EventLayer struct {
+	Load    EventLayerLoad
+	Process EventLayerProcess
 	Data    interface{}
 }
 
-type KurinEventLayerLoad func(manager *KurinEventManager, layer *KurinEventLayer) error
+type EventLayerLoad func(layer *EventLayer) error
 
-type KurinEventLayerProcess func(manager *KurinEventManager, layer *KurinEventLayer) error
+type EventLayerProcess func(layer *EventLayer) error

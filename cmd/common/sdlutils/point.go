@@ -33,10 +33,24 @@ func PointToFPointCenter(point sdl.Point) sdl.FPoint {
 	}
 }
 
+func AddPoints(a sdl.Point, b sdl.Point) sdl.Point {
+	return sdl.Point{
+		X: a.X + b.X,
+		Y: a.Y + b.Y,
+	}
+}
+
 func AddFPoints(a sdl.FPoint, b sdl.FPoint) sdl.FPoint {
 	return sdl.FPoint{
 		X: a.X + b.X,
 		Y: a.Y + b.Y,
+	}
+}
+
+func SubtractPoints(a sdl.Point, b sdl.Point) sdl.Point {
+	return sdl.Point{
+		X: a.X - b.X,
+		Y: a.Y - b.Y,
 	}
 }
 
@@ -106,12 +120,12 @@ func GetDistanceF(a sdl.FPoint, b sdl.FPoint) float32 {
 }
 
 func RotatePoint(point sdl.Point, center sdl.Point, angle float32) sdl.Point {
-	x1 := float32(point.X - center.X);
-	y1 := float32(point.Y - center.Y);
+	x1 := float32(point.X - center.X)
+	y1 := float32(point.Y - center.Y)
 
-	rad := -angle * (math.Pi/180);
-	x2 := x1 * math32.Cos(rad) - y1 * math32.Sin(rad);
-	y2 := x1 * math32.Sin(rad) + y1 * math32.Cos(rad);
+	rad := -angle * (math.Pi / 180)
+	x2 := x1*math32.Cos(rad) - y1*math32.Sin(rad)
+	y2 := x1*math32.Sin(rad) + y1*math32.Cos(rad)
 
 	return sdl.Point{
 		X: int32(x2) + center.X,

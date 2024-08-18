@@ -11,57 +11,59 @@ import (
 )
 
 type KurinEventLayerInteractionData struct {
-	ItemLayer *gfx.KurinRendererLayer
+	ItemLayer *gfx.RendererLayer
 }
 
-func NewKurinEventLayerInteraction(itemLayer *gfx.KurinRendererLayer) *event.KurinEventLayer {
-	return &event.KurinEventLayer{
+func NewKurinEventLayerInteraction(itemLayer *gfx.RendererLayer) *event.EventLayer {
+	return &event.EventLayer{
 		Load:    LoadKurinEventLayerInteraction,
 		Process: ProcessKurinEventLayerInteraction,
-		Data: KurinEventLayerInteractionData{
+		Data: &KurinEventLayerInteractionData{
 			ItemLayer: itemLayer,
 		},
 	}
 }
 
-func LoadKurinEventLayerInteraction(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
+func LoadKurinEventLayerInteraction(layer *event.EventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerInteraction(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
-	if manager.Renderer.Context.CameraMode != gfx.KurinRendererCameraModeCharacter || manager.Keyboard.InputMode {
+func ProcessKurinEventLayerInteraction(layer *event.EventLayer) error {
+	if gfx.RendererInstance.Context.CameraMode != gfx.KurinRendererCameraModeCharacter || event.EventManagerInstance.Keyboard.InputMode {
 		return nil
 	}
-	if manager.Mouse.PendingLeft != nil {
-		gameplay.InteractKurinCharacter(gameplay.KurinGameInstance.SelectedCharacter, *manager.Mouse.PendingLeft)
-		manager.Mouse.PendingLeft = nil
+	if event.EventManagerInstance.Mouse.PendingLeft != nil {
+		gameplay.InteractKurinCharacter(gameplay.GameInstance.SelectedCharacter, *event.EventManagerInstance.Mouse.PendingLeft)
+		event.EventManagerInstance.Mouse.PendingLeft = nil
 	}
 
 	// TODO: add hovered tile and object
 
-	data := layer.Data.(KurinEventLayerInteractionData)
-	gameplay.KurinGameInstance.HoveredItem = nil
-	for _, currentItem := range gameplay.KurinGameInstance.Map.Items {
-		if !gameplay.CanKurinCharacterInteractWithItem(gameplay.KurinGameInstance.SelectedCharacter, currentItem) {
+	data := layer.Data.(*KurinEventLayerInteractionData)
+	itemData := data.ItemLayer.Data.(*item.KurinRendererLayerItemData)
+	gameplay.GameInstance.HoveredItem = nil
+
+	for _, currentItem := range gameplay.GameInstance.Map.Items {
+		if !gameplay.CanKurinCharacterInteractWithItem(gameplay.GameInstance.SelectedCharacter, currentItem) {
 			continue
 		}
-		graphic := data.ItemLayer.Data.(item.KurinRendererLayerItemData).Items[currentItem.Type]
-		hoveredOffset := gfx.GetHoveredOffset(&manager.Renderer.Context, item.GetKurinItemRect(manager.Renderer, data.ItemLayer, currentItem))
-		hoveredOffset = sdlutils.RotatePoint(hoveredOffset, sdl.Point{X: graphic.Textures[0].Surface.W/2, Y: graphic.Textures[0].Surface.H/2}, float32(currentItem.Transform.Rotation))
+		graphic := itemData.Items[currentItem.Type]
+		hoveredOffset := gfx.GetHoveredOffset(&gfx.RendererInstance.Context, item.GetKurinItemRect(data.ItemLayer, currentItem))
+		hoveredOffset = sdlutils.RotatePoint(hoveredOffset, sdl.Point{X: graphic.Textures[0].Surface.W / 2, Y: graphic.Textures[0].Surface.H / 2}, float32(currentItem.Transform.Rotation))
 		if gfx.IsHoveredOffsetSolid(graphic.Textures[0], hoveredOffset) {
-			gameplay.KurinGameInstance.HoveredItem = currentItem
-			manager.Mouse.Cursor = sdl.SYSTEM_CURSOR_HAND
+			gameplay.GameInstance.HoveredItem = currentItem
+			event.EventManagerInstance.Mouse.Cursor = sdl.SYSTEM_CURSOR_HAND
 		}
 	}
 
-	gameplay.KurinGameInstance.HoveredCharacter = nil
-	for _, currentCharacter := range gameplay.KurinGameInstance.Characters {
-		if !gameplay.CanKurinCharacterInteractWithCharacter(gameplay.KurinGameInstance.SelectedCharacter, currentCharacter) {
+	gameplay.GameInstance.HoveredCharacter = nil
+	for _, currentCharacter := range gameplay.GameInstance.Characters {
+		if !gameplay.CanKurinCharacterInteractWithCharacter(gameplay.GameInstance.SelectedCharacter, currentCharacter) {
 			continue
 		}
-		hoveredOffset := gfx.GetHoveredOffset(&manager.Renderer.Context, species.GetKurinCharacterRect(manager.Renderer, currentCharacter))
+		hoveredOffset := gfx.GetHoveredOffset(&gfx.RendererInstance.Context, species.GetKurinCharacterRect(currentCharacter))
 		if hoveredOffset.InRect(&sdl.Rect{W: gameplay.KurinTileSize.X, H: gameplay.KurinTileSize.Y}) {
-			gameplay.KurinGameInstance.HoveredCharacter = currentCharacter
+			gameplay.GameInstance.HoveredCharacter = currentCharacter
 		}
 	}
 

@@ -10,23 +10,29 @@ import (
 
 var ApplicationPath = ""
 
-var TempPath = ""
-var TempAudioPath = ""
-var TempSavesPath = ""
+var (
+	TempPath      = ""
+	TempAudioPath = ""
+	TempSavesPath = ""
+)
 
-var ResourcesPath = ""
-var IconsPath = ""
-var TexturesPath = ""
-var FontsPath = ""
-var DataPath = ""
-var SoundsPath = ""
+var (
+	ResourcesPath = ""
+	IconsPath     = ""
+	TexturesPath  = ""
+	FontsPath     = ""
+	DataPath      = ""
+	SoundsPath    = ""
+)
 
-var ApplicationProfileCpu = ""
-var ApplicationProfileHeap = ""
-var ApplicationIcon = ""
-var ApplicationFontDefault = ""
-var ApplicationFontPixeled = ""
-var ApplicationFontOutline = ""
+var (
+	ApplicationProfileCpu  = ""
+	ApplicationProfileHeap = ""
+	ApplicationIcon        = ""
+	ApplicationFontDefault = ""
+	ApplicationFontPixeled = ""
+	ApplicationFontOutline = ""
+)
 
 func LoadConstants() error {
 	ex, err := os.Executable()

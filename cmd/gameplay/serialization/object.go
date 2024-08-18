@@ -2,26 +2,27 @@ package serialization
 
 import (
 	"github.com/LamkasDev/kurin/cmd/gameplay"
+	"github.com/LamkasDev/kurin/cmd/gameplay/common"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
 type KurinObjectData struct {
-	Id   uint32
-	Type string
-	Position sdl.Point
-	Direction gameplay.KurinDirection
-	Health uint8
-	Data []byte
+	Id        uint32
+	Type      string
+	Position  sdl.Point
+	Direction common.KurinDirection
+	Health    uint16
+	Data      []byte
 }
 
 func EncodeKurinObject(obj *gameplay.KurinObject) KurinObjectData {
 	data := KurinObjectData{
-		Id: obj.Id,
-		Type: obj.Type,
-		Position: obj.Tile.Position.Base,
+		Id:        obj.Id,
+		Type:      obj.Type,
+		Position:  obj.Tile.Position.Base,
 		Direction: obj.Direction,
-		Health: obj.Health,
-		Data: obj.EncodeData(obj),
+		Health:    obj.Health,
+		Data:      obj.EncodeData(obj),
 	}
 
 	return data

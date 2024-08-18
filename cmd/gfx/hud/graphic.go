@@ -10,16 +10,16 @@ import (
 )
 
 type KurinHUDGraphic struct {
-	Texture sdlutils.TextureWithSize
+	Texture *sdlutils.TextureWithSize
 }
 
-func NewKurinHUDGraphic(renderer *gfx.KurinRenderer, hudId string) (*KurinHUDGraphic, error) {
+func NewKurinHUDGraphic(graphicId string) (*KurinHUDGraphic, error) {
 	graphic := KurinHUDGraphic{}
 	graphicDirectory := path.Join(constants.TexturesPath, "icons")
 
 	var err error
-	partPath := path.Join(graphicDirectory, fmt.Sprintf("%s_0.png", hudId))
-	if graphic.Texture, err = sdlutils.LoadTexture(renderer.Renderer, partPath); err != nil {
+	partPath := path.Join(graphicDirectory, fmt.Sprintf("%s.png", graphicId))
+	if graphic.Texture, err = sdlutils.LoadTexture(gfx.RendererInstance.Renderer, partPath); err != nil {
 		return &graphic, err
 	}
 

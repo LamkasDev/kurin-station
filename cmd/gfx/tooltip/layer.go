@@ -6,18 +6,18 @@ import (
 
 type KurinRendererLayerTooltipData struct{}
 
-func NewKurinRendererLayerTooltip() *gfx.KurinRendererLayer {
-	return &gfx.KurinRendererLayer{
+func NewKurinRendererLayerTooltip() *gfx.RendererLayer {
+	return &gfx.RendererLayer{
 		Load:   LoadKurinRendererLayerTooltip,
 		Render: RenderKurinRendererLayerTooltip,
-		Data:   KurinRendererLayerTooltipData{},
+		Data:   &KurinRendererLayerTooltipData{},
 	}
 }
 
-func LoadKurinRendererLayerTooltip(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
+func LoadKurinRendererLayerTooltip(layer *gfx.RendererLayer) error {
 	return nil
 }
 
-func RenderKurinRendererLayerTooltip(renderer *gfx.KurinRenderer, layer *gfx.KurinRendererLayer) error {
+func RenderKurinRendererLayerTooltip(layer *gfx.RendererLayer) error {
 	return nil
 }

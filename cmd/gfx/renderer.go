@@ -7,64 +7,63 @@ import (
 	"github.com/veandco/go-sdl2/ttf"
 )
 
+var RendererInstance *KurinRenderer
+
 type KurinRenderer struct {
-	Window        *sdl.Window
-	Renderer      *sdl.Renderer
-	Icons         KurinRendererIcons
-	Fonts         KurinRendererFonts
-	Context KurinRendererContext
-	Layers        []*KurinRendererLayer
+	Window   *sdl.Window
+	Renderer *sdl.Renderer
+	Fonts    KurinRendererFonts
+	Context  KurinRendererContext
+	Layers   []*RendererLayer
+
+	IconTextures *sdlutils.TextureContainer
 }
 
-type KurinRendererIcons struct {
-	Icon *sdl.Texture
-}
-
-func NewKurinRenderer() (*KurinRenderer, error) {
-	renderer := &KurinRenderer{
-		Icons:         KurinRendererIcons{},
-		Context: NewKurinRendererContext(),
-		Layers:        []*KurinRendererLayer{},
+func InitializeKurinRenderer() error {
+	RendererInstance = &KurinRenderer{
+		Context:      NewKurinRendererContext(),
+		Layers:       []*RendererLayer{},
+		IconTextures: sdlutils.NewTextureContainer("icons"),
 	}
 	err := sdl.Init(sdl.INIT_EVERYTHING)
 	if err != nil {
-		return renderer, err
+		return err
 	}
 	if err = ttf.Init(); err != nil {
-		return renderer, err
+		return err
 	}
 
-	if renderer.Window, err = sdl.CreateWindow(constants.ApplicationName, sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
+	if RendererInstance.Window, err = sdl.CreateWindow(constants.ApplicationName, sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
 		800, 600, sdl.WINDOW_SHOWN|sdl.WINDOW_RESIZABLE); err != nil {
-		return renderer, err
+		return err
 	}
-	renderer.Context.WindowSize = sdl.Point{X: 800, Y: 600}
+	RendererInstance.Context.WindowSize = sdl.Point{X: 800, Y: 600}
 
-	if renderer.Renderer, err = sdl.CreateRenderer(renderer.Window, -1, sdl.RENDERER_ACCELERATED); err != nil {
-		return renderer, err
+	if RendererInstance.Renderer, err = sdl.CreateRenderer(RendererInstance.Window, -1, sdl.RENDERER_ACCELERATED); err != nil {
+		return err
 	}
-	if err := renderer.Renderer.SetDrawBlendMode(sdl.BLENDMODE_NONE); err != nil {
-		return renderer, err
+	if err := RendererInstance.Renderer.SetDrawBlendMode(sdl.BLENDMODE_NONE); err != nil {
+		return err
 	}
 
-	icon, _, iconErr := sdlutils.LoadTextureRaw(renderer.Renderer, constants.ApplicationIcon)
+	icon, _, iconErr := sdlutils.LoadTextureRaw(RendererInstance.Renderer, constants.ApplicationIcon)
 	if iconErr != nil {
-		return renderer, err
+		return err
 	}
-	renderer.Window.SetIcon(icon)
+	RendererInstance.Window.SetIcon(icon)
 
 	var fontErr error
-	renderer.Fonts, fontErr = NewKurinRendererFonts()
+	RendererInstance.Fonts, fontErr = NewKurinRendererFonts()
 	if fontErr != nil {
-		return renderer, fontErr
+		return fontErr
 	}
 
-	return renderer, nil
+	return nil
 }
 
-func LoadKurinRenderer(renderer *KurinRenderer) error {
-	for _, layer := range renderer.Layers {
-		if err := layer.Load(renderer, layer); err != nil {
+func LoadKurinRenderer() error {
+	for _, layer := range RendererInstance.Layers {
+		if err := layer.Load(layer); err != nil {
 			return err
 		}
 	}
@@ -72,23 +71,23 @@ func LoadKurinRenderer(renderer *KurinRenderer) error {
 	return nil
 }
 
-func ClearKurinRenderer(renderer *KurinRenderer) error {
-	if err := renderer.Renderer.Clear(); err != nil {
+func ClearKurinRenderer() error {
+	if err := RendererInstance.Renderer.Clear(); err != nil {
 		return err
 	}
-	if err := sdlutils.SetDrawColor(renderer.Renderer, constants.ApplicationBackgroundColor); err != nil {
+	if err := sdlutils.SetDrawColor(RendererInstance.Renderer, constants.ApplicationBackgroundColor); err != nil {
 		return err
 	}
-	if err := renderer.Renderer.FillRect(nil); err != nil {
+	if err := RendererInstance.Renderer.FillRect(nil); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func RenderKurinRenderer(renderer *KurinRenderer) error {
-	for _, layer := range renderer.Layers {
-		if err := layer.Render(renderer, layer); err != nil {
+func RenderKurinRenderer() error {
+	for _, layer := range RendererInstance.Layers {
+		if err := layer.Render(layer); err != nil {
 			return err
 		}
 	}
@@ -96,18 +95,18 @@ func RenderKurinRenderer(renderer *KurinRenderer) error {
 	return nil
 }
 
-func PresentKurinRenderer(renderer *KurinRenderer) {
-	renderer.Renderer.Present()
-	renderer.Context.Frame++
+func PresentKurinRenderer() {
+	RendererInstance.Renderer.Present()
+	RendererInstance.Context.Frame++
 }
 
 // TODO: make layers free themselves.
-func FreeKurinRenderer(renderer *KurinRenderer) error {
-	if err := renderer.Renderer.Destroy(); err != nil {
+func FreeKurinRenderer() error {
+	if err := RendererInstance.Renderer.Destroy(); err != nil {
 		return err
 	}
-	FreeKurinRendererFonts(&renderer.Fonts)
-	if err := renderer.Window.Destroy(); err != nil {
+	FreeKurinRendererFonts(&RendererInstance.Fonts)
+	if err := RendererInstance.Window.Destroy(); err != nil {
 		return err
 	}
 

@@ -19,25 +19,26 @@ type KurinSpeciesGraphicContainer struct {
 
 type KurinSpeciesGraphic struct {
 	Template templates.KurinSpeciesTemplate
-	Textures map[string][]sdlutils.TextureWithSize
+	Textures map[string][]*sdlutils.TextureWithSize
 }
 
-func NewKurinSpeciesGraphicContainer(renderer *gfx.KurinRenderer, speciesId string) (*KurinSpeciesGraphicContainer, error) {
+func NewKurinSpeciesGraphicContainer(speciesId string) (*KurinSpeciesGraphicContainer, error) {
 	container := KurinSpeciesGraphicContainer{
 		Types: map[string]*KurinSpeciesGraphic{},
 	}
 
-	var err error
-	if container.Types[gameplay.KurinDefaultType], err = NewKurinSpeciesGraphic(renderer, speciesId, gameplay.KurinDefaultType); err != nil {
+	graphic, err := NewKurinSpeciesGraphic(speciesId, gameplay.KurinDefaultType)
+	if err != nil {
 		return &container, err
 	}
+	container.Types[gameplay.KurinDefaultType] = graphic
 
 	return &container, nil
 }
 
-func NewKurinSpeciesGraphic(renderer *gfx.KurinRenderer, speciesId string, speciesType string) (*KurinSpeciesGraphic, error) {
+func NewKurinSpeciesGraphic(speciesId string, speciesType string) (*KurinSpeciesGraphic, error) {
 	graphic := KurinSpeciesGraphic{
-		Textures: map[string][]sdlutils.TextureWithSize{},
+		Textures: map[string][]*sdlutils.TextureWithSize{},
 	}
 
 	templateBytes, err := os.ReadFile(path.Join(constants.DataPath, "templates", "species", fmt.Sprintf("%s.json", speciesId)))
@@ -61,10 +62,10 @@ func NewKurinSpeciesGraphic(renderer *gfx.KurinRenderer, speciesId string, speci
 			partFile = fmt.Sprintf("%s_%s", partFile, speciesType)
 		}
 
-		graphic.Textures[part.Id] = make([]sdlutils.TextureWithSize, 4)
-		for i := 0; i < 4; i++ {
+		graphic.Textures[part.Id] = make([]*sdlutils.TextureWithSize, 4)
+		for i := range 4 {
 			partPath := path.Join(partDirectory, fmt.Sprintf("%s_%d.png", partFile, i))
-			if graphic.Textures[part.Id][i], err = sdlutils.LoadTexture(renderer.Renderer, partPath); err != nil {
+			if graphic.Textures[part.Id][i], err = sdlutils.LoadTexture(gfx.RendererInstance.Renderer, partPath); err != nil {
 				return &graphic, err
 			}
 		}

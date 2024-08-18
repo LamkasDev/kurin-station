@@ -52,11 +52,3 @@ func RenderUTF8SolidTexture(renderer *sdl.Renderer, texture *TextureWithSize, po
 
 	return nil, rect
 }
-
-func RenderUTF8SolidTextureRect(renderer *sdl.Renderer, texture *TextureWithSize, rect sdl.Rect) error {
-	if err := renderer.Copy(texture.Texture, nil, &rect); err != nil {
-		return err
-	}
-
-	return nil
-}

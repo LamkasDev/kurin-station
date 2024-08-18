@@ -9,57 +9,56 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinEventLayerCameraData struct {
-}
+type KurinEventLayerCameraData struct{}
 
-func NewKurinEventLayerCamera() *event.KurinEventLayer {
-	return &event.KurinEventLayer{
+func NewKurinEventLayerCamera() *event.EventLayer {
+	return &event.EventLayer{
 		Load:    LoadKurinEventLayerCamera,
 		Process: ProcessKurinEventLayerCamera,
-		Data: KurinEventLayerCameraData{},
+		Data:    &KurinEventLayerCameraData{},
 	}
 }
 
-func LoadKurinEventLayerCamera(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
+func LoadKurinEventLayerCamera(layer *event.EventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerCamera(manager *event.KurinEventManager, layer *event.KurinEventLayer) error {
-	if manager.Keyboard.InputMode {
+func ProcessKurinEventLayerCamera(layer *event.EventLayer) error {
+	if event.EventManagerInstance.Keyboard.InputMode {
 		return nil
 	}
 
-	switch manager.Renderer.Context.CameraMode {
+	switch gfx.RendererInstance.Context.CameraMode {
 	case gfx.KurinRendererCameraModeCharacter:
-		manager.Renderer.Context.CameraPosition = gameplay.KurinGameInstance.SelectedCharacter.PositionRender
-		manager.Renderer.Context.CameraPositionDestination = manager.Renderer.Context.CameraPosition
+		gfx.RendererInstance.Context.CameraPosition = gameplay.GameInstance.SelectedCharacter.PositionRender
+		gfx.RendererInstance.Context.CameraPositionDestination = gfx.RendererInstance.Context.CameraPosition
 	case gfx.KurinRendererCameraModeFree:
 		delay := float32(60)
-		if pressed := manager.Keyboard.Pressed[sdl.K_w]; pressed {
-			manager.Renderer.Context.CameraPositionDestination.Y -= timing.KurinTimingGlobal.FrameTime / delay
+		if pressed := event.EventManagerInstance.Keyboard.Pressed[sdl.K_w]; pressed {
+			gfx.RendererInstance.Context.CameraPositionDestination.Y -= timing.KurinTimingGlobal.FrameTime / delay
 		}
-		if pressed := manager.Keyboard.Pressed[sdl.K_s]; pressed {
-			manager.Renderer.Context.CameraPositionDestination.Y += timing.KurinTimingGlobal.FrameTime / delay
+		if pressed := event.EventManagerInstance.Keyboard.Pressed[sdl.K_s]; pressed {
+			gfx.RendererInstance.Context.CameraPositionDestination.Y += timing.KurinTimingGlobal.FrameTime / delay
 		}
-		if pressed := manager.Keyboard.Pressed[sdl.K_a]; pressed {
-			manager.Renderer.Context.CameraPositionDestination.X -= timing.KurinTimingGlobal.FrameTime / delay
+		if pressed := event.EventManagerInstance.Keyboard.Pressed[sdl.K_a]; pressed {
+			gfx.RendererInstance.Context.CameraPositionDestination.X -= timing.KurinTimingGlobal.FrameTime / delay
 		}
-		if pressed := manager.Keyboard.Pressed[sdl.K_d]; pressed {
-			manager.Renderer.Context.CameraPositionDestination.X += timing.KurinTimingGlobal.FrameTime / delay
+		if pressed := event.EventManagerInstance.Keyboard.Pressed[sdl.K_d]; pressed {
+			gfx.RendererInstance.Context.CameraPositionDestination.X += timing.KurinTimingGlobal.FrameTime / delay
 		}
 
-		manager.Renderer.Context.CameraPosition = mathutils.LerpFPoint(manager.Renderer.Context.CameraPosition, manager.Renderer.Context.CameraPositionDestination, 0.4)
+		gfx.RendererInstance.Context.CameraPosition = mathutils.LerpFPoint(gfx.RendererInstance.Context.CameraPosition, gfx.RendererInstance.Context.CameraPositionDestination, 0.4)
 	}
 
-	if manager.Mouse.Scroll != 0 {
-		zoom := float32(manager.Mouse.Scroll) * float32(0.5)
-		zoomDestination := mathutils.ClampFloat32(manager.Renderer.Context.CameraZoomDestination.X+zoom, 1, 4)
-		manager.Renderer.Context.CameraZoomDestination = sdl.FPoint{
+	if event.EventManagerInstance.Mouse.PendingScroll != 0 {
+		zoom := float32(event.EventManagerInstance.Mouse.PendingScroll) * float32(0.5)
+		zoomDestination := mathutils.ClampFloat32(gfx.RendererInstance.Context.CameraZoomDestination.X+zoom, 1, 4)
+		gfx.RendererInstance.Context.CameraZoomDestination = sdl.FPoint{
 			X: zoomDestination,
 			Y: zoomDestination,
 		}
 	}
-	manager.Renderer.Context.CameraZoom = mathutils.LerpFPoint(manager.Renderer.Context.CameraZoom, manager.Renderer.Context.CameraZoomDestination, 0.4)
+	gfx.RendererInstance.Context.CameraZoom = mathutils.LerpFPoint(gfx.RendererInstance.Context.CameraZoom, gfx.RendererInstance.Context.CameraZoomDestination, 0.4)
 
 	return nil
 }

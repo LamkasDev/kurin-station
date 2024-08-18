@@ -41,16 +41,16 @@ func LoadKurinSoundLayerAmbient(manager *sound.KurinSoundManager, layer *sound.K
 }
 
 func ProcessKurinSoundLayerAmbient(manager *sound.KurinSoundManager, layer *sound.KurinSoundLayer) error {
-	if len(gameplay.KurinGameInstance.SoundController.Pending) > 0 {
-		for _, sound := range gameplay.KurinGameInstance.SoundController.Pending {
+	if len(gameplay.GameInstance.SoundController.Pending) > 0 {
+		for _, sound := range gameplay.GameInstance.SoundController.Pending {
 			track := layer.Data.(KurinSoundLayerAmbientData).Tracks[sound.Type]
 			c, err := track.Data.Play(-1, 0)
 			if err != nil {
 				return err
 			}
-			mix.Volume(c, int(sound.Volume * 128))
+			mix.Volume(c, int(sound.Volume*128))
 		}
-		gameplay.KurinGameInstance.SoundController.Pending = []*gameplay.KurinSound{}
+		gameplay.GameInstance.SoundController.Pending = []*gameplay.KurinSound{}
 	}
 
 	return nil
