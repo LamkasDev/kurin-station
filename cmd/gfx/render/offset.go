@@ -9,16 +9,16 @@ import (
 )
 
 func GetCameraTileSize() sdl.FPoint {
-	return sdlutils.MultiplyFPoints(gameplay.KurinTileSizeF, gfx.RendererInstance.Context.CameraZoom)
+	return sdlutils.MultiplyFPoints(gameplay.TileSizeF, gfx.RendererInstance.Context.CameraZoom)
 }
 
 func GetCameraOffset() sdl.FPoint {
 	return sdlutils.SubtractFPoints(
 		sdlutils.AddFPoints(
 			sdlutils.MultiplyFPoints(gfx.RendererInstance.Context.CameraPosition, gfx.RendererInstance.Context.CameraTileSize),
-			sdlutils.DivideFPointByFloat(gfx.RendererInstance.Context.CameraTileSize, 2),
+			sdlutils.DivideFPoint(gfx.RendererInstance.Context.CameraTileSize, 2),
 		),
-		sdlutils.DivideFPointByFloat(sdlutils.PointToFPoint(gfx.RendererInstance.Context.WindowSize), 2),
+		sdlutils.DivideFPoint(sdlutils.PointToFPoint(gfx.RendererInstance.Context.WindowSize), 2),
 	)
 }
 

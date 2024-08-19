@@ -6,34 +6,18 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinObject struct {
+type Object struct {
 	Id        uint32
 	Type      string
-	Tile      *KurinTile
-	Direction common.KurinDirection
+	Tile      *Tile
+	Direction common.Direction
 	Health    uint16
 
-	Process       KurinObjectProcess
-	GetTexture    KurinObjectGetTexture
-	OnInteraction KurinObjectOnInteraction
-	OnCreate      KurinObjectOnDestroy
-	OnDestroy     KurinObjectOnDestroy
-	EncodeData    KurinObjectEncodeData
-	DecodeData    KurinObjectDecodeData
-	Data          interface{}
+	Template *ObjectTemplate
+	Data     interface{}
 }
 
-type (
-	KurinObjectProcess       func(object *KurinObject)
-	KurinObjectGetTexture    func(object *KurinObject) int
-	KurinObjectOnInteraction func(object *KurinObject, item *KurinItem) bool
-	KurinObjectOnCreate      func(object *KurinObject)
-	KurinObjectOnDestroy     func(object *KurinObject)
-	KurinObjectEncodeData    func(object *KurinObject) []byte
-	KurinObjectDecodeData    func(object *KurinObject, data []byte)
-)
-
-func GetKurinObjectAtTile(tile *KurinTile) *KurinObject {
+func GetObjectAtTile(tile *Tile) *Object {
 	if len(tile.Objects) == 0 {
 		return nil
 	}
@@ -41,47 +25,55 @@ func GetKurinObjectAtTile(tile *KurinTile) *KurinObject {
 	return tile.Objects[len(tile.Objects)-1]
 }
 
-func GetKurinObjectAtMapPosition(kmap *KurinMap, position sdlutils.Vector3) *KurinObject {
-	tile := GetKurinTileAt(kmap, position)
+func GetObjectAtMapPosition(kmap *Map, position sdlutils.Vector3) *Object {
+	tile := GetTileAt(kmap, position)
 	if tile == nil {
 		return nil
 	}
 
-	return GetKurinObjectAtTile(tile)
+	return GetObjectAtTile(tile)
 }
 
-func GetKurinObjectInDirection(kmap *KurinMap, object *KurinObject, direction common.KurinDirection) *KurinObject {
-	return GetKurinObjectAtMapPosition(kmap, common.GetPositionInDirectionV(object.Tile.Position, direction))
+func GetObjectInDirection(kmap *Map, object *Object, direction common.Direction) *Object {
+	return GetObjectAtMapPosition(kmap, common.GetPositionInDirectionV(object.Tile.Position, direction))
 }
 
-func GetKurinObjectDirectionHint(kmap *KurinMap, obj *KurinObject) string {
+func CanObjectsJoinHint(a *Object, b *Object) bool {
+	if a.Template.Smooth && b.Template.Smooth {
+		return true
+	}
+
+	return a.Type == b.Type
+}
+
+func GetObjectDirectionHint(kmap *Map, obj *Object) string {
 	direction := ""
-	if neighbour := GetKurinObjectInDirection(kmap, obj, common.KurinDirectionNorth); neighbour != nil && neighbour.Type == obj.Type {
+	if neighbour := GetObjectInDirection(kmap, obj, common.DirectionNorth); neighbour != nil && CanObjectsJoinHint(neighbour, obj) {
 		direction += "n"
 	}
-	if neighbour := GetKurinObjectInDirection(kmap, obj, common.KurinDirectionEast); neighbour != nil && neighbour.Type == obj.Type {
+	if neighbour := GetObjectInDirection(kmap, obj, common.DirectionEast); neighbour != nil && CanObjectsJoinHint(neighbour, obj) {
 		direction += "e"
 	}
-	if neighbour := GetKurinObjectInDirection(kmap, obj, common.KurinDirectionSouth); neighbour != nil && neighbour.Type == obj.Type {
+	if neighbour := GetObjectInDirection(kmap, obj, common.DirectionSouth); neighbour != nil && CanObjectsJoinHint(neighbour, obj) {
 		direction += "s"
 	}
-	if neighbour := GetKurinObjectInDirection(kmap, obj, common.KurinDirectionWest); neighbour != nil && neighbour.Type == obj.Type {
+	if neighbour := GetObjectInDirection(kmap, obj, common.DirectionWest); neighbour != nil && CanObjectsJoinHint(neighbour, obj) {
 		direction += "w"
 	}
 
 	return direction
 }
 
-func CanBuildKurinObjectAtMapPosition(kmap *KurinMap, position sdlutils.Vector3) bool {
-	tile := GetKurinTileAt(kmap, position)
+func CanBuildObjectAtMapPosition(kmap *Map, position sdlutils.Vector3) bool {
+	tile := GetTileAt(kmap, position)
 	if tile == nil {
 		return false
 	}
 
-	return GetKurinObjectAtTile(tile) == nil
+	return GetObjectAtTile(tile) == nil
 }
 
-func GetKurinObjectSize(object *KurinObject) sdl.Point {
+func GetObjectSize(object *Object) sdl.Point {
 	switch object.Type {
 	case "pod":
 		return sdl.Point{X: 2, Y: 2}
@@ -92,19 +84,23 @@ func GetKurinObjectSize(object *KurinObject) sdl.Point {
 	return sdl.Point{X: 1, Y: 1}
 }
 
-func GetKurinObjectCenter(object *KurinObject) sdl.FPoint {
-	size := GetKurinObjectSize(object)
+func GetObjectCenter(object *Object) sdl.FPoint {
+	size := GetObjectSize(object)
 	return sdl.FPoint{
 		X: float32(object.Tile.Position.Base.X) + float32(size.X)/2,
 		Y: float32(object.Tile.Position.Base.Y) + float32(size.Y)/2,
 	}
 }
 
-func HitKurinObject(object *KurinObject) {
+func InteractObject(character *Character, object *Object) {
+	CharacterHitObject(character, object)
+}
+
+func HitObject(object *Object) {
 	PlaySound(&GameInstance.SoundController, "grillehit")
-	CreateKurinParticle(&GameInstance.ParticleController, NewKurinParticleCross(sdlutils.Vector3ToFVector3Center(object.Tile.Position), 0.75, sdl.Color{R: 210, G: 210, B: 210}))
+	CreateParticle(&GameInstance.ParticleController, NewParticleCross(sdlutils.Vector3ToFVector3Center(object.Tile.Position), 0.75, sdl.Color{R: 210, G: 210, B: 210}))
 	object.Health--
 	if object.Health <= 0 {
-		DestroyKurinObject(object)
+		DestroyObject(object)
 	}
 }

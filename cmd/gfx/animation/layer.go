@@ -5,37 +5,37 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx"
 )
 
-type KurinRendererLayerAnimationData struct {
-	Animations map[string]*KurinAnimationGraphic
+type RendererLayerAnimationData struct {
+	Animations map[string]*AnimationGraphic
 }
 
-func NewKurinRendererLayerAnimation() *gfx.RendererLayer {
+func NewRendererLayerAnimation() *gfx.RendererLayer {
 	return &gfx.RendererLayer{
-		Load:   LoadKurinRendererLayerAnimation,
-		Render: RenderKurinRendererLayerAnimation,
-		Data: &KurinRendererLayerAnimationData{
-			Animations: map[string]*KurinAnimationGraphic{},
+		Load:   LoadRendererLayerAnimation,
+		Render: RenderRendererLayerAnimation,
+		Data: &RendererLayerAnimationData{
+			Animations: map[string]*AnimationGraphic{},
 		},
 	}
 }
 
-func LoadKurinRendererLayerAnimation(layer *gfx.RendererLayer) error {
+func LoadRendererLayerAnimation(layer *gfx.RendererLayer) error {
 	var err error
-	if layer.Data.(*KurinRendererLayerAnimationData).Animations["hit"], err = NewKurinAnimationGraphic("hit"); err != nil {
+	if layer.Data.(*RendererLayerAnimationData).Animations["hit"], err = NewAnimationGraphic("hit"); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func RenderKurinRendererLayerAnimation(layer *gfx.RendererLayer) error {
+func RenderRendererLayerAnimation(layer *gfx.RendererLayer) error {
 	for _, character := range gameplay.GameInstance.Characters {
 		if character.AnimationController.Animation != nil {
-			graphic := layer.Data.(*KurinRendererLayerAnimationData).Animations[character.AnimationController.Animation.Type]
+			graphic := layer.Data.(*RendererLayerAnimationData).Animations[character.AnimationController.Animation.Type]
 			if character.AnimationController.Animation.Step == -1 {
-				AdvanceKurinCharacterAnimation(character, &graphic.Template)
+				AdvanceCharacterAnimation(character, &graphic.Template)
 			}
-			ProcessKurinCharacterAnimation(character, &graphic.Template)
+			ProcessCharacterAnimation(character, &graphic.Template)
 		}
 	}
 

@@ -4,15 +4,15 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinAnimationController struct {
-	Animation     *KurinAnimation
+type AnimationController struct {
+	Animation     *Animation
 	Position      sdl.FPoint
 	PositionShift sdl.FPoint
 	Direction     bool
 }
 
-func NewKurinAnimationController() KurinAnimationController {
-	return KurinAnimationController{
+func NewAnimationController() AnimationController {
+	return AnimationController{
 		Animation:     nil,
 		Position:      sdl.FPoint{},
 		PositionShift: sdl.FPoint{},
@@ -20,14 +20,14 @@ func NewKurinAnimationController() KurinAnimationController {
 	}
 }
 
-func PlayKurinCharacterAnimation(character *KurinCharacter, atype string) {
+func PlayCharacterAnimation(character *Character, atype string) {
 	if character.AnimationController.Animation != nil {
-		EndKurinCharacterAnimation(character)
+		EndCharacterAnimation(character)
 	}
-	character.AnimationController.Animation = NewKurinAnimation(atype)
+	character.AnimationController.Animation = NewAnimation(atype)
 }
 
-func EndKurinCharacterAnimation(character *KurinCharacter) {
+func EndCharacterAnimation(character *Character) {
 	character.AnimationController.Animation = nil
 	character.AnimationController.Position = sdl.FPoint{}
 	character.AnimationController.PositionShift = sdl.FPoint{}

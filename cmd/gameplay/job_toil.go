@@ -1,26 +1,18 @@
 package gameplay
 
-type KurinJobToil struct {
+type JobToil struct {
 	Type    string
 	Started bool
 	Ticks   int32
 
-	Start   KurinJobToilStart
-	Process KurinJobToilProcess
-	End     KurinJobToilEnd
-	Data    interface{}
+	Template *JobToilTemplate
+	Data     interface{}
 }
 
-type (
-	KurinJobToilStart   func(driver *KurinJobDriver, toil *KurinJobToil) KurinJobToilStatus
-	KurinJobToilProcess func(driver *KurinJobDriver, toil *KurinJobToil) KurinJobToilStatus
-	KurinJobToilEnd     func(driver *KurinJobDriver, toil *KurinJobToil)
-)
-
-type KurinJobToilStatus uint8
+type JobToilStatus uint8
 
 const (
-	KurinJobToilStatusFailed   = KurinJobToilStatus(0)
-	KurinJobToilStatusWorking  = KurinJobToilStatus(1)
-	KurinJobToilStatusComplete = KurinJobToilStatus(2)
+	JobToilStatusFailed   = JobToilStatus(0)
+	JobToilStatusWorking  = JobToilStatus(1)
+	JobToilStatusComplete = JobToilStatus(2)
 )

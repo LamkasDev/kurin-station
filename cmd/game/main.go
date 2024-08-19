@@ -6,49 +6,44 @@ import (
 	"time"
 
 	"github.com/LamkasDev/kurin/cmd/common/constants"
+	"github.com/LamkasDev/kurin/cmd/event"
 	"github.com/LamkasDev/kurin/cmd/game/life"
 	"github.com/LamkasDev/kurin/cmd/game/timing"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
 func main() {
-	if err := constants.LoadConstants(); err != nil {
+	var err error
+	if err = constants.LoadConstants(); err != nil {
 		panic(err)
 	}
-
 	StartProfiling()
-
-	instance, err := life.NewKurinInstance()
-	if err != nil {
+	if err = life.InitializeSystems(); err != nil {
 		panic(err)
 	}
 
 	fps := 60
 	tickMs := 1000 / float32(fps)
 	tick := time.Tick(time.Duration(tickMs) * time.Millisecond)
-	timing.KurinTimingGlobal.FrameTime = tickMs
+	timing.TimingGlobal.FrameTime = tickMs
 
 	for {
 		<-tick
-
-		if err = life.RunKurinInstance(&instance); err != nil {
+		if err = life.RunSystems(); err != nil {
 			break
 		}
-
-		timing.KurinTimingGlobal.FrameTime = tickMs
+		timing.TimingGlobal.FrameTime = tickMs
 	}
 
-	if instance.EventManager.Close {
+	if event.EventManagerInstance.Close {
 		StopProfiling()
-
-		if err := life.FreeKurinInstance(&instance); err != nil {
+		if err = life.FreeSystems(); err != nil {
 			panic(err)
 		}
-
 		sdl.Quit()
-
 		return
 	}
+
 	if err != nil {
 		panic(err)
 	}

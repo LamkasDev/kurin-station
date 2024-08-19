@@ -2,33 +2,33 @@ package serialization
 
 import "github.com/LamkasDev/kurin/cmd/gameplay"
 
-type KurinNarratorObjectiveData struct {
+type NarratorObjectiveData struct {
 	Text         string
-	Requirements []KurinNarratorObjectiveRequirementData
+	Requirements []NarratorObjectiveRequirementData
 	Ticks        uint64
 }
 
-func EncodeKurinNarratorObjective(objective *gameplay.KurinNarratorObjective) KurinNarratorObjectiveData {
-	data := KurinNarratorObjectiveData{
+func EncodeNarratorObjective(objective *gameplay.Objective) NarratorObjectiveData {
+	data := NarratorObjectiveData{
 		Text:         objective.Text,
-		Requirements: []KurinNarratorObjectiveRequirementData{},
+		Requirements: []NarratorObjectiveRequirementData{},
 		Ticks:        objective.Ticks,
 	}
 	for _, requirement := range objective.Requirements {
-		data.Requirements = append(data.Requirements, EncodeKurinNarratorObjectiveRequirement(requirement))
+		data.Requirements = append(data.Requirements, EncodeNarratorObjectiveRequirement(requirement))
 	}
 
 	return data
 }
 
-func DecodeKurinNarratorObjective(data KurinNarratorObjectiveData) *gameplay.KurinNarratorObjective {
-	objective := &gameplay.KurinNarratorObjective{
+func DecodeNarratorObjective(data NarratorObjectiveData) *gameplay.Objective {
+	objective := &gameplay.Objective{
 		Text:         data.Text,
-		Requirements: []*gameplay.KurinNarratorObjectiveRequirement{},
+		Requirements: []*gameplay.ObjectiveRequirement{},
 		Ticks:        data.Ticks,
 	}
 	for _, requirementData := range data.Requirements {
-		objective.Requirements = append(objective.Requirements, DecodeKurinNarratorObjectiveRequirement(requirementData))
+		objective.Requirements = append(objective.Requirements, DecodeNarratorObjectiveRequirement(requirementData))
 	}
 
 	return objective

@@ -7,61 +7,64 @@ import (
 )
 
 const (
-	KurinDefaultSpecies         = "human"
-	KurinDefaultType            = "f"
-	KurinCharacterMovementTicks = 30
+	DefaultSpecies         = "human"
+	DefaultGender          = "f"
+	CharacterMovementTicks = 10
 )
 
-type KurinCharacter struct {
+type Character struct {
 	Id         uint32
-	Type       string
 	Species    string
+	Gender     string
+	Faction    Faction
 	Position   sdlutils.Vector3
-	Direction  common.KurinDirection
+	Direction  common.Direction
 	Fatigue    int32
-	ActiveHand KurinHand
-	Inventory  KurinInventory
-	JobTracker *KurinJobTracker
+	ActiveHand Hand
+	Inventory  Inventory
+	JobTracker *JobTracker
 
 	PositionRender      sdl.FPoint
-	Movement            sdl.FPoint
-	Moving              bool
-	Thinktree           KurinCharacterThinktree
-	AnimationController KurinAnimationController
+	Movement            sdl.Point
+	MovementTicks       uint8
+	Thinktree           CharacterThinktree
+	AnimationController AnimationController
 }
 
-func NewKurinCharacter() *KurinCharacter {
-	character := &KurinCharacter{
+func NewCharacter(faction Faction) *Character {
+	character := &Character{
 		Id:                  GetNextId(),
-		Type:                KurinDefaultType,
-		Species:             KurinDefaultSpecies,
-		ActiveHand:          KurinHandLeft,
-		Fatigue:             0,
+		Species:             DefaultSpecies,
+		Gender:              DefaultGender,
+		Faction:             faction,
 		Position:            sdlutils.Vector3{},
+		Direction:           common.DirectionEast,
+		Fatigue:             0,
+		ActiveHand:          HandLeft,
+		Inventory:           NewInventory(),
 		PositionRender:      sdl.FPoint{},
-		Movement:            sdl.FPoint{},
-		Direction:           common.KurinDirectionEast,
-		Inventory:           NewKurinInventory(),
-		Thinktree:           NewKurinCharacterThinktree(),
-		AnimationController: NewKurinAnimationController(),
+		Movement:            sdl.Point{},
+		MovementTicks:       0,
+		Thinktree:           NewCharacterThinktree(),
+		AnimationController: NewAnimationController(),
 	}
-	character.JobTracker = NewKurinJobTracker(character)
+	character.JobTracker = NewJobTracker(character)
 
 	return character
 }
 
-func PopulateKurinCharacter(character *KurinCharacter) {
-	character.Inventory.Hands[KurinHandLeft] = NewKurinItem("survivalknife", 1)
-	character.Inventory.Hands[KurinHandRight] = NewKurinItem("welder", 1)
+func PopulateCharacter(character *Character) {
+	character.Inventory.Hands[HandLeft] = NewItem("survivalknife", 1)
+	character.Inventory.Hands[HandRight] = NewItem("welder", 1)
 }
 
-func ProcessKurinCharacter(character *KurinCharacter) {
+func ProcessCharacter(character *Character) {
 	if character.Fatigue > 0 {
 		character.Fatigue--
 	}
 	if GameInstance.SelectedCharacter != character {
-		if !ProcessKurinJobTracker(character.JobTracker) {
-			ProcessKurinCharacterThinktree(character)
+		if !ProcessJobTracker(character.JobTracker) {
+			ProcessCharacterThinktree(character)
 		}
 	}
 }

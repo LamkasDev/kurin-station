@@ -9,46 +9,46 @@ import (
 )
 
 const (
-	KurinRendererLayerContextDataItemWidth  = 164
-	KurinRendererLayerContextDataItemHeight = 36
+	RendererLayerContextDataItemWidth  = 164
+	RendererLayerContextDataItemHeight = 36
 )
 
-type KurinRendererLayerContextData struct {
+type RendererLayerContextData struct {
 	Position    *sdl.Point
-	Items       []KurinRendererLayerContextDataItem
+	Items       []RendererLayerContextDataItem
 	HoveredItem int
 }
 
-type KurinRendererLayerContextDataItem struct {
+type RendererLayerContextDataItem struct {
 	Text     string
 	Disabled bool
 	OnClick  func()
 }
 
-func NewKurinRendererLayerContext() *gfx.RendererLayer {
+func NewRendererLayerContext() *gfx.RendererLayer {
 	return &gfx.RendererLayer{
-		Load:   LoadKurinRendererLayerContext,
-		Render: RenderKurinRendererLayerContext,
-		Data: &KurinRendererLayerContextData{
+		Load:   LoadRendererLayerContext,
+		Render: RenderRendererLayerContext,
+		Data: &RendererLayerContextData{
 			Position:    nil,
-			Items:       []KurinRendererLayerContextDataItem{},
+			Items:       []RendererLayerContextDataItem{},
 			HoveredItem: -1,
 		},
 	}
 }
 
-func LoadKurinRendererLayerContext(layer *gfx.RendererLayer) error {
+func LoadRendererLayerContext(layer *gfx.RendererLayer) error {
 	return nil
 }
 
-func RenderKurinRendererLayerContext(layer *gfx.RendererLayer) error {
-	data := layer.Data.(*KurinRendererLayerContextData)
+func RenderRendererLayerContext(layer *gfx.RendererLayer) error {
+	data := layer.Data.(*RendererLayerContextData)
 	if data.Position == nil {
 		return nil
 	}
 	for i, item := range data.Items {
-		y := data.Position.Y + int32(i)*KurinRendererLayerContextDataItemHeight
-		rect := sdl.Rect{X: data.Position.X, Y: y, W: KurinRendererLayerContextDataItemWidth, H: KurinRendererLayerContextDataItemHeight}
+		y := data.Position.Y + int32(i)*RendererLayerContextDataItemHeight
+		rect := sdl.Rect{X: data.Position.X, Y: y, W: RendererLayerContextDataItemWidth, H: RendererLayerContextDataItemHeight}
 		gfx.RendererInstance.Renderer.SetDrawColor(255, 255, 255, 0)
 		if err := gfx.RendererInstance.Renderer.FillRect(&rect); err != nil {
 			return err

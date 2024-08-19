@@ -4,25 +4,25 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gameplay"
 )
 
-type KurinJobControllerData struct {
-	Jobs []KurinJobDriverData
+type JobControllerData struct {
+	Jobs []JobDriverData
 }
 
-func EncodeKurinJobController(controller *gameplay.KurinJobController) KurinJobControllerData {
-	data := KurinJobControllerData{
-		Jobs: []KurinJobDriverData{},
+func EncodeJobController(controller *gameplay.JobController) JobControllerData {
+	data := JobControllerData{
+		Jobs: []JobDriverData{},
 	}
 	for _, job := range controller.Jobs {
-		data.Jobs = append(data.Jobs, EncodeKurinJobDriver(job))
+		data.Jobs = append(data.Jobs, EncodeJobDriver(job))
 	}
 
 	return data
 }
 
-func DecodeKurinJobController(data KurinJobControllerData) *gameplay.KurinJobController {
-	controller := gameplay.NewKurinJobController()
+func DecodeJobController(data JobControllerData) *gameplay.JobController {
+	controller := gameplay.NewJobController()
 	for _, jobData := range data.Jobs {
-		gameplay.PushKurinJobToController(controller, DecodeKurinJobDriver(jobData))
+		gameplay.PushJobToController(controller, DecodeJobDriver(jobData))
 	}
 
 	return controller

@@ -5,40 +5,43 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx"
 )
 
-type KurinRendererLayerTileData struct {
-	Turfs map[string]*KurinTurfGraphic
+type RendererLayerTileData struct {
+	Turfs map[string]*TurfGraphic
 }
 
-func NewKurinRendererLayerTile() *gfx.RendererLayer {
+func NewRendererLayerTile() *gfx.RendererLayer {
 	return &gfx.RendererLayer{
-		Load:   LoadKurinRendererLayerTile,
-		Render: RenderKurinRendererLayerTile,
-		Data: &KurinRendererLayerTileData{
-			Turfs: map[string]*KurinTurfGraphic{},
+		Load:   LoadRendererLayerTile,
+		Render: RenderRendererLayerTile,
+		Data: &RendererLayerTileData{
+			Turfs: map[string]*TurfGraphic{},
 		},
 	}
 }
 
-func LoadKurinRendererLayerTile(layer *gfx.RendererLayer) error {
+func LoadRendererLayerTile(layer *gfx.RendererLayer) error {
 	var err error
-	if layer.Data.(*KurinRendererLayerTileData).Turfs["floor"], err = NewKurinTurfGraphic("floor"); err != nil {
+	if layer.Data.(*RendererLayerTileData).Turfs["floor"], err = NewTurfGraphic("floor"); err != nil {
 		return err
 	}
-	if layer.Data.(*KurinRendererLayerTileData).Turfs["blank"], err = NewKurinTurfGraphic("blank"); err != nil {
+	if layer.Data.(*RendererLayerTileData).Turfs["blank"], err = NewTurfGraphic("blank"); err != nil {
+		return err
+	}
+	if layer.Data.(*RendererLayerTileData).Turfs["catwalk"], err = NewTurfGraphic("catwalk"); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func RenderKurinRendererLayerTile(layer *gfx.RendererLayer) error {
+func RenderRendererLayerTile(layer *gfx.RendererLayer) error {
 	for x := range gameplay.GameInstance.Map.Size.Base.X {
 		for y := range gameplay.GameInstance.Map.Size.Base.Y {
 			tile := gameplay.GameInstance.Map.Tiles[x][y][0]
 			if tile == nil {
 				continue
 			}
-			RenderKurinTile(layer, tile)
+			RenderTile(layer, tile)
 		}
 	}
 

@@ -7,23 +7,23 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-func GetKurinTileRectDebug(tile *gameplay.KurinTile, offset sdl.FPoint) sdl.Rect {
+func GetTileRectDebug(tile *gameplay.Tile, offset sdl.FPoint) sdl.Rect {
 	return render.WorldToScreenRect(sdl.FRect{
 		X: float32(tile.Position.Base.X) + offset.X, Y: float32(tile.Position.Base.Y) + offset.Y,
-		W: gameplay.KurinTileSizeF.X, H: gameplay.KurinTileSizeF.Y,
+		W: gameplay.TileSizeF.X, H: gameplay.TileSizeF.Y,
 	})
 }
 
-func GetKurinTileRect(tile *gameplay.KurinTile) sdl.Rect {
+func GetTileRect(tile *gameplay.Tile) sdl.Rect {
 	return render.WorldToScreenRect(sdl.FRect{
 		X: float32(tile.Position.Base.X), Y: float32(tile.Position.Base.Y),
-		W: gameplay.KurinTileSizeF.X, H: gameplay.KurinTileSizeF.Y,
+		W: gameplay.TileSizeF.X, H: gameplay.TileSizeF.Y,
 	})
 }
 
-func RenderKurinTile(layer *gfx.RendererLayer, tile *gameplay.KurinTile) error {
-	graphic := layer.Data.(*KurinRendererLayerTileData).Turfs[tile.Type]
-	rect := GetKurinTileRect(tile)
+func RenderTile(layer *gfx.RendererLayer, tile *gameplay.Tile) error {
+	graphic := layer.Data.(*RendererLayerTileData).Turfs[tile.Type]
+	rect := GetTileRect(tile)
 	if err := gfx.RendererInstance.Renderer.Copy(graphic.Textures[0].Texture, nil, &rect); err != nil {
 		return err
 	}
@@ -31,9 +31,12 @@ func RenderKurinTile(layer *gfx.RendererLayer, tile *gameplay.KurinTile) error {
 	return nil
 }
 
-func RenderKurinTileBlueprint(layer *gfx.RendererLayer, tile *gameplay.KurinTile, color sdl.Color) error {
-	graphic := layer.Data.(*KurinRendererLayerTileData).Turfs[tile.Type]
-	rect := GetKurinTileRect(tile)
+func RenderTileBlueprint(layer *gfx.RendererLayer, tile *gameplay.Tile, color sdl.Color) error {
+	graphic := layer.Data.(*RendererLayerTileData).Turfs[tile.Type]
+	if graphic.Blueprint == nil {
+		return nil
+	}
+	rect := GetTileRect(tile)
 	graphic.Blueprint.Texture.SetColorMod(color.R, color.G, color.B)
 	if err := gfx.RendererInstance.Renderer.Copy(graphic.Blueprint.Texture, nil, &rect); err != nil {
 		return err

@@ -7,8 +7,8 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-func GetKurinObjectRect(layer *gfx.RendererLayer, obj *gameplay.KurinObject) sdl.Rect {
-	graphic := layer.Data.(*KurinRendererLayerObjectData).Structures[obj.Type]
+func GetObjectRect(layer *gfx.RendererLayer, obj *gameplay.Object) sdl.Rect {
+	graphic := layer.Data.(*RendererLayerObjectData).Structures[obj.Type]
 	texture := graphic.Textures[obj.Direction][0]
 	return render.WorldToScreenRect(sdl.FRect{
 		X: float32(obj.Tile.Position.Base.X), Y: float32(obj.Tile.Position.Base.Y),
@@ -16,12 +16,12 @@ func GetKurinObjectRect(layer *gfx.RendererLayer, obj *gameplay.KurinObject) sdl
 	})
 }
 
-func RenderKurinObject(layer *gfx.RendererLayer, obj *gameplay.KurinObject) error {
-	graphic := layer.Data.(*KurinRendererLayerObjectData).Structures[obj.Type]
-	rect := GetKurinObjectRect(layer, obj)
-	texture := graphic.Textures[obj.Direction][obj.GetTexture(obj)]
+func RenderObject(layer *gfx.RendererLayer, obj *gameplay.Object) error {
+	graphic := layer.Data.(*RendererLayerObjectData).Structures[obj.Type]
+	rect := GetObjectRect(layer, obj)
+	texture := graphic.Textures[obj.Direction][obj.Template.GetTexture(obj)]
 	if graphic.Template.Smooth != nil && *graphic.Template.Smooth {
-		texture = graphic.TexturesSmooth[gameplay.GetKurinObjectDirectionHint(&gameplay.GameInstance.Map, obj)]
+		texture = graphic.TexturesSmooth[gameplay.GetObjectDirectionHint(&gameplay.GameInstance.Map, obj)]
 	}
 	if err := gfx.RendererInstance.Renderer.Copy(texture.Texture, nil, &rect); err != nil {
 		return err
@@ -30,9 +30,12 @@ func RenderKurinObject(layer *gfx.RendererLayer, obj *gameplay.KurinObject) erro
 	return nil
 }
 
-func RenderKurinObjectBlueprint(layer *gfx.RendererLayer, obj *gameplay.KurinObject, color sdl.Color) error {
-	graphic := layer.Data.(*KurinRendererLayerObjectData).Structures[obj.Type]
-	rect := GetKurinObjectRect(layer, obj)
+func RenderObjectBlueprint(layer *gfx.RendererLayer, obj *gameplay.Object, color sdl.Color) error {
+	graphic := layer.Data.(*RendererLayerObjectData).Structures[obj.Type]
+	if graphic.Blueprint == nil {
+		return nil
+	}
+	rect := GetObjectRect(layer, obj)
 	graphic.Blueprint.Texture.SetColorMod(color.R, color.G, color.B)
 	if err := gfx.RendererInstance.Renderer.Copy(graphic.Blueprint.Texture, nil, &rect); err != nil {
 		return err

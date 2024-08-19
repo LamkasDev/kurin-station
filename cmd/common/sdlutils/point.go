@@ -3,23 +3,10 @@ package sdlutils
 import (
 	"math"
 
-	"github.com/LamkasDev/kurin/cmd/common/mathutils"
 	"github.com/adam-lavrik/go-imath/i32"
 	"github.com/arl/math32"
 	"github.com/veandco/go-sdl2/sdl"
 )
-
-func FPointToPoint(point sdl.FPoint) sdl.Point {
-	return sdl.Point{
-		X: int32(point.X), Y: int32(point.Y),
-	}
-}
-
-func FPointToPointFloored(point sdl.FPoint) sdl.Point {
-	return sdl.Point{
-		X: int32(math32.Floor(point.X)), Y: int32(math32.Floor(point.Y)),
-	}
-}
 
 func PointToFPoint(point sdl.Point) sdl.FPoint {
 	return sdl.FPoint{
@@ -40,13 +27,6 @@ func AddPoints(a sdl.Point, b sdl.Point) sdl.Point {
 	}
 }
 
-func AddFPoints(a sdl.FPoint, b sdl.FPoint) sdl.FPoint {
-	return sdl.FPoint{
-		X: a.X + b.X,
-		Y: a.Y + b.Y,
-	}
-}
-
 func SubtractPoints(a sdl.Point, b sdl.Point) sdl.Point {
 	return sdl.Point{
 		X: a.X - b.X,
@@ -54,22 +34,8 @@ func SubtractPoints(a sdl.Point, b sdl.Point) sdl.Point {
 	}
 }
 
-func SubtractFPoints(a sdl.FPoint, b sdl.FPoint) sdl.FPoint {
-	return sdl.FPoint{
-		X: a.X - b.X,
-		Y: a.Y - b.Y,
-	}
-}
-
 func MultiplyPoints(a sdl.Point, b sdl.Point) sdl.Point {
 	return sdl.Point{
-		X: a.X * b.X,
-		Y: a.Y * b.Y,
-	}
-}
-
-func MultiplyFPoints(a sdl.FPoint, b sdl.FPoint) sdl.FPoint {
-	return sdl.FPoint{
 		X: a.X * b.X,
 		Y: a.Y * b.Y,
 	}
@@ -89,34 +55,20 @@ func DividePoints(a sdl.Point, b sdl.Point) sdl.Point {
 	}
 }
 
-func DivideFPoints(a sdl.FPoint, b sdl.FPoint) sdl.FPoint {
-	return sdl.FPoint{
-		X: a.X / b.X,
-		Y: a.Y / b.Y,
-	}
+func IsPointZero(a sdl.Point) bool {
+	return a.X == 0 && a.Y == 0
 }
 
-func DivideFPointByFloat(a sdl.FPoint, b float32) sdl.FPoint {
-	return sdl.FPoint{
-		X: a.X / b,
-		Y: a.Y / b,
-	}
+func ComparePoints(a sdl.Point, b sdl.Point) bool {
+	return a.X == b.X && a.Y == b.Y
 }
 
 func GetDistanceSimple(a sdl.Point, b sdl.Point) int32 {
 	return i32.Max(i32.Abs(a.X-b.X), i32.Abs(a.Y-b.Y))
 }
 
-func GetDistanceSimpleF(a sdl.FPoint, b sdl.FPoint) float32 {
-	return mathutils.MaxFloat32(mathutils.AbsFloat32(a.X-b.X), mathutils.AbsFloat32(a.Y-b.Y))
-}
-
 func GetDistance(a sdl.Point, b sdl.Point) int32 {
 	return i32.Abs(a.X-b.X) + i32.Abs(a.Y-b.Y)
-}
-
-func GetDistanceF(a sdl.FPoint, b sdl.FPoint) float32 {
-	return mathutils.AbsFloat32(a.X-b.X) + mathutils.AbsFloat32(a.Y-b.Y)
 }
 
 func RotatePoint(point sdl.Point, center sdl.Point, angle float32) sdl.Point {

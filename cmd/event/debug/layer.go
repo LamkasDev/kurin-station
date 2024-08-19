@@ -9,38 +9,40 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinEventLayerDebugData struct {
+type EventLayerDebugData struct {
 	Layer *gfx.RendererLayer
 }
 
-func NewKurinEventLayerDebug(layer *gfx.RendererLayer) *event.EventLayer {
+func NewEventLayerDebug(layer *gfx.RendererLayer) *event.EventLayer {
 	return &event.EventLayer{
-		Load:    LoadKurinEventLayerDebug,
-		Process: ProcessKurinEventLayerDebug,
-		Data: &KurinEventLayerDebugData{
+		Load:    LoadEventLayerDebug,
+		Process: ProcessEventLayerDebug,
+		Data: &EventLayerDebugData{
 			Layer: layer,
 		},
 	}
 }
 
-func LoadKurinEventLayerDebug(layer *event.EventLayer) error {
+func LoadEventLayerDebug(layer *event.EventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerDebug(layer *event.EventLayer) error {
+func ProcessEventLayerDebug(layer *event.EventLayer) error {
 	if event.EventManagerInstance.Keyboard.Pending == nil {
 		return nil
 	}
-	data := layer.Data.(*KurinEventLayerDebugData).Layer.Data.(*debug.KurinRendererLayerDebugData)
+	data := layer.Data.(*EventLayerDebugData).Layer.Data.(*debug.RendererLayerDebugData)
 	switch *event.EventManagerInstance.Keyboard.Pending {
 	case sdl.K_p:
-		data.Path = gameplay.FindKurinPath(&gameplay.GameInstance.Map.Pathfinding, gameplay.GameInstance.SelectedCharacter.Position, sdlutils.Vector3{Base: sdl.Point{X: 0, Y: 0}, Z: 0})
+		data.Path = gameplay.FindPath(&gameplay.GameInstance.Map.Pathfinding, gameplay.GameInstance.SelectedCharacter.Position, sdlutils.Vector3{Base: sdl.Point{X: 0, Y: 0}, Z: 0})
 		event.EventManagerInstance.Keyboard.Pending = nil
 	case sdl.K_o:
 		if len(gameplay.GameInstance.Narrator.Objectives) > 0 {
-			gameplay.CompleteKurinNarratorObjective(gameplay.GameInstance.Narrator)
+			gameplay.CompleteNarratorObjective(gameplay.GameInstance.Narrator)
 		}
 		event.EventManagerInstance.Keyboard.Pending = nil
+	case sdl.K_F1:
+		gameplay.GameInstance.Godmode = !gameplay.GameInstance.Godmode
 	default:
 		return nil
 	}

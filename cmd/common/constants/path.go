@@ -40,7 +40,7 @@ func LoadConstants() error {
 		return err
 	}
 
-	if arch.KurinDebug {
+	if arch.Debug {
 		ApplicationPath = path.Join(path.Dir(ex), "..", "..")
 	} else {
 		u, err := user.Current()

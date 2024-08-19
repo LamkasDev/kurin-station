@@ -31,3 +31,12 @@ func AddRectAndPoint(a sdl.Rect, b sdl.Point) sdl.Rect {
 		H: a.H,
 	}
 }
+
+func ScaleRectCentered(rect sdl.Rect, n float32) sdl.Rect {
+	return sdl.Rect{
+		X: rect.X + int32((float32(rect.W)*(1-n))/2),
+		Y: rect.Y + int32((float32(rect.H)*(1-n))/2),
+		W: int32(float32(rect.W) * n),
+		H: int32(float32(rect.H) * n),
+	}
+}

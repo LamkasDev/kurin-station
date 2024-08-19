@@ -1,11 +1,11 @@
 package gameplay
 
-type KurinForceController struct {
-	Forces map[*KurinItem]*KurinForce
+type ForceController struct {
+	Forces map[*Item]*Force
 }
 
-func NewKurinForceController() KurinForceController {
-	return KurinForceController{
-		Forces: map[*KurinItem]*KurinForce{},
+func NewForceController() ForceController {
+	return ForceController{
+		Forces: map[*Item]*Force{},
 	}
 }

@@ -1,11 +1,11 @@
 package gfx
 
 type RendererLayer struct {
-	Load   KurinRendererLayerLoad
-	Render KurinRendererLayerRender
+	Load   RendererLayerLoad
+	Render RendererLayerRender
 	Data   interface{}
 }
 
-type KurinRendererLayerLoad func(layer *RendererLayer) error
+type RendererLayerLoad func(layer *RendererLayer) error
 
-type KurinRendererLayerRender func(layer *RendererLayer) error
+type RendererLayerRender func(layer *RendererLayer) error

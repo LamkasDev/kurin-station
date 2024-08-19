@@ -10,12 +10,12 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gameplay/templates"
 )
 
-type KurinAnimationGraphic struct {
-	Template templates.KurinAnimationTemplate
+type AnimationGraphic struct {
+	Template templates.AnimationTemplate
 }
 
-func NewKurinAnimationGraphic(animationId string) (*KurinAnimationGraphic, error) {
-	graphic := KurinAnimationGraphic{}
+func NewAnimationGraphic(animationId string) (*AnimationGraphic, error) {
+	graphic := AnimationGraphic{}
 
 	templateBytes, err := os.ReadFile(path.Join(constants.DataPath, "templates", "animations", fmt.Sprintf("%s.json", animationId)))
 	if err != nil {

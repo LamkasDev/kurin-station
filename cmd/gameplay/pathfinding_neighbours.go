@@ -2,8 +2,8 @@ package gameplay
 
 import "github.com/veandco/go-sdl2/sdl"
 
-func GetKurinPathfindingNodeNeighbours(grid *KurinPathfindingGrid, node *KurinPathfindingNode, walk bool) []*KurinPathfindingNode {
-	neighbours := []*KurinPathfindingNode{}
+func GetPathfindingNodeNeighbours(grid *PathfindingGrid, node *PathfindingNode, walk bool) []*PathfindingNode {
+	neighbours := []*PathfindingNode{}
 	north := GetNodeAt(grid, sdl.Point{X: node.Position.Base.X, Y: node.Position.Base.Y - 1})
 	if north != nil {
 		neighbours = append(neighbours, north)

@@ -12,28 +12,28 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinRendererLayerHUDData struct {
-	Icons       map[string]*KurinHUDGraphic
+type RendererLayerHUDData struct {
+	Icons       map[string]*HUDGraphic
 	ItemLayer   *gfx.RendererLayer
-	HoveredItem *gameplay.KurinItem
+	HoveredItem *gameplay.Item
 }
 
-func NewKurinRendererLayerHUD(itemLayer *gfx.RendererLayer) *gfx.RendererLayer {
+func NewRendererLayerHUD(itemLayer *gfx.RendererLayer) *gfx.RendererLayer {
 	return &gfx.RendererLayer{
-		Load:   LoadKurinRendererLayerHUD,
-		Render: RenderKurinRendererLayerHUD,
-		Data: &KurinRendererLayerHUDData{
-			Icons:     map[string]*KurinHUDGraphic{},
+		Load:   LoadRendererLayerHUD,
+		Render: RenderRendererLayerHUD,
+		Data: &RendererLayerHUDData{
+			Icons:     map[string]*HUDGraphic{},
 			ItemLayer: itemLayer,
 		},
 	}
 }
 
-func LoadKurinRendererLayerHUD(layer *gfx.RendererLayer) error {
+func LoadRendererLayerHUD(layer *gfx.RendererLayer) error {
 	textures := []string{"hand_l", "lhandactive", "hand_r", "rhandactive", "act_equip", "swap_1", "swap_2", "pda", "selector", "template", "template_active", "credit", "objective_window", "cat"}
 	var err error
 	for _, texture := range textures {
-		if layer.Data.(*KurinRendererLayerHUDData).Icons[texture], err = NewKurinHUDGraphic(texture); err != nil {
+		if layer.Data.(*RendererLayerHUDData).Icons[texture], err = NewHUDGraphic(texture); err != nil {
 			return err
 		}
 	}
@@ -41,41 +41,41 @@ func LoadKurinRendererLayerHUD(layer *gfx.RendererLayer) error {
 	return nil
 }
 
-func RenderKurinRendererLayerHUD(layer *gfx.RendererLayer) error {
-	if gfx.RendererInstance.Context.CameraMode != gfx.KurinRendererCameraModeCharacter {
+func RenderRendererLayerHUD(layer *gfx.RendererLayer) error {
+	if gfx.RendererInstance.Context.CameraMode != gfx.RendererCameraModeCharacter {
 		return nil
 	}
 	half := gfx.GetHalfWindowSize(&gfx.RendererInstance.Context)
-	data := layer.Data.(*KurinRendererLayerHUDData)
-	itemData := data.ItemLayer.Data.(*item.KurinRendererLayerItemData)
+	data := layer.Data.(*RendererLayerHUDData)
+	itemData := data.ItemLayer.Data.(*item.RendererLayerItemData)
 
-	sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["hand_l"].Texture, KurinHUDElementHandLeft.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
-	if gameplay.GameInstance.SelectedCharacter.ActiveHand == gameplay.KurinHandLeft {
+	sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["hand_l"].Texture, HUDElementHandLeft.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
+	if gameplay.GameInstance.SelectedCharacter.ActiveHand == gameplay.HandLeft {
 		sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["lhandactive"].Texture, sdl.Point{X: half.X, Y: gfx.RendererInstance.Context.WindowSize.Y - 72}, sdl.FPoint{X: 2, Y: 2})
 	}
-	lhand := gameplay.GameInstance.SelectedCharacter.Inventory.Hands[gameplay.KurinHandLeft]
+	lhand := gameplay.GameInstance.SelectedCharacter.Inventory.Hands[gameplay.HandLeft]
 	if lhand != nil {
 		graphic := itemData.Items[lhand.Type]
 		if graphic.Outline != nil && data.HoveredItem == lhand {
-			sdlutils.RenderTexture(gfx.RendererInstance.Renderer, graphic.Outline, KurinHUDElementHandLeft.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
+			sdlutils.RenderTexture(gfx.RendererInstance.Renderer, graphic.Outline, HUDElementHandLeft.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
 		}
-		for _, i := range lhand.GetTextures(lhand) {
-			sdlutils.RenderTexture(gfx.RendererInstance.Renderer, graphic.Textures[i].Base, KurinHUDElementHandLeft.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
+		for _, i := range lhand.Template.GetTextures(lhand) {
+			sdlutils.RenderTexture(gfx.RendererInstance.Renderer, graphic.Textures[i].Base, HUDElementHandLeft.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
 		}
 	}
 
-	sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["hand_r"].Texture, KurinHUDElementHandRight.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
-	if gameplay.GameInstance.SelectedCharacter.ActiveHand == gameplay.KurinHandRight {
+	sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["hand_r"].Texture, HUDElementHandRight.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
+	if gameplay.GameInstance.SelectedCharacter.ActiveHand == gameplay.HandRight {
 		sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["rhandactive"].Texture, sdl.Point{X: half.X - 64, Y: gfx.RendererInstance.Context.WindowSize.Y - 72}, sdl.FPoint{X: 2, Y: 2})
 	}
-	rhand := gameplay.GameInstance.SelectedCharacter.Inventory.Hands[gameplay.KurinHandRight]
+	rhand := gameplay.GameInstance.SelectedCharacter.Inventory.Hands[gameplay.HandRight]
 	if rhand != nil {
 		graphic := itemData.Items[rhand.Type]
 		if graphic.Outline != nil && data.HoveredItem == rhand {
-			sdlutils.RenderTexture(gfx.RendererInstance.Renderer, graphic.Outline, KurinHUDElementHandRight.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
+			sdlutils.RenderTexture(gfx.RendererInstance.Renderer, graphic.Outline, HUDElementHandRight.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
 		}
-		for _, i := range rhand.GetTextures(rhand) {
-			sdlutils.RenderTexture(gfx.RendererInstance.Renderer, graphic.Textures[i].Base, KurinHUDElementHandRight.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
+		for _, i := range rhand.Template.GetTextures(rhand) {
+			sdlutils.RenderTexture(gfx.RendererInstance.Renderer, graphic.Textures[i].Base, HUDElementHandRight.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
 		}
 	}
 
@@ -83,13 +83,13 @@ func RenderKurinRendererLayerHUD(layer *gfx.RendererLayer) error {
 	sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["swap_1"].Texture, sdl.Point{X: half.X - 64, Y: gfx.RendererInstance.Context.WindowSize.Y - 136}, sdl.FPoint{X: 2, Y: 2})
 	sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["swap_2"].Texture, sdl.Point{X: half.X, Y: gfx.RendererInstance.Context.WindowSize.Y - 136}, sdl.FPoint{X: 2, Y: 2})
 
-	sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["pda"].Texture, KurinHUDElementPDA.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
-	if KurinHUDElementPDA.Hovered {
-		layer.Data.(*KurinRendererLayerHUDData).Icons["selector"].Texture.Texture.SetColorMod(0, 255, 0)
-		sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["selector"].Texture, KurinHUDElementPDA.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
+	sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["pda"].Texture, HUDElementPDA.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
+	if HUDElementPDA.Hovered {
+		layer.Data.(*RendererLayerHUDData).Icons["selector"].Texture.Texture.SetColorMod(0, 255, 0)
+		sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["selector"].Texture, HUDElementPDA.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
 	}
 
-	goals := KurinHUDElementGoals.GetPosition(gfx.RendererInstance.Context.WindowSize)
+	goals := HUDElementGoals.GetPosition(gfx.RendererInstance.Context.WindowSize)
 	sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["objective_window"].Texture, goals, sdl.FPoint{X: 1, Y: 1})
 	if len(gameplay.GameInstance.Narrator.Objectives) > 0 {
 		objective := gameplay.GameInstance.Narrator.Objectives[0]
@@ -100,16 +100,16 @@ func RenderKurinRendererLayerHUD(layer *gfx.RendererLayer) error {
 			pos := sdl.Point{X: goals.X + 72, Y: goals.Y + 36 + (int32(i) * 16)}
 			text := "??"
 			switch data := requirement.Data.(type) {
-			case gameplay.KurinNarratorObjectiveRequirementDataCredits:
+			case *gameplay.ObjectiveRequirementDataCredits:
 				text = fmt.Sprintf("Earn %d credits (%d/%d)", data.Count, gameplay.GameInstance.Credits, data.Count)
-			case gameplay.KurinNarratorObjectiveRequirementDataCreate:
+			case *gameplay.ObjectiveRequirementDataCreate:
 				text = fmt.Sprintf("Create %d %s (%d/%d)", data.Count, data.ObjectType, data.Progress, data.Count)
-			case gameplay.KurinNarratorObjectiveRequirementDataDestroy:
+			case *gameplay.ObjectiveRequirementDataDestroy:
 				text = fmt.Sprintf("Destroy %d %s (%d/%d)", data.Count, data.ObjectType, data.Progress, data.Count)
 			}
 
 			sdlutils.SetDrawColor(gfx.RendererInstance.Renderer, sdlutils.White)
-			if requirement.IsDone(requirement) {
+			if requirement.Template.IsDone(requirement) {
 				gfx.RendererInstance.Renderer.FillRect(&sdl.Rect{X: pos.X, Y: pos.Y + 2, W: 10, H: 10})
 			} else {
 				gfx.RendererInstance.Renderer.DrawRect(&sdl.Rect{X: pos.X, Y: pos.Y + 2, W: 10, H: 10})
@@ -118,7 +118,7 @@ func RenderKurinRendererLayerHUD(layer *gfx.RendererLayer) error {
 		}
 	}
 
-	credit := KurinHUDElementCredit.GetPosition(gfx.RendererInstance.Context.WindowSize)
+	credit := HUDElementCredit.GetPosition(gfx.RendererInstance.Context.WindowSize)
 	sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["credit"].Texture, credit, sdl.FPoint{X: 2, Y: 2})
 	sdlutils.RenderLabel(gfx.RendererInstance.Renderer, "hud.credits", gfx.RendererInstance.Fonts.Default, sdlutils.White, fmt.Sprint(gameplay.GameInstance.Credits), sdl.Point{X: credit.X + 58, Y: credit.Y + 28}, sdl.FPoint{X: 1, Y: 1})
 

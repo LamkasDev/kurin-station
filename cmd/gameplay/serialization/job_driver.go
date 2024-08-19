@@ -5,29 +5,33 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinJobDriverData struct {
+type JobDriverData struct {
 	Type      string
 	Position  *sdl.Point
 	ToilIndex uint8
 	Data      []byte
 }
 
-func EncodeKurinJobDriver(jobDriver *gameplay.KurinJobDriver) KurinJobDriverData {
-	return KurinJobDriverData{
+func EncodeJobDriver(jobDriver *gameplay.JobDriver) JobDriverData {
+	data := JobDriverData{
 		Type:      jobDriver.Type,
-		Position:  &jobDriver.Tile.Position.Base,
 		ToilIndex: jobDriver.ToilIndex,
-		Data:      jobDriver.EncodeData(jobDriver),
+		Data:      jobDriver.Template.EncodeData(jobDriver),
 	}
+	if jobDriver.Tile != nil {
+		data.Position = &jobDriver.Tile.Position.Base
+	}
+
+	return data
 }
 
-func DecodeKurinJobDriver(data KurinJobDriverData) *gameplay.KurinJobDriver {
-	jobDriver := gameplay.NewKurinJobDriver(data.Type)
+func DecodeJobDriver(data JobDriverData) *gameplay.JobDriver {
+	jobDriver := gameplay.NewJobDriver(data.Type, nil)
 	if data.Position != nil {
 		jobDriver.Tile = gameplay.GameInstance.Map.Tiles[data.Position.X][data.Position.Y][0]
 	}
 	jobDriver.ToilIndex = data.ToilIndex
-	jobDriver.DecodeData(jobDriver, data.Data)
+	jobDriver.Template.DecodeData(jobDriver, data.Data)
 
 	return jobDriver
 }

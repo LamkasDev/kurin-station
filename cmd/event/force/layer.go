@@ -9,21 +9,21 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinEventLayerForceData struct{}
+type EventLayerForceData struct{}
 
-func NewKurinEventLayerForce() *event.EventLayer {
+func NewEventLayerForce() *event.EventLayer {
 	return &event.EventLayer{
-		Load:    LoadKurinEventLayerForce,
-		Process: ProcessKurinEventLayerForce,
-		Data:    &KurinEventLayerForceData{},
+		Load:    LoadEventLayerForce,
+		Process: ProcessEventLayerForce,
+		Data:    &EventLayerForceData{},
 	}
 }
 
-func LoadKurinEventLayerForce(layer *event.EventLayer) error {
+func LoadEventLayerForce(layer *event.EventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerForce(layer *event.EventLayer) error {
+func ProcessEventLayerForce(layer *event.EventLayer) error {
 	for _, force := range gameplay.GameInstance.ForceController.Forces {
 		if force.Item == nil {
 			continue
@@ -31,13 +31,13 @@ func ProcessKurinEventLayerForce(layer *event.EventLayer) error {
 		newPosition := sdlutils.AddFPoints(force.Item.Transform.Position.Base, force.Delta)
 		newVector := sdlutils.Vector3{Base: sdlutils.FPointToPointFloored(newPosition), Z: force.Item.Transform.Position.Z}
 		if gameplay.IsMapPositionOutOfBounds(&gameplay.GameInstance.Map, newVector) {
-			gameplay.RemoveKurinItemFromMapRaw(&gameplay.GameInstance.Map, force.Item)
+			gameplay.RemoveItemFromMapRaw(&gameplay.GameInstance.Map, force.Item)
 			delete(gameplay.GameInstance.ForceController.Forces, force.Item)
 			continue
 		}
-		if gameplay.GetKurinTileAt(&gameplay.GameInstance.Map, newVector) != nil && !gameplay.CanEnterMapPosition(&gameplay.GameInstance.Map, newVector) {
+		if gameplay.GetTileAt(&gameplay.GameInstance.Map, newVector) != nil && gameplay.CanEnterMapPosition(&gameplay.GameInstance.Map, newVector) != gameplay.EnteranceStatusYes {
 			gameplay.PlaySound(&gameplay.GameInstance.SoundController, "grillehit")
-			gameplay.CreateKurinParticle(&gameplay.GameInstance.ParticleController, gameplay.NewKurinParticleCross(force.Item.Transform.Position, 0.75, sdl.Color{R: 210, G: 210, B: 210}))
+			gameplay.CreateParticle(&gameplay.GameInstance.ParticleController, gameplay.NewParticleCross(force.Item.Transform.Position, 0.75, sdl.Color{R: 210, G: 210, B: 210}))
 			force.Item.Transform.Rotation = rand.Float64() * 360
 			delete(gameplay.GameInstance.ForceController.Forces, force.Item)
 			continue

@@ -32,3 +32,7 @@ func FVector3ToVector3(fvector3 FVector3) Vector3 {
 		Z:    fvector3.Z,
 	}
 }
+
+func CompareVector3(a Vector3, b Vector3) bool {
+	return a.Base.X == b.Base.X && a.Base.Y == b.Base.Y && a.Z == b.Z
+}

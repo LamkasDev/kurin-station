@@ -5,69 +5,79 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-var GameInstance *KurinGame
+var GameInstance *Game
 
-type KurinGame struct {
-	Map               KurinMap
+type Game struct {
+	Map               Map
 	Ticks             uint64
 	Credits           uint32
-	Characters        []*KurinCharacter
-	SelectedCharacter *KurinCharacter
+	Characters        []*Character
+	SelectedCharacter *Character
 
-	JobController      *KurinJobController
-	ParticleController KurinParticleController
-	RunechatController KurinRunechatController
-	SoundController    KurinSoundController
-	ForceController    KurinForceController
-	DialogController   KurinDialogController
-	Narrator           *KurinNarrator
+	JobController         map[Faction]*JobController
+	ParticleController    ParticleController
+	RunechatController    RunechatController
+	SoundController       SoundController
+	ForceController       ForceController
+	DialogController      DialogController
+	ReservationController ReservationController
+	Narrator              *Narrator
 
-	HoveredCharacter *KurinCharacter
-	HoveredItem      *KurinItem
+	HoveredTile      *Tile
+	HoveredObject    *Object
+	HoveredCharacter *Character
+	HoveredItem      *Item
+	Godmode          bool
 }
 
-func NewKurinGame() KurinGame {
-	game := KurinGame{
-		Map:                NewKurinMap(sdlutils.Vector3{Base: sdl.Point{X: 32, Y: 32}, Z: 1}),
-		Ticks:              0,
-		Characters:         []*KurinCharacter{},
-		JobController:      NewKurinJobController(),
-		ParticleController: NewKurinParticleController(),
-		RunechatController: NewKurinRunechatController(),
-		SoundController:    NewKurinSoundController(),
-		ForceController:    NewKurinForceController(),
-		DialogController:   NewKurinDialogController(),
-		Narrator:           NewKurinNarrator(),
+func InitializeGame() {
+	GameInstance = &Game{
+		Map:        NewMap(sdlutils.Vector3{Base: sdl.Point{X: 50, Y: 50}, Z: 1}),
+		Ticks:      0,
+		Characters: []*Character{},
+		JobController: map[Faction]*JobController{
+			FactionPlayer: NewJobController(),
+			FactionTrader: NewJobController(),
+		},
+		ParticleController:    NewParticleController(),
+		RunechatController:    NewRunechatController(),
+		SoundController:       NewSoundController(),
+		ForceController:       NewForceController(),
+		DialogController:      NewDialogController(),
+		ReservationController: NewReservationController(),
+		Narrator:              NewNarrator(),
 	}
-	GameInstance = &game
-	PopulateKurinMap(&game.Map)
+	RegisterItems()
+	RegisterObjects()
+	RegisterJobToils()
+	RegisterJobDrivers()
+	RegisterObjectiveRequirements()
+	PopulateMap(&GameInstance.Map)
 
-	playerCharacter := NewKurinCharacter()
-	PopulateKurinCharacter(playerCharacter)
-	TeleportRandomlyKurinCharacter(playerCharacter)
-	game.Characters = append(game.Characters, playerCharacter)
-	game.SelectedCharacter = playerCharacter
+	playerCharacter := NewCharacter(FactionPlayer)
+	PopulateCharacter(playerCharacter)
+	TeleportRandomlyCharacter(playerCharacter)
+	GameInstance.Characters = append(GameInstance.Characters, playerCharacter)
+	GameInstance.SelectedCharacter = playerCharacter
 
-	npcCharacter := NewKurinCharacter()
-	TeleportRandomlyKurinCharacter(npcCharacter)
-	game.Characters = append(game.Characters, npcCharacter)
-
-	return game
+	npcCharacter := NewCharacter(FactionPlayer)
+	TeleportRandomlyCharacter(npcCharacter)
+	GameInstance.Characters = append(GameInstance.Characters, npcCharacter)
 }
 
-func ProcessKurinGame() {
+func ProcessGame() {
 	for _, object := range GameInstance.Map.Objects {
-		object.Process(object)
+		object.Template.Process(object)
 	}
 	for _, character := range GameInstance.Characters {
-		ProcessKurinCharacter(character)
+		ProcessCharacter(character)
 	}
-	ProcessKurinNarrator()
+	ProcessNarrator()
 	GameInstance.Ticks++
 }
 
-func TransferKurinItemToCharacter(item *KurinItem, character *KurinCharacter) bool {
-	if TransferKurinItemToCharacterRaw(item, &GameInstance.Map, character) {
+func TransferItemToCharacter(item *Item, character *Character) bool {
+	if TransferItemToCharacterRaw(item, &GameInstance.Map, character) {
 		delete(GameInstance.ForceController.Forces, item)
 		return true
 	}
@@ -75,36 +85,40 @@ func TransferKurinItemToCharacter(item *KurinItem, character *KurinCharacter) bo
 	return false
 }
 
-func TransferKurinItemFromCharacter(item *KurinItem, character *KurinCharacter) bool {
-	return TransferKurinItemFromCharacterRaw(item, &GameInstance.Map, character)
+func TransferItemFromCharacter(item *Item, character *Character) bool {
+	return TransferItemFromCharacterRaw(item, &GameInstance.Map, character)
 }
 
-func DropKurinItemFromCharacter(character *KurinCharacter) bool {
-	return TransferKurinItemFromCharacter(character.Inventory.Hands[character.ActiveHand], character)
+func DropItemFromCharacter(character *Character) bool {
+	return TransferItemFromCharacter(character.Inventory.Hands[character.ActiveHand], character)
 }
 
-func CreateKurinTile(position sdlutils.Vector3, tileType string) *KurinTile {
-	if !CanBuildKurinTileAtMapPosition(&GameInstance.Map, position) {
+func CreateTile(position sdlutils.Vector3, tileType string) *Tile {
+	if !CanBuildTileAtMapPosition(&GameInstance.Map, position) {
 		return nil
 	}
-	tile := CreateKurinTileRaw(&GameInstance.Map, position, tileType)
+	tile := CreateTileRaw(&GameInstance.Map, position, tileType)
 
 	return tile
 }
 
-func CreateKurinObject(tile *KurinTile, objectType string) *KurinObject {
-	if !CanBuildKurinObjectAtMapPosition(&GameInstance.Map, tile.Position) {
+func DestroyTile(tile *Tile) {
+	DestroyTileRaw(&GameInstance.Map, tile)
+}
+
+func CreateObject(tile *Tile, objectType string) *Object {
+	if !CanBuildObjectAtMapPosition(&GameInstance.Map, tile.Position) {
 		return nil
 	}
-	obj := CreateKurinObjectRaw(&GameInstance.Map, tile, objectType)
-	obj.OnCreate(obj)
-	KurinNarratorOnCreateObject(obj)
+	obj := CreateObjectRaw(&GameInstance.Map, tile, objectType)
+	obj.Template.OnCreate(obj)
+	NarratorOnCreateObject(obj)
 
 	return obj
 }
 
-func DestroyKurinObject(obj *KurinObject) {
-	DestroyKurinObjectRaw(&GameInstance.Map, obj)
-	obj.OnDestroy(obj)
-	KurinNarratorOnDestroyObject(obj)
+func DestroyObject(obj *Object) {
+	DestroyObjectRaw(&GameInstance.Map, obj)
+	obj.Template.OnDestroy(obj)
+	NarratorOnDestroyObject(obj)
 }

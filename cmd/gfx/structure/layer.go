@@ -10,26 +10,26 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx"
 )
 
-type KurinRendererLayerObjectData struct {
-	Structures map[string]*KurinStructureGraphic
+type RendererLayerObjectData struct {
+	Structures map[string]*StructureGraphic
 }
 
-func NewKurinRendererLayerObject() *gfx.RendererLayer {
+func NewRendererLayerObject() *gfx.RendererLayer {
 	return &gfx.RendererLayer{
-		Load:   LoadKurinRendererLayerObject,
-		Render: RenderKurinRendererLayerObject,
-		Data: &KurinRendererLayerObjectData{
-			Structures: map[string]*KurinStructureGraphic{},
+		Load:   LoadRendererLayerObject,
+		Render: RenderRendererLayerObject,
+		Data: &RendererLayerObjectData{
+			Structures: map[string]*StructureGraphic{},
 		},
 	}
 }
 
-func LoadKurinRendererLayerObject(layer *gfx.RendererLayer) error {
+func LoadRendererLayerObject(layer *gfx.RendererLayer) error {
 	return filepath.WalkDir(path.Join(constants.TexturesPath, "structures"), func(path string, d fs.DirEntry, err error) error {
 		if d.Name() == "structures" || !d.IsDir() {
 			return nil
 		}
-		if layer.Data.(*KurinRendererLayerObjectData).Structures[d.Name()], err = NewKurinStructureGraphic(d.Name()); err != nil {
+		if layer.Data.(*RendererLayerObjectData).Structures[d.Name()], err = NewStructureGraphic(d.Name()); err != nil {
 			return err
 		}
 
@@ -37,9 +37,9 @@ func LoadKurinRendererLayerObject(layer *gfx.RendererLayer) error {
 	})
 }
 
-func RenderKurinRendererLayerObject(layer *gfx.RendererLayer) error {
+func RenderRendererLayerObject(layer *gfx.RendererLayer) error {
 	for _, obj := range gameplay.GameInstance.Map.Objects {
-		RenderKurinObject(layer, obj)
+		RenderObject(layer, obj)
 	}
 
 	return nil

@@ -5,13 +5,13 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gameplay"
 )
 
-type KurinTileData struct {
+type TileData struct {
 	Type     string
 	Position sdlutils.Vector3
 }
 
-func EncodeKurinTile(tile *gameplay.KurinTile) KurinTileData {
-	data := KurinTileData{
+func EncodeTile(tile *gameplay.Tile) TileData {
+	data := TileData{
 		Type:     tile.Type,
 		Position: tile.Position,
 	}
@@ -19,8 +19,8 @@ func EncodeKurinTile(tile *gameplay.KurinTile) KurinTileData {
 	return data
 }
 
-func DecodeKurinTile(kmap *gameplay.KurinMap, data KurinTileData) *gameplay.KurinTile {
-	tile := gameplay.CreateKurinTileRaw(kmap, data.Position, data.Type)
+func DecodeTile(kmap *gameplay.Map, data TileData) *gameplay.Tile {
+	tile := gameplay.CreateTileRaw(kmap, data.Position, data.Type)
 
 	return tile
 }

@@ -10,17 +10,17 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinEventLayerHUDData struct {
+type EventLayerHUDData struct {
 	HudLayer  *gfx.RendererLayer
 	ItemLayer *gfx.RendererLayer
 	Cursors   map[sdl.SystemCursor]*sdl.Cursor
 }
 
-func NewKurinEventLayerHUD(hudLayer *gfx.RendererLayer, itemLayer *gfx.RendererLayer) *event.EventLayer {
+func NewEventLayerHUD(hudLayer *gfx.RendererLayer, itemLayer *gfx.RendererLayer) *event.EventLayer {
 	return &event.EventLayer{
-		Load:    LoadKurinEventLayerHUD,
-		Process: ProcessKurinEventLayerHUD,
-		Data: &KurinEventLayerHUDData{
+		Load:    LoadEventLayerHUD,
+		Process: ProcessEventLayerHUD,
+		Data: &EventLayerHUDData{
 			HudLayer:  hudLayer,
 			ItemLayer: itemLayer,
 			Cursors: map[sdl.SystemCursor]*sdl.Cursor{
@@ -31,46 +31,46 @@ func NewKurinEventLayerHUD(hudLayer *gfx.RendererLayer, itemLayer *gfx.RendererL
 	}
 }
 
-func LoadKurinEventLayerHUD(layer *event.EventLayer) error {
+func LoadEventLayerHUD(layer *event.EventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerHUD(layer *event.EventLayer) error {
+func ProcessEventLayerHUD(layer *event.EventLayer) error {
 	if gameplay.GameInstance.SelectedCharacter == nil {
 		return nil
 	}
 
-	data := layer.Data.(*KurinEventLayerHUDData)
-	itemData := data.ItemLayer.Data.(*item.KurinRendererLayerItemData)
-	hudData := data.HudLayer.Data.(*hud.KurinRendererLayerHUDData)
+	data := layer.Data.(*EventLayerHUDData)
+	itemData := data.ItemLayer.Data.(*item.RendererLayerItemData)
+	hudData := data.HudLayer.Data.(*hud.RendererLayerHUDData)
 	hudData.HoveredItem = nil
 
-	lhand := gameplay.GameInstance.SelectedCharacter.Inventory.Hands[gameplay.KurinHandLeft]
+	lhand := gameplay.GameInstance.SelectedCharacter.Inventory.Hands[gameplay.HandLeft]
 	if lhand != nil {
-		hoveredOffset := sdlutils.DividePoints(gfx.GetHoveredOffsetUnscaled(&gfx.RendererInstance.Context, hud.KurinHUDElementHandLeft.GetPosition(gfx.RendererInstance.Context.WindowSize)), sdl.Point{X: 2, Y: 2})
+		hoveredOffset := sdlutils.DividePoints(gfx.GetHoveredOffsetUnscaled(&gfx.RendererInstance.Context, hud.HUDElementHandLeft.GetPosition(gfx.RendererInstance.Context.WindowSize)), sdl.Point{X: 2, Y: 2})
 		if gfx.IsHoveredOffsetSolid(itemData.Items[lhand.Type].Textures[0], hoveredOffset) {
 			event.EventManagerInstance.Mouse.Cursor = sdl.SYSTEM_CURSOR_HAND
 			hudData.HoveredItem = lhand
 			if event.EventManagerInstance.Mouse.PendingLeft != nil {
-				lhand.OnHandInteraction(lhand)
+				lhand.Template.OnHandInteraction(lhand)
 				event.EventManagerInstance.Mouse.PendingLeft = nil
 			}
 		}
 	}
-	rhand := gameplay.GameInstance.SelectedCharacter.Inventory.Hands[gameplay.KurinHandRight]
+	rhand := gameplay.GameInstance.SelectedCharacter.Inventory.Hands[gameplay.HandRight]
 	if rhand != nil {
-		hoveredOffset := sdlutils.DividePoints(gfx.GetHoveredOffsetUnscaled(&gfx.RendererInstance.Context, hud.KurinHUDElementHandRight.GetPosition(gfx.RendererInstance.Context.WindowSize)), sdl.Point{X: 2, Y: 2})
+		hoveredOffset := sdlutils.DividePoints(gfx.GetHoveredOffsetUnscaled(&gfx.RendererInstance.Context, hud.HUDElementHandRight.GetPosition(gfx.RendererInstance.Context.WindowSize)), sdl.Point{X: 2, Y: 2})
 		if gfx.IsHoveredOffsetSolid(itemData.Items[rhand.Type].Textures[0], hoveredOffset) {
 			event.EventManagerInstance.Mouse.Cursor = sdl.SYSTEM_CURSOR_HAND
 			hudData.HoveredItem = rhand
 			if event.EventManagerInstance.Mouse.PendingLeft != nil {
-				rhand.OnHandInteraction(rhand)
+				rhand.Template.OnHandInteraction(rhand)
 				event.EventManagerInstance.Mouse.PendingLeft = nil
 			}
 		}
 	}
 
-	for _, element := range hud.KurinHUDElements {
+	for _, element := range hud.HUDElements {
 		pos := element.GetPosition(gfx.RendererInstance.Context.WindowSize)
 		if gfx.RendererInstance.Context.MousePosition.InRect(&sdl.Rect{X: pos.X, Y: pos.Y, W: 64, H: 64}) {
 			element.Hovered = true

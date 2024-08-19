@@ -4,21 +4,21 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gameplay"
 )
 
-type KurinNarratorObjectiveRequirementData struct {
+type NarratorObjectiveRequirementData struct {
 	Type string
 	Data []byte
 }
 
-func EncodeKurinNarratorObjectiveRequirement(requirement *gameplay.KurinNarratorObjectiveRequirement) KurinNarratorObjectiveRequirementData {
-	return KurinNarratorObjectiveRequirementData{
+func EncodeNarratorObjectiveRequirement(requirement *gameplay.ObjectiveRequirement) NarratorObjectiveRequirementData {
+	return NarratorObjectiveRequirementData{
 		Type: requirement.Type,
-		Data: requirement.EncodeData(requirement),
+		Data: requirement.Template.EncodeData(requirement),
 	}
 }
 
-func DecodeKurinNarratorObjectiveRequirement(data KurinNarratorObjectiveRequirementData) *gameplay.KurinNarratorObjectiveRequirement {
-	requirement := gameplay.NewKurinNarratorObjectiveRequirement(data.Type)
-	requirement.DecodeData(requirement, data.Data)
+func DecodeNarratorObjectiveRequirement(data NarratorObjectiveRequirementData) *gameplay.ObjectiveRequirement {
+	requirement := gameplay.NewObjectiveRequirement(data.Type, nil)
+	requirement.Template.DecodeData(requirement, data.Data)
 
 	return requirement
 }

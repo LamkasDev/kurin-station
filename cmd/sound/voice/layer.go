@@ -14,21 +14,21 @@ import (
 	"github.com/veandco/go-sdl2/mix"
 )
 
-var KurinAvailablePitches = []float32{0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4}
+var AvailablePitches = []float32{0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4}
 
-type KurinSoundLayerVoiceData struct {
+type SoundLayerVoiceData struct {
 	Filesystem vfs.FileSystem
-	Silence    *sound.KurinTrackComplex
-	Normal     map[float32]*sound.KurinTrackComplex
+	Silence    *sound.TrackComplex
+	Normal     map[float32]*sound.TrackComplex
 }
 
-func NewKurinSoundLayerVoice() *sound.KurinSoundLayer {
-	return &sound.KurinSoundLayer{
-		Load:    LoadKurinSoundLayerVoice,
-		Process: ProcessKurinSoundLayerVoice,
-		Data: KurinSoundLayerVoiceData{
+func NewSoundLayerVoice() *sound.SoundLayer {
+	return &sound.SoundLayer{
+		Load:    LoadSoundLayerVoice,
+		Process: ProcessSoundLayerVoice,
+		Data: SoundLayerVoiceData{
 			Filesystem: memoryfs.New(),
-			Normal:     map[float32]*sound.KurinTrackComplex{},
+			Normal:     map[float32]*sound.TrackComplex{},
 		},
 	}
 }
@@ -37,19 +37,19 @@ func GetCachePitchedPath(trackId string, pitch float32) string {
 	return path.Join(constants.TempAudioPath, fmt.Sprintf("%s_%d.ogg", trackId, int(pitch*100)))
 }
 
-func LoadKurinSoundLayerVoice(manager *sound.KurinSoundManager, layer *sound.KurinSoundLayer) error {
-	data := layer.Data.(KurinSoundLayerVoiceData)
+func LoadSoundLayerVoice(layer *sound.SoundLayer) error {
+	data := layer.Data.(SoundLayerVoiceData)
 	var err error
-	if data.Silence, err = sound.NewKurinTrackComplex(manager, "silence", 1); err != nil {
+	if data.Silence, err = sound.NewTrackComplex("silence", 1); err != nil {
 		return err
 	}
 
-	for _, pitch := range KurinAvailablePitches {
+	for _, pitch := range AvailablePitches {
 		path := GetCachePitchedPath("owl", pitch)
 		if _, err := os.Stat(path); err == nil {
 			continue
 		}
-		if data.Normal[pitch], err = sound.NewKurinTrackComplex(manager, "owl", pitch); err != nil {
+		if data.Normal[pitch], err = sound.NewTrackComplex("owl", pitch); err != nil {
 			return err
 		}
 		os.WriteFile(path, data.Normal[pitch].Buffer.Bytes(), 777)
@@ -59,8 +59,8 @@ func LoadKurinSoundLayerVoice(manager *sound.KurinSoundManager, layer *sound.Kur
 	return nil
 }
 
-func ProcessKurinSoundLayerVoice(manager *sound.KurinSoundManager, layer *sound.KurinSoundLayer) error {
-	data := layer.Data.(KurinSoundLayerVoiceData)
+func ProcessSoundLayerVoice(layer *sound.SoundLayer) error {
+	data := layer.Data.(SoundLayerVoiceData)
 	if len(gameplay.GameInstance.RunechatController.Sounds) > 0 {
 		for _, runechatSound := range gameplay.GameInstance.RunechatController.Sounds {
 			paths := []string{}
@@ -69,12 +69,12 @@ func ProcessKurinSoundLayerVoice(manager *sound.KurinSoundManager, layer *sound.
 				case ' ', ',', '.':
 					paths = append(paths, data.Silence.Base.Path)
 				default:
-					pitch := KurinAvailablePitches[rand.Intn(len(KurinAvailablePitches))]
+					pitch := AvailablePitches[rand.Intn(len(AvailablePitches))]
 					paths = append(paths, GetCachePitchedPath("owl", pitch))
 				}
 			}
 
-			track, err := sound.ConcatKurinTrackComplex(manager, paths)
+			track, err := sound.ConcatTrackComplex(paths)
 			if err != nil {
 				return err
 			}
@@ -84,7 +84,7 @@ func ProcessKurinSoundLayerVoice(manager *sound.KurinSoundManager, layer *sound.
 			}
 			mix.Volume(c, 128)
 		}
-		gameplay.GameInstance.RunechatController.Sounds = []*gameplay.KurinRunechatSound{}
+		gameplay.GameInstance.RunechatController.Sounds = []*gameplay.RunechatSound{}
 	}
 
 	return nil

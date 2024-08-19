@@ -6,30 +6,32 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinSoundManager struct {
-	Layers []*KurinSoundLayer
+var SoundManagerInstance *SoundManager
+
+type SoundManager struct {
+	Layers []*SoundLayer
 	Device sdl.AudioDeviceID
 }
 
-func NewKurinSoundManager() (KurinSoundManager, error) {
-	manager := KurinSoundManager{
-		Layers: []*KurinSoundLayer{},
+func InitializeSoundManager() error {
+	SoundManagerInstance = &SoundManager{
+		Layers: []*SoundLayer{},
 	}
 
 	if err := mix.Init(mix.INIT_OGG); err != nil {
-		return manager, err
+		return err
 	}
 	if err := mix.OpenAudio(mix.DEFAULT_FREQUENCY, mix.DEFAULT_FORMAT, mix.DEFAULT_CHANNELS, mix.DEFAULT_CHUNKSIZE); err != nil {
-		return manager, err
+		return err
 	}
 	mix.AllocateChannels(32)
 
-	return manager, nil
+	return nil
 }
 
-func LoadKurinSoundManager(manager *KurinSoundManager) error {
-	for _, layer := range manager.Layers {
-		if err := layer.Load(manager, layer); err != nil {
+func LoadSoundManager() error {
+	for _, layer := range SoundManagerInstance.Layers {
+		if err := layer.Load(layer); err != nil {
 			return err
 		}
 	}
@@ -37,9 +39,9 @@ func LoadKurinSoundManager(manager *KurinSoundManager) error {
 	return nil
 }
 
-func ProcessKurinSoundManager(manager *KurinSoundManager) error {
-	for _, layer := range manager.Layers {
-		if err := layer.Process(manager, layer); err != nil {
+func ProcessSoundManager() error {
+	for _, layer := range SoundManagerInstance.Layers {
+		if err := layer.Process(layer); err != nil {
 			return err
 		}
 	}
@@ -48,7 +50,7 @@ func ProcessKurinSoundManager(manager *KurinSoundManager) error {
 }
 
 // TODO: make layers free themselves.
-func FreeKurinSoundManager(manager *KurinSoundManager) error {
+func FreeSoundManager() error {
 	mix.Quit()
 	mix.CloseAudio()
 

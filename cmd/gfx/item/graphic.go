@@ -13,17 +13,17 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx"
 )
 
-type KurinItemGraphic struct {
-	Template templates.KurinItemTemplate
+type ItemGraphic struct {
+	Template templates.ItemTemplate
 	Textures []*sdlutils.TextureWithSizeAndSurface
 	Outline  *sdlutils.TextureWithSize
-	Hands    map[gameplay.KurinHand][][]*sdlutils.TextureWithSize
+	Hands    map[gameplay.Hand][][]*sdlutils.TextureWithSize
 }
 
-func NewKurinItemGraphic(itemId string) (*KurinItemGraphic, error) {
+func NewItemGraphic(itemId string) (*ItemGraphic, error) {
 	graphicDirectory := path.Join(constants.TexturesPath, "items", itemId)
-	graphic := KurinItemGraphic{
-		Hands: map[gameplay.KurinHand][][]*sdlutils.TextureWithSize{},
+	graphic := ItemGraphic{
+		Hands: map[gameplay.Hand][][]*sdlutils.TextureWithSize{},
 	}
 
 	templateBytes, err := os.ReadFile(path.Join(constants.DataPath, "templates", "items", fmt.Sprintf("%s.json", itemId)))
@@ -58,24 +58,24 @@ func NewKurinItemGraphic(itemId string) (*KurinItemGraphic, error) {
 			textures = *graphic.Template.StatesHand
 		}
 
-		graphic.Hands[gameplay.KurinHandLeft] = make([][]*sdlutils.TextureWithSize, textures)
+		graphic.Hands[gameplay.HandLeft] = make([][]*sdlutils.TextureWithSize, textures)
 		for j := 0; j < textures; j++ {
-			graphic.Hands[gameplay.KurinHandLeft][j] = make([]*sdlutils.TextureWithSize, 4)
+			graphic.Hands[gameplay.HandLeft][j] = make([]*sdlutils.TextureWithSize, 4)
 			for i := 0; i < 4; i++ {
 				handPath := path.Join(graphicDirectory, fmt.Sprintf("%s_left_%d_%d.png", itemId, j, i))
 				if handTexture, err := sdlutils.LoadTexture(gfx.RendererInstance.Renderer, handPath); err == nil {
-					graphic.Hands[gameplay.KurinHandLeft][j][i] = handTexture
+					graphic.Hands[gameplay.HandLeft][j][i] = handTexture
 				}
 			}
 		}
 
-		graphic.Hands[gameplay.KurinHandRight] = make([][]*sdlutils.TextureWithSize, textures)
+		graphic.Hands[gameplay.HandRight] = make([][]*sdlutils.TextureWithSize, textures)
 		for j := 0; j < textures; j++ {
-			graphic.Hands[gameplay.KurinHandRight][j] = make([]*sdlutils.TextureWithSize, 4)
+			graphic.Hands[gameplay.HandRight][j] = make([]*sdlutils.TextureWithSize, 4)
 			for i := 0; i < 4; i++ {
 				handPath := path.Join(graphicDirectory, fmt.Sprintf("%s_right_%d_%d.png", itemId, j, i))
 				if handTexture, err := sdlutils.LoadTexture(gfx.RendererInstance.Renderer, handPath); err == nil {
-					graphic.Hands[gameplay.KurinHandRight][j][i] = handTexture
+					graphic.Hands[gameplay.HandRight][j][i] = handTexture
 				}
 			}
 		}

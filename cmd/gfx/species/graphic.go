@@ -13,31 +13,31 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx"
 )
 
-type KurinSpeciesGraphicContainer struct {
-	Types map[string]*KurinSpeciesGraphic
+type SpeciesGraphicContainer struct {
+	Types map[string]*SpeciesGraphic
 }
 
-type KurinSpeciesGraphic struct {
-	Template templates.KurinSpeciesTemplate
+type SpeciesGraphic struct {
+	Template templates.SpeciesTemplate
 	Textures map[string][]*sdlutils.TextureWithSize
 }
 
-func NewKurinSpeciesGraphicContainer(speciesId string) (*KurinSpeciesGraphicContainer, error) {
-	container := KurinSpeciesGraphicContainer{
-		Types: map[string]*KurinSpeciesGraphic{},
+func NewSpeciesGraphicContainer(speciesId string) (*SpeciesGraphicContainer, error) {
+	container := SpeciesGraphicContainer{
+		Types: map[string]*SpeciesGraphic{},
 	}
 
-	graphic, err := NewKurinSpeciesGraphic(speciesId, gameplay.KurinDefaultType)
+	graphic, err := NewSpeciesGraphic(speciesId, gameplay.DefaultGender)
 	if err != nil {
 		return &container, err
 	}
-	container.Types[gameplay.KurinDefaultType] = graphic
+	container.Types[gameplay.DefaultGender] = graphic
 
 	return &container, nil
 }
 
-func NewKurinSpeciesGraphic(speciesId string, speciesType string) (*KurinSpeciesGraphic, error) {
-	graphic := KurinSpeciesGraphic{
+func NewSpeciesGraphic(speciesId string, speciesType string) (*SpeciesGraphic, error) {
+	graphic := SpeciesGraphic{
 		Textures: map[string][]*sdlutils.TextureWithSize{},
 	}
 

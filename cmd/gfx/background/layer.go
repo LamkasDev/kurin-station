@@ -6,27 +6,27 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinRendererLayerBackgroundData struct {
+type RendererLayerBackgroundData struct {
 	Position         sdl.FPoint
 	TextureContainer *sdlutils.TextureContainer
 }
 
-func NewKurinRendererLayerBackground() *gfx.RendererLayer {
+func NewRendererLayerBackground() *gfx.RendererLayer {
 	return &gfx.RendererLayer{
-		Load:   LoadKurinRendererLayerBackground,
-		Render: RenderKurinRendererLayerBackground,
-		Data: &KurinRendererLayerBackgroundData{
+		Load:   LoadRendererLayerBackground,
+		Render: RenderRendererLayerBackground,
+		Data: &RendererLayerBackgroundData{
 			TextureContainer: sdlutils.NewTextureContainer("bgs"),
 		},
 	}
 }
 
-func LoadKurinRendererLayerBackground(layer *gfx.RendererLayer) error {
+func LoadRendererLayerBackground(layer *gfx.RendererLayer) error {
 	return nil
 }
 
-func RenderKurinRendererLayerBackground(layer *gfx.RendererLayer) error {
-	data := layer.Data.(*KurinRendererLayerBackgroundData)
+func RenderRendererLayerBackground(layer *gfx.RendererLayer) error {
+	data := layer.Data.(*RendererLayerBackgroundData)
 	position := sdlutils.FPointToPoint(data.Position)
 	for range 6 {
 		for range 3 {

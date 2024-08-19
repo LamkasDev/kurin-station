@@ -6,47 +6,56 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-func TeleportRandomlyKurinCharacter(character *KurinCharacter) {
+func TeleportRandomlyCharacter(character *Character) {
 	for {
 		position := GetRandomMapPosition(&GameInstance.Map)
-		if MoveKurinCharacter(character, position) {
+		if MoveCharacter(character, position) {
 			character.PositionRender = sdlutils.PointToFPoint(position.Base)
 			break
 		}
 	}
 }
 
-func MoveKurinCharacterDirection(character *KurinCharacter, direction common.KurinDirection) bool {
-	tile := GetKurinTileInDirection(&GameInstance.Map, GetKurinTileAt(&GameInstance.Map, character.Position), direction)
-	if tile == nil {
-		return false
-	}
-
-	return MoveKurinCharacter(character, tile.Position)
+func MoveCharacterDirection(character *Character, direction common.Direction) bool {
+	return MoveCharacter(character, common.GetPositionInDirectionV(character.Position, direction))
 }
 
-func MoveKurinCharacter(character *KurinCharacter, position sdlutils.Vector3) bool {
-	if !CanEnterMapPosition(&GameInstance.Map, position) {
+func MoveCharacter(character *Character, position sdlutils.Vector3) bool {
+	if CanEnterMapPosition(&GameInstance.Map, position) == EnteranceStatusNo {
 		return false
 	}
-	TurnKurinCharacterTo(character, position.Base)
+	TurnCharacterTo(character, position.Base)
+	tile := GetTileAt(&GameInstance.Map, position)
+	object := GetObjectAtTile(tile)
+	if object != nil {
+		switch data := object.Data.(type) {
+		case *ObjectAirlockData:
+			if !data.Open {
+				object.Template.OnInteraction(object, nil)
+				return false
+			}
+		}
+	}
 	character.Position = position
 
 	return true
 }
 
-func TurnKurinCharacterTo(character *KurinCharacter, position sdl.Point) {
+func TurnCharacterTo(character *Character, position sdl.Point) {
 	character.Direction = common.GetFacingDirection(character.Position.Base, position)
 }
 
-func FollowKurinPath(character *KurinCharacter, path *KurinPath) bool {
+func FollowPath(character *Character, path *Path) bool {
 	if path.Index == len(path.Nodes) {
 		return true
 	}
-	path.Ticks++
-	if path.Ticks > KurinCharacterMovementTicks {
-		MoveKurinCharacter(character, path.Nodes[path.Index].Position)
-		path.Ticks = 0
+	character.MovementTicks++
+	if character.MovementTicks >= CharacterMovementTicks {
+		node := path.Nodes[path.Index]
+		character.MovementTicks = 0
+		if !MoveCharacter(character, node.Position) {
+			return false
+		}
 		path.Index++
 	}
 

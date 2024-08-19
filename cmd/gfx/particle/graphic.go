@@ -9,12 +9,12 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx"
 )
 
-type KurinParticleGraphic struct {
+type ParticleGraphic struct {
 	Textures []*sdlutils.TextureWithSize
 }
 
-func NewKurinParticleGraphic(particleId string, states uint8) (*KurinParticleGraphic, error) {
-	graphic := KurinParticleGraphic{
+func NewParticleGraphic(particleId string, states uint8) (*ParticleGraphic, error) {
+	graphic := ParticleGraphic{
 		Textures: make([]*sdlutils.TextureWithSize, states),
 	}
 	graphicDirectory := path.Join(constants.TexturesPath, "particles")

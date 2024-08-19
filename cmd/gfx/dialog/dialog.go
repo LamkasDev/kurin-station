@@ -5,13 +5,13 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinDialog struct {
+type Dialog struct {
 	Type        string
 	Title       string
 	Icon        string
-	Elements    []*KurinDialogElement
-	GetSize     KurinDialogGetSize
-	ShouldClose KurinDialogShouldClose
+	Elements    []*DialogElement
+	GetSize     DialogGetSize
+	ShouldClose DialogShouldClose
 	Movable     bool
 
 	Position sdl.Point
@@ -19,33 +19,33 @@ type KurinDialog struct {
 	Data     interface{}
 }
 
-type KurinDialogElement struct {
-	GetRect   KurinDialogElementGetRect
-	Render    KurinDialogElementRender
-	OnClick   KurinDialogElementOnClick
+type DialogElement struct {
+	GetRect   DialogElementGetRect
+	Render    DialogElementRender
+	OnClick   DialogElementOnClick
 	Clickable bool
 
 	Hovered bool
 }
 
 type (
-	KurinDialogGetSize        func(windowSize sdl.Point) sdl.Point
-	KurinDialogShouldClose    func(dialog *KurinDialog) bool
-	KurinDialogElementGetRect func(dialogRect *sdl.Rect) *sdl.Rect
-	KurinDialogElementRender  func(element *KurinDialogElement, rect *sdl.Rect)
-	KurinDialogElementOnClick func(dialog *KurinDialog)
+	DialogGetSize        func(windowSize sdl.Point) sdl.Point
+	DialogShouldClose    func(dialog *Dialog) bool
+	DialogElementGetRect func(dialogRect *sdl.Rect) *sdl.Rect
+	DialogElementRender  func(element *DialogElement, rect *sdl.Rect)
+	DialogElementOnClick func(dialog *Dialog)
 )
 
-func NewKurinDialogRaw(layer *gfx.RendererLayer, dialogType string, title string, icon string) *KurinDialog {
-	dialog := &KurinDialog{
+func NewDialogRaw(layer *gfx.RendererLayer, dialogType string, title string, icon string) *Dialog {
+	dialog := &Dialog{
 		Type:     dialogType,
 		Title:    title,
 		Icon:     icon,
-		Elements: []*KurinDialogElement{},
+		Elements: []*DialogElement{},
 		GetSize: func(windowSize sdl.Point) sdl.Point {
 			return sdl.Point{X: 256, Y: 256}
 		},
-		ShouldClose: func(dialog *KurinDialog) bool {
+		ShouldClose: func(dialog *Dialog) bool {
 			return false
 		},
 		Position: sdl.Point{

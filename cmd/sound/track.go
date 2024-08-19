@@ -9,13 +9,13 @@ import (
 	"github.com/veandco/go-sdl2/mix"
 )
 
-type KurinTrack struct {
+type Track struct {
 	Path string
 	Data *mix.Chunk
 }
 
-func NewKurinTrack(manager *KurinSoundManager, trackDirectory string, trackId string) (*KurinTrack, error) {
-	track := KurinTrack{
+func NewTrack(trackDirectory string, trackId string) (*Track, error) {
+	track := Track{
 		Path: path.Join(constants.SoundsPath, trackDirectory, fmt.Sprintf("%s.ogg", trackId)),
 	}
 

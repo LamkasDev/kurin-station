@@ -7,21 +7,21 @@ import (
 	"github.com/veandco/go-sdl2/ttf"
 )
 
-var RendererInstance *KurinRenderer
+var RendererInstance *Renderer
 
-type KurinRenderer struct {
+type Renderer struct {
 	Window   *sdl.Window
 	Renderer *sdl.Renderer
-	Fonts    KurinRendererFonts
-	Context  KurinRendererContext
+	Fonts    RendererFonts
+	Context  RendererContext
 	Layers   []*RendererLayer
 
 	IconTextures *sdlutils.TextureContainer
 }
 
-func InitializeKurinRenderer() error {
-	RendererInstance = &KurinRenderer{
-		Context:      NewKurinRendererContext(),
+func InitializeRenderer() error {
+	RendererInstance = &Renderer{
+		Context:      NewRendererContext(),
 		Layers:       []*RendererLayer{},
 		IconTextures: sdlutils.NewTextureContainer("icons"),
 	}
@@ -53,7 +53,7 @@ func InitializeKurinRenderer() error {
 	RendererInstance.Window.SetIcon(icon)
 
 	var fontErr error
-	RendererInstance.Fonts, fontErr = NewKurinRendererFonts()
+	RendererInstance.Fonts, fontErr = NewRendererFonts()
 	if fontErr != nil {
 		return fontErr
 	}
@@ -61,7 +61,7 @@ func InitializeKurinRenderer() error {
 	return nil
 }
 
-func LoadKurinRenderer() error {
+func LoadRenderer() error {
 	for _, layer := range RendererInstance.Layers {
 		if err := layer.Load(layer); err != nil {
 			return err
@@ -71,7 +71,7 @@ func LoadKurinRenderer() error {
 	return nil
 }
 
-func ClearKurinRenderer() error {
+func ClearRenderer() error {
 	if err := RendererInstance.Renderer.Clear(); err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func ClearKurinRenderer() error {
 	return nil
 }
 
-func RenderKurinRenderer() error {
+func RenderRenderer() error {
 	for _, layer := range RendererInstance.Layers {
 		if err := layer.Render(layer); err != nil {
 			return err
@@ -95,17 +95,17 @@ func RenderKurinRenderer() error {
 	return nil
 }
 
-func PresentKurinRenderer() {
+func PresentRenderer() {
 	RendererInstance.Renderer.Present()
 	RendererInstance.Context.Frame++
 }
 
 // TODO: make layers free themselves.
-func FreeKurinRenderer() error {
+func FreeRenderer() error {
 	if err := RendererInstance.Renderer.Destroy(); err != nil {
 		return err
 	}
-	FreeKurinRendererFonts(&RendererInstance.Fonts)
+	FreeRendererFonts(&RendererInstance.Fonts)
 	if err := RendererInstance.Window.Destroy(); err != nil {
 		return err
 	}

@@ -8,13 +8,13 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-func NewKurinDialogElementButton(position sdl.Point, text string, onClick KurinDialogElementOnClick) *KurinDialogElement {
+func NewDialogElementButton(position sdl.Point, text string, onClick DialogElementOnClick) *DialogElement {
 	w, h, _ := gfx.RendererInstance.Fonts.Default.SizeUTF8(text)
-	return &KurinDialogElement{
+	return &DialogElement{
 		GetRect: func(dialogRect *sdl.Rect) *sdl.Rect {
 			return &sdl.Rect{X: position.X, Y: position.Y, W: int32(w) + 28, H: int32(h) + 12}
 		},
-		Render: func(element *KurinDialogElement, rect *sdl.Rect) {
+		Render: func(element *DialogElement, rect *sdl.Rect) {
 			if element.Hovered {
 				sdlutils.SetDrawColor(gfx.RendererInstance.Renderer, sdlutils.Blue)
 			} else {

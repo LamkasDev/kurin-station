@@ -7,41 +7,28 @@ import (
 	"robpike.io/filter"
 )
 
-type KurinItem struct {
+type Item struct {
 	Id        uint32
 	Type      string
 	Count     uint16
 	Reserved  bool
 	Transform *sdlutils.Transform
-	Character *KurinCharacter
+	Character *Character
 
-	Process           KurinItemProcess
-	GetTextures       KurinItemGetTextures
-	GetTextureHand    KurinItemGetTextureHand
-	OnHandInteraction KurinItemOnHandInteraction
-	OnTileInteraction KurinItemOnTileInteraction
-	EncodeData        KurinItemEncodeData
-	DecodeData        KurinItemDecodeData
-	CanHit            bool
-	MaxCount          uint16
-	Data              interface{}
+	Template *ItemTemplate
+	Data     interface{}
 }
 
-type (
-	KurinItemProcess           func(item *KurinItem)
-	KurinItemGetTextures       func(item *KurinItem) []int
-	KurinItemGetTextureHand    func(item *KurinItem) int
-	KurinItemOnHandInteraction func(item *KurinItem)
-	KurinItemOnTileInteraction func(item *KurinItem, tile *KurinTile) bool
-	KurinItemEncodeData        func(item *KurinItem) []byte
-	KurinItemDecodeData        func(item *KurinItem, data []byte)
-)
+type ItemRequirement struct {
+	Type  string
+	Count uint16
+}
 
-func NewKurinItemRandom(kmap *KurinMap, itemType string, count uint16) *KurinItem {
-	item := NewKurinItem(itemType, count)
+func NewItemRandom(kmap *Map, itemType string, count uint16) *Item {
+	item := NewItem(itemType, count)
 	for {
 		position := GetRandomMapPosition(kmap)
-		if CanEnterMapPosition(kmap, position) {
+		if CanEnterMapPosition(kmap, position) == EnteranceStatusYes {
 			item.Transform = &sdlutils.Transform{
 				Position: sdlutils.Vector3ToFVector3Center(position),
 				Rotation: 0,
@@ -53,13 +40,13 @@ func NewKurinItemRandom(kmap *KurinMap, itemType string, count uint16) *KurinIte
 	return item
 }
 
-func FindItemsOfType(kmap *KurinMap, itemType string, reservation bool) []*KurinItem {
-	return filter.Choose(kmap.Items, func(item *KurinItem) bool {
+func FindItemsOfType(kmap *Map, itemType string, reservation bool) []*Item {
+	return filter.Choose(kmap.Items, func(item *Item) bool {
 		return item.Type == itemType && (!reservation || !item.Reserved)
-	}).([]*KurinItem)
+	}).([]*Item)
 }
 
-func FindClosestItemOfType(kmap *KurinMap, position sdlutils.Vector3, itemType string, reservation bool) *KurinItem {
+func FindClosestItemOfType(kmap *Map, position sdlutils.Vector3, itemType string, reservation bool) *Item {
 	items := FindItemsOfType(kmap, itemType, reservation)
 	start := sdlutils.PointToFPoint(position.Base)
 	sort.Slice(items, func(i, j int) bool {
@@ -70,12 +57,4 @@ func FindClosestItemOfType(kmap *KurinMap, position sdlutils.Vector3, itemType s
 	}
 
 	return items[0]
-}
-
-func ReserveKurinItem(item *KurinItem) {
-	item.Reserved = true
-}
-
-func UnreserveKurinItem(item *KurinItem) {
-	item.Reserved = false
 }

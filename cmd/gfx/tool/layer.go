@@ -9,61 +9,72 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinRendererLayerToolData struct {
-	Mode   KurinToolMode
+type RendererLayerToolData struct {
+	Mode   ToolMode
 	Prefab interface{}
 
 	TurfLayer   *gfx.RendererLayer
 	ObjectLayer *gfx.RendererLayer
 }
 
-type KurinToolMode uint8
+type ToolMode uint8
 
-const KurinToolModeBuild = KurinToolMode(0)
+const (
+	ToolModeBuild   = ToolMode(0)
+	ToolModeDestroy = ToolMode(1)
+)
 
-func NewKurinRendererLayerTool(turfLayer *gfx.RendererLayer, objectLayer *gfx.RendererLayer) *gfx.RendererLayer {
+func NewRendererLayerTool(turfLayer *gfx.RendererLayer, objectLayer *gfx.RendererLayer) *gfx.RendererLayer {
 	return &gfx.RendererLayer{
-		Load:   LoadKurinRendererLayerTool,
-		Render: RenderKurinRendererLayerTool,
-		Data: &KurinRendererLayerToolData{
-			Mode:        KurinToolModeBuild,
+		Load:   LoadRendererLayerTool,
+		Render: RenderRendererLayerTool,
+		Data: &RendererLayerToolData{
+			Mode:        ToolModeBuild,
 			TurfLayer:   turfLayer,
 			ObjectLayer: objectLayer,
 		},
 	}
 }
 
-func LoadKurinRendererLayerTool(layer *gfx.RendererLayer) error {
+func LoadRendererLayerTool(layer *gfx.RendererLayer) error {
 	return nil
 }
 
-func RenderKurinRendererLayerTool(layer *gfx.RendererLayer) error {
-	if gfx.RendererInstance.Context.State != gfx.KurinRendererContextStateTool {
+func RenderRendererLayerTool(layer *gfx.RendererLayer) error {
+	if gfx.RendererInstance.Context.State != gfx.RendererContextStateTool {
 		return nil
 	}
-	data := layer.Data.(*KurinRendererLayerToolData)
+	data := layer.Data.(*RendererLayerToolData)
 	switch data.Mode {
-	case KurinToolModeBuild:
+	case ToolModeBuild:
 		switch realPrefab := data.Prefab.(type) {
-		case *gameplay.KurinObject:
+		case *gameplay.Object:
 			if realPrefab.Tile == nil {
 				return nil
 			}
 			color := sdlutils.White
-			if !gameplay.CanEnterKurinTile(realPrefab.Tile) {
+			if !gameplay.CanBuildObjectAtMapPosition(&gameplay.GameInstance.Map, realPrefab.Tile.Position) {
 				color = sdl.Color{R: 128, G: 0, B: 0}
 			}
-			if err := structure.RenderKurinObjectBlueprint(data.ObjectLayer, realPrefab, color); err != nil {
+			if err := structure.RenderObjectBlueprint(data.ObjectLayer, realPrefab, color); err != nil {
 				return err
 			}
-		case *gameplay.KurinTile:
+		case *gameplay.Tile:
 			color := sdlutils.White
-			if !gameplay.CanBuildKurinTileAtMapPosition(&gameplay.GameInstance.Map, realPrefab.Position) {
+			if !gameplay.CanBuildTileAtMapPosition(&gameplay.GameInstance.Map, realPrefab.Position) {
 				color = sdl.Color{R: 128, G: 0, B: 0}
 			}
-			if err := turf.RenderKurinTileBlueprint(data.TurfLayer, realPrefab, color); err != nil {
+			if err := turf.RenderTileBlueprint(data.TurfLayer, realPrefab, color); err != nil {
 				return err
 			}
+		}
+	case ToolModeDestroy:
+		if gameplay.GameInstance.HoveredObject != nil {
+			rect := sdlutils.ScaleRectCentered(structure.GetObjectRect(data.ObjectLayer, gameplay.GameInstance.HoveredObject), 0.8)
+			sdlutils.RenderTextureRect(gfx.RendererInstance.Renderer, sdlutils.GetTextureFromContainer(gfx.RendererInstance.IconTextures, gfx.RendererInstance.Renderer, "delete"), rect)
+		} else if gameplay.GameInstance.HoveredTile != nil {
+			rect := sdlutils.ScaleRectCentered(turf.GetTileRect(gameplay.GameInstance.HoveredTile), 0.8)
+			sdlutils.RenderTextureRect(gfx.RendererInstance.Renderer, sdlutils.GetTextureFromContainer(gfx.RendererInstance.IconTextures, gfx.RendererInstance.Renderer, "delete_floor"), rect)
 		}
 	}
 

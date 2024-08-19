@@ -9,42 +9,42 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinEventLayerCameraData struct{}
+type EventLayerCameraData struct{}
 
-func NewKurinEventLayerCamera() *event.EventLayer {
+func NewEventLayerCamera() *event.EventLayer {
 	return &event.EventLayer{
-		Load:    LoadKurinEventLayerCamera,
-		Process: ProcessKurinEventLayerCamera,
-		Data:    &KurinEventLayerCameraData{},
+		Load:    LoadEventLayerCamera,
+		Process: ProcessEventLayerCamera,
+		Data:    &EventLayerCameraData{},
 	}
 }
 
-func LoadKurinEventLayerCamera(layer *event.EventLayer) error {
+func LoadEventLayerCamera(layer *event.EventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerCamera(layer *event.EventLayer) error {
+func ProcessEventLayerCamera(layer *event.EventLayer) error {
 	if event.EventManagerInstance.Keyboard.InputMode {
 		return nil
 	}
 
 	switch gfx.RendererInstance.Context.CameraMode {
-	case gfx.KurinRendererCameraModeCharacter:
+	case gfx.RendererCameraModeCharacter:
 		gfx.RendererInstance.Context.CameraPosition = gameplay.GameInstance.SelectedCharacter.PositionRender
 		gfx.RendererInstance.Context.CameraPositionDestination = gfx.RendererInstance.Context.CameraPosition
-	case gfx.KurinRendererCameraModeFree:
+	case gfx.RendererCameraModeFree:
 		delay := float32(60)
 		if pressed := event.EventManagerInstance.Keyboard.Pressed[sdl.K_w]; pressed {
-			gfx.RendererInstance.Context.CameraPositionDestination.Y -= timing.KurinTimingGlobal.FrameTime / delay
+			gfx.RendererInstance.Context.CameraPositionDestination.Y -= timing.TimingGlobal.FrameTime / delay
 		}
 		if pressed := event.EventManagerInstance.Keyboard.Pressed[sdl.K_s]; pressed {
-			gfx.RendererInstance.Context.CameraPositionDestination.Y += timing.KurinTimingGlobal.FrameTime / delay
+			gfx.RendererInstance.Context.CameraPositionDestination.Y += timing.TimingGlobal.FrameTime / delay
 		}
 		if pressed := event.EventManagerInstance.Keyboard.Pressed[sdl.K_a]; pressed {
-			gfx.RendererInstance.Context.CameraPositionDestination.X -= timing.KurinTimingGlobal.FrameTime / delay
+			gfx.RendererInstance.Context.CameraPositionDestination.X -= timing.TimingGlobal.FrameTime / delay
 		}
 		if pressed := event.EventManagerInstance.Keyboard.Pressed[sdl.K_d]; pressed {
-			gfx.RendererInstance.Context.CameraPositionDestination.X += timing.KurinTimingGlobal.FrameTime / delay
+			gfx.RendererInstance.Context.CameraPositionDestination.X += timing.TimingGlobal.FrameTime / delay
 		}
 
 		gfx.RendererInstance.Context.CameraPosition = mathutils.LerpFPoint(gfx.RendererInstance.Context.CameraPosition, gfx.RendererInstance.Context.CameraPositionDestination, 0.4)

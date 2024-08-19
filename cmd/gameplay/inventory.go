@@ -1,26 +1,26 @@
 package gameplay
 
-type KurinHand uint8
+type Hand uint8
 
 const (
-	KurinHandLeft  = KurinHand(0)
-	KurinHandRight = KurinHand(1)
+	HandLeft  = Hand(0)
+	HandRight = Hand(1)
 )
 
-type KurinInventory struct {
-	Hands map[KurinHand]*KurinItem
+type Inventory struct {
+	Hands map[Hand]*Item
 }
 
-func NewKurinInventory() KurinInventory {
-	return KurinInventory{
-		Hands: map[KurinHand]*KurinItem{
-			KurinHandLeft:  nil,
-			KurinHandRight: nil,
+func NewInventory() Inventory {
+	return Inventory{
+		Hands: map[Hand]*Item{
+			HandLeft:  nil,
+			HandRight: nil,
 		},
 	}
 }
 
-func FindItemInInventory(inventory *KurinInventory, itemType string) *KurinItem {
+func FindItemInInventory(inventory *Inventory, itemType string) *Item {
 	for _, item := range inventory.Hands {
 		if item != nil && item.Type == itemType {
 			return item

@@ -10,38 +10,38 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx"
 )
 
-type KurinRendererLayerItemData struct {
-	Items map[string]*KurinItemGraphic
+type RendererLayerItemData struct {
+	Items map[string]*ItemGraphic
 }
 
-func NewKurinRendererLayerItem() *gfx.RendererLayer {
+func NewRendererLayerItem() *gfx.RendererLayer {
 	return &gfx.RendererLayer{
-		Load:   LoadKurinRendererLayerItem,
-		Render: RenderKurinRendererLayerItem,
-		Data: &KurinRendererLayerItemData{
-			Items: map[string]*KurinItemGraphic{},
+		Load:   LoadRendererLayerItem,
+		Render: RenderRendererLayerItem,
+		Data: &RendererLayerItemData{
+			Items: map[string]*ItemGraphic{},
 		},
 	}
 }
 
-func LoadKurinRendererLayerItem(layer *gfx.RendererLayer) error {
+func LoadRendererLayerItem(layer *gfx.RendererLayer) error {
 	return filepath.WalkDir(path.Join(constants.TexturesPath, "items"), func(path string, d fs.DirEntry, err error) error {
 		if d.Name() == "items" || !d.IsDir() {
 			return nil
 		}
-		graphic, err := NewKurinItemGraphic(d.Name())
+		graphic, err := NewItemGraphic(d.Name())
 		if err != nil {
 			return err
 		}
-		layer.Data.(*KurinRendererLayerItemData).Items[d.Name()] = graphic
+		layer.Data.(*RendererLayerItemData).Items[d.Name()] = graphic
 
 		return nil
 	})
 }
 
-func RenderKurinRendererLayerItem(layer *gfx.RendererLayer) error {
+func RenderRendererLayerItem(layer *gfx.RendererLayer) error {
 	for _, item := range gameplay.GameInstance.Map.Items {
-		RenderKurinItem(layer, item)
+		RenderItem(layer, item)
 	}
 
 	return nil

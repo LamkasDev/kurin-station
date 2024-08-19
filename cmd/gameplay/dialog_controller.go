@@ -1,23 +1,23 @@
 package gameplay
 
-type KurinDialogRequest struct {
+type DialogRequest struct {
 	Type string
 	Data interface{}
 }
 
-type KurinDialogController struct {
-	OpenRequest  *KurinDialogRequest
+type DialogController struct {
+	OpenRequest  *DialogRequest
 	CloseRequest bool
 }
 
-func NewKurinDialogController() KurinDialogController {
-	return KurinDialogController{}
+func NewDialogController() DialogController {
+	return DialogController{}
 }
 
-func OpenKurinDialog(request *KurinDialogRequest) {
+func OpenDialog(request *DialogRequest) {
 	GameInstance.DialogController.OpenRequest = request
 }
 
-func CloseKurinDialog() {
+func CloseDialog() {
 	GameInstance.DialogController.CloseRequest = true
 }

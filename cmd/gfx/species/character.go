@@ -11,34 +11,34 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-func GetKurinCharacterRect(character *gameplay.KurinCharacter) sdl.Rect {
+func GetCharacterRect(character *gameplay.Character) sdl.Rect {
 	position := sdlutils.AddFPoints(character.PositionRender, gameplay.GetAnimationOffset(character))
 	return render.WorldToScreenRect(sdl.FRect{
 		X: position.X, Y: position.Y,
-		W: gameplay.KurinTileSizeF.X, H: gameplay.KurinTileSizeF.Y,
+		W: gameplay.TileSizeF.X, H: gameplay.TileSizeF.Y,
 	})
 }
 
-func RenderKurinCharacter(layer *gfx.RendererLayer, character *gameplay.KurinCharacter) error {
-	graphic := layer.Data.(*KurinRendererLayerCharacterData).Species[character.Species].Types[character.Type]
-	rect := GetKurinCharacterRect(character)
+func RenderCharacter(layer *gfx.RendererLayer, character *gameplay.Character) error {
+	graphic := layer.Data.(*RendererLayerCharacterData).Species[character.Species].Types[character.Gender]
+	rect := GetCharacterRect(character)
 
 	switch character.Direction {
-	case common.KurinDirectionNorth:
-		RenderKurinCharacterHand(layer, character, gameplay.KurinHandLeft, rect)
-		RenderKurinCharacterHand(layer, character, gameplay.KurinHandRight, rect)
-	case common.KurinDirectionEast:
-		RenderKurinCharacterHand(layer, character, gameplay.KurinHandLeft, rect)
-	case common.KurinDirectionSouth:
+	case common.DirectionNorth:
+		RenderCharacterHand(layer, character, gameplay.HandLeft, rect)
+		RenderCharacterHand(layer, character, gameplay.HandRight, rect)
+	case common.DirectionEast:
+		RenderCharacterHand(layer, character, gameplay.HandLeft, rect)
+	case common.DirectionSouth:
 		break
-	case common.KurinDirectionWest:
-		RenderKurinCharacterHand(layer, character, gameplay.KurinHandRight, rect)
+	case common.DirectionWest:
+		RenderCharacterHand(layer, character, gameplay.HandRight, rect)
 	}
 
 	for _, part := range graphic.Template.Parts {
 		offset := part.Offset
 		if offset == nil {
-			offset = &templates.KurinSpeciesTemplateBodypartOffset{}
+			offset = &templates.SpeciesTemplateBodypartOffset{}
 		}
 
 		texture := graphic.Textures[part.Id][character.Direction]
@@ -49,29 +49,29 @@ func RenderKurinCharacter(layer *gfx.RendererLayer, character *gameplay.KurinCha
 	}
 
 	switch character.Direction {
-	case common.KurinDirectionNorth:
+	case common.DirectionNorth:
 		break
-	case common.KurinDirectionEast:
-		RenderKurinCharacterHand(layer, character, gameplay.KurinHandRight, rect)
-	case common.KurinDirectionSouth:
-		RenderKurinCharacterHand(layer, character, gameplay.KurinHandLeft, rect)
-		RenderKurinCharacterHand(layer, character, gameplay.KurinHandRight, rect)
-	case common.KurinDirectionWest:
-		RenderKurinCharacterHand(layer, character, gameplay.KurinHandLeft, rect)
+	case common.DirectionEast:
+		RenderCharacterHand(layer, character, gameplay.HandRight, rect)
+	case common.DirectionSouth:
+		RenderCharacterHand(layer, character, gameplay.HandLeft, rect)
+		RenderCharacterHand(layer, character, gameplay.HandRight, rect)
+	case common.DirectionWest:
+		RenderCharacterHand(layer, character, gameplay.HandLeft, rect)
 	}
 
 	return nil
 }
 
-func RenderKurinCharacterHand(layer *gfx.RendererLayer, character *gameplay.KurinCharacter, hand gameplay.KurinHand, rect sdl.Rect) error {
+func RenderCharacterHand(layer *gfx.RendererLayer, character *gameplay.Character, hand gameplay.Hand, rect sdl.Rect) error {
 	handItem := character.Inventory.Hands[hand]
 	if handItem != nil {
-		graphic := layer.Data.(*KurinRendererLayerCharacterData).ItemLayer.Data.(*item.KurinRendererLayerItemData).Items[handItem.Type]
+		graphic := layer.Data.(*RendererLayerCharacterData).ItemLayer.Data.(*item.RendererLayerItemData).Items[handItem.Type]
 		if graphic.Template.Hand == nil || !*graphic.Template.Hand {
 			return nil
 		}
 
-		graphicDirections := graphic.Hands[hand][handItem.GetTextureHand(handItem)]
+		graphicDirections := graphic.Hands[hand][handItem.Template.GetTextureHand(handItem)]
 		if err := gfx.RendererInstance.Renderer.Copy(graphicDirections[character.Direction].Texture, nil, &rect); err != nil {
 			return err
 		}

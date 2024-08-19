@@ -5,35 +5,34 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx"
 )
 
-type KurinRendererLayerCharacterData struct {
-	Species   map[string]*KurinSpeciesGraphicContainer
+type RendererLayerCharacterData struct {
+	Species   map[string]*SpeciesGraphicContainer
 	ItemLayer *gfx.RendererLayer
 }
 
-func NewKurinRendererLayerCharacter(itemLayer *gfx.RendererLayer) *gfx.RendererLayer {
+func NewRendererLayerCharacter(itemLayer *gfx.RendererLayer) *gfx.RendererLayer {
 	return &gfx.RendererLayer{
-		Load:   LoadKurinRendererLayerCharacter,
-		Render: RenderKurinRendererLayerCharacter,
-		Data: &KurinRendererLayerCharacterData{
-			Species:   map[string]*KurinSpeciesGraphicContainer{},
+		Load:   LoadRendererLayerCharacter,
+		Render: RenderRendererLayerCharacter,
+		Data: &RendererLayerCharacterData{
+			Species:   map[string]*SpeciesGraphicContainer{},
 			ItemLayer: itemLayer,
 		},
 	}
 }
 
-func LoadKurinRendererLayerCharacter(layer *gfx.RendererLayer) error {
+func LoadRendererLayerCharacter(layer *gfx.RendererLayer) error {
 	var err error
-	if layer.Data.(*KurinRendererLayerCharacterData).Species[gameplay.KurinDefaultSpecies], err = NewKurinSpeciesGraphicContainer(gameplay.KurinDefaultSpecies); err != nil {
+	if layer.Data.(*RendererLayerCharacterData).Species[gameplay.DefaultSpecies], err = NewSpeciesGraphicContainer(gameplay.DefaultSpecies); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func RenderKurinRendererLayerCharacter(layer *gfx.RendererLayer) error {
+func RenderRendererLayerCharacter(layer *gfx.RendererLayer) error {
 	for _, character := range gameplay.GameInstance.Characters {
-		gameplay.ProcessKurinCharacter(character)
-		RenderKurinCharacter(layer, character)
+		RenderCharacter(layer, character)
 	}
 
 	return nil

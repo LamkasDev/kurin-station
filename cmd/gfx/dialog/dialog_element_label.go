@@ -8,13 +8,13 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-func NewKurinDialogElementLabel(position sdl.Point, text string, icon *sdlutils.TextureWithSize) *KurinDialogElement {
+func NewDialogElementLabel(position sdl.Point, text string, icon *sdlutils.TextureWithSize) *DialogElement {
 	w, h, _ := gfx.RendererInstance.Fonts.Default.SizeUTF8(text)
-	return &KurinDialogElement{
+	return &DialogElement{
 		GetRect: func(dialogRect *sdl.Rect) *sdl.Rect {
 			return &sdl.Rect{X: position.X, Y: position.Y, W: int32(w), H: int32(h)}
 		},
-		Render: func(element *KurinDialogElement, rect *sdl.Rect) {
+		Render: func(element *DialogElement, rect *sdl.Rect) {
 			if icon != nil {
 				sdlutils.RenderTexture(gfx.RendererInstance.Renderer, icon, sdl.Point{X: rect.X, Y: rect.Y}, sdl.FPoint{X: 1, Y: 1})
 				rect.X += 24

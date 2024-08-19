@@ -5,43 +5,43 @@ import (
 	"github.com/veandco/go-sdl2/ttf"
 )
 
-type KurinRendererFonts struct {
+type RendererFonts struct {
 	Container    map[string]*ttf.Font
 	Default      *ttf.Font
 	DefaultSmall *ttf.Font
 }
 
 const (
-	KurinRendererFontDefault      = "default"
-	KurinRendererFontDefaultSmall = "default.small"
-	KurinRendererFontPixeled      = "pixeled"
-	KurinRendererFontOutline      = "outline"
+	RendererFontDefault      = "default"
+	RendererFontDefaultSmall = "default.small"
+	RendererFontPixeled      = "pixeled"
+	RendererFontOutline      = "outline"
 )
 
-func NewKurinRendererFonts() (KurinRendererFonts, error) {
-	fonts := KurinRendererFonts{
+func NewRendererFonts() (RendererFonts, error) {
+	fonts := RendererFonts{
 		Container: map[string]*ttf.Font{},
 	}
 	var err error
-	if fonts.Container[KurinRendererFontDefault], err = ttf.OpenFont(constants.ApplicationFontDefault, 14); err != nil {
+	if fonts.Container[RendererFontDefault], err = ttf.OpenFont(constants.ApplicationFontDefault, 14); err != nil {
 		return fonts, err
 	}
-	if fonts.Container[KurinRendererFontDefaultSmall], err = ttf.OpenFont(constants.ApplicationFontDefault, 10); err != nil {
+	if fonts.Container[RendererFontDefaultSmall], err = ttf.OpenFont(constants.ApplicationFontDefault, 10); err != nil {
 		return fonts, err
 	}
-	if fonts.Container[KurinRendererFontPixeled], err = ttf.OpenFont(constants.ApplicationFontPixeled, 24); err != nil {
+	if fonts.Container[RendererFontPixeled], err = ttf.OpenFont(constants.ApplicationFontPixeled, 24); err != nil {
 		return fonts, err
 	}
-	if fonts.Container[KurinRendererFontOutline], err = ttf.OpenFont(constants.ApplicationFontOutline, 24); err != nil {
+	if fonts.Container[RendererFontOutline], err = ttf.OpenFont(constants.ApplicationFontOutline, 24); err != nil {
 		return fonts, err
 	}
-	fonts.Default = fonts.Container[KurinRendererFontDefault]
-	fonts.DefaultSmall = fonts.Container[KurinRendererFontDefaultSmall]
+	fonts.Default = fonts.Container[RendererFontDefault]
+	fonts.DefaultSmall = fonts.Container[RendererFontDefaultSmall]
 
 	return fonts, nil
 }
 
-func FreeKurinRendererFonts(fonts *KurinRendererFonts) {
+func FreeRendererFonts(fonts *RendererFonts) {
 	for _, font := range fonts.Container {
 		font.Close()
 	}

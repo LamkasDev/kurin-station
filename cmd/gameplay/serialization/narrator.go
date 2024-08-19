@@ -2,25 +2,25 @@ package serialization
 
 import "github.com/LamkasDev/kurin/cmd/gameplay"
 
-type KurinNarratorData struct {
-	Objectives []KurinNarratorObjectiveData
+type NarratorData struct {
+	Objectives []NarratorObjectiveData
 }
 
-func EncodeKurinNarrator(narrator *gameplay.KurinNarrator) KurinNarratorData {
-	data := KurinNarratorData{
-		Objectives: []KurinNarratorObjectiveData{},
+func EncodeNarrator(narrator *gameplay.Narrator) NarratorData {
+	data := NarratorData{
+		Objectives: []NarratorObjectiveData{},
 	}
 	for _, objective := range narrator.Objectives {
-		data.Objectives = append(data.Objectives, EncodeKurinNarratorObjective(objective))
+		data.Objectives = append(data.Objectives, EncodeNarratorObjective(objective))
 	}
 
 	return data
 }
 
-func DecodeKurinNarrator(data KurinNarratorData) *gameplay.KurinNarrator {
-	narrator := gameplay.NewKurinNarrator()
+func DecodeNarrator(data NarratorData) *gameplay.Narrator {
+	narrator := gameplay.NewNarrator()
 	for _, objectiveData := range data.Objectives {
-		gameplay.AddKurinNarratorObjective(narrator, DecodeKurinNarratorObjective(objectiveData))
+		gameplay.AddNarratorObjective(narrator, DecodeNarratorObjective(objectiveData))
 	}
 
 	return narrator

@@ -9,12 +9,12 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx"
 )
 
-type KurinHUDGraphic struct {
+type HUDGraphic struct {
 	Texture *sdlutils.TextureWithSize
 }
 
-func NewKurinHUDGraphic(graphicId string) (*KurinHUDGraphic, error) {
-	graphic := KurinHUDGraphic{}
+func NewHUDGraphic(graphicId string) (*HUDGraphic, error) {
+	graphic := HUDGraphic{}
 	graphicDirectory := path.Join(constants.TexturesPath, "icons")
 
 	var err error

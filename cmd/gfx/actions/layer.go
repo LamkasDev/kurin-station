@@ -7,7 +7,7 @@ import (
 	"github.com/LamkasDev/kurin/cmd/common/constants"
 	"github.com/LamkasDev/kurin/cmd/common/mathutils"
 	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
-	"github.com/LamkasDev/kurin/cmd/gameplay/templates"
+	"github.com/LamkasDev/kurin/cmd/gameplay"
 	"github.com/LamkasDev/kurin/cmd/gfx"
 	"github.com/LamkasDev/kurin/cmd/gfx/structure"
 	"github.com/LamkasDev/kurin/cmd/gfx/turf"
@@ -32,10 +32,10 @@ const (
 	ActionModeBuild = ActionMode(1)
 )
 
-func NewKurinRendererLayerActions(turfLayer *gfx.RendererLayer, objectLayer *gfx.RendererLayer, itemLayer *gfx.RendererLayer) *gfx.RendererLayer {
+func NewRendererLayerActions(turfLayer *gfx.RendererLayer, objectLayer *gfx.RendererLayer, itemLayer *gfx.RendererLayer) *gfx.RendererLayer {
 	return &gfx.RendererLayer{
-		Load:   LoadKurinRendererLayerActions,
-		Render: RenderKurinRendererLayerActions,
+		Load:   LoadRendererLayerActions,
+		Render: RenderRendererLayerActions,
 		Data: &RendererLayerActionsData{
 			Input:       "",
 			Mode:        ActionModeSay,
@@ -47,7 +47,7 @@ func NewKurinRendererLayerActions(turfLayer *gfx.RendererLayer, objectLayer *gfx
 	}
 }
 
-func LoadKurinRendererLayerActions(layer *gfx.RendererLayer) error {
+func LoadRendererLayerActions(layer *gfx.RendererLayer) error {
 	data := layer.Data.(*RendererLayerActionsData)
 	var err error
 	if data.UseTexture, err = sdlutils.LoadTexture(gfx.RendererInstance.Renderer, path.Join(constants.TexturesPath, "icons", "radial_use.png")); err != nil {
@@ -57,13 +57,13 @@ func LoadKurinRendererLayerActions(layer *gfx.RendererLayer) error {
 	return nil
 }
 
-func RenderKurinRendererLayerActions(layer *gfx.RendererLayer) error {
+func RenderRendererLayerActions(layer *gfx.RendererLayer) error {
 	if gfx.RendererInstance.Context.State != gfx.RendererContextStateActions {
 		return nil
 	}
 
 	data := layer.Data.(*RendererLayerActionsData)
-	name := GetKurinActionModeName(data.Mode)
+	name := GetActionModeName(data.Mode)
 	nameWidth, _, _ := gfx.RendererInstance.Fonts.Default.SizeUTF8(name)
 
 	size := &sdl.Rect{W: 312, H: 36}
@@ -114,17 +114,16 @@ func RenderKurinRendererLayerActions(layer *gfx.RendererLayer) error {
 
 			var structureTexture *sdlutils.TextureWithSize
 			var structureName string
-			var structureRequirements *[]templates.KurinItemRequirementTemplate
+			var structureRequirements []gameplay.ItemRequirement
 			switch data := structureGraphic.(type) {
-			case *structure.KurinStructureGraphic:
+			case *structure.StructureGraphic:
 				structureTexture = data.Textures[0][0]
 				structureName = data.Template.Name
-				structureRequirements = data.Template.Requirements
+				structureRequirements = gameplay.ObjectContainer[data.Template.Id].Requirements
 				break
-			case *turf.KurinTurfGraphic:
+			case *turf.TurfGraphic:
 				structureTexture = data.Textures[0]
 				structureName = data.Template.Name
-				structureRequirements = data.Template.Requirements
 				break
 			}
 
@@ -132,8 +131,8 @@ func RenderKurinRendererLayerActions(layer *gfx.RendererLayer) error {
 			sdlutils.RenderTexture(gfx.RendererInstance.Renderer, structureTexture, structurePoint, sdl.FPoint{X: 1.5, Y: 1.5})
 			sdlutils.RenderLabel(gfx.RendererInstance.Renderer, fmt.Sprintf("actions.%d.name", i), gfx.RendererInstance.Fonts.Default, sdlutils.Blue, structureName, sdl.Point{X: menurect.X + 72, Y: menurect.Y + 12}, sdl.FPoint{X: 1, Y: 1})
 			if structureRequirements != nil {
-				for j, requirement := range *structureRequirements {
-					sdlutils.RenderLabel(gfx.RendererInstance.Renderer, fmt.Sprintf("actions.%d.requirements.%d", j), gfx.RendererInstance.Fonts.Default, sdlutils.Blue, requirement.Type, sdl.Point{X: menurect.X + 72, Y: menurect.Y + 36}, sdl.FPoint{X: 1, Y: 1})
+				for j, requirement := range structureRequirements {
+					sdlutils.RenderLabel(gfx.RendererInstance.Renderer, fmt.Sprintf("actions.%d.requirements.%d", j), gfx.RendererInstance.Fonts.Default, sdlutils.Blue, fmt.Sprintf("%dx %s", requirement.Count, requirement.Type), sdl.Point{X: menurect.X + 72, Y: menurect.Y + 36}, sdl.FPoint{X: 1, Y: 1})
 				}
 			}
 
@@ -153,7 +152,7 @@ func RenderKurinRendererLayerActions(layer *gfx.RendererLayer) error {
 	return nil
 }
 
-func GetKurinActionModeName(mode ActionMode) string {
+func GetActionModeName(mode ActionMode) string {
 	switch mode {
 	case ActionModeSay:
 		return "Say"

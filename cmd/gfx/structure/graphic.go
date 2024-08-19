@@ -12,16 +12,16 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx"
 )
 
-type KurinStructureGraphic struct {
-	Template       templates.KurinStructureTemplate
+type StructureGraphic struct {
+	Template       templates.StructureTemplate
 	Textures       [][]*sdlutils.TextureWithSize
 	TexturesSmooth map[string]*sdlutils.TextureWithSize
 	Blueprint      *sdlutils.TextureWithSize
 }
 
-func NewKurinStructureGraphic(structureId string) (*KurinStructureGraphic, error) {
+func NewStructureGraphic(structureId string) (*StructureGraphic, error) {
 	graphicDirectory := path.Join(constants.TexturesPath, "structures", structureId)
-	graphic := KurinStructureGraphic{
+	graphic := StructureGraphic{
 		Textures:       make([][]*sdlutils.TextureWithSize, 4),
 		TexturesSmooth: map[string]*sdlutils.TextureWithSize{},
 	}

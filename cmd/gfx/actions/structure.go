@@ -20,13 +20,13 @@ func GetMenuGraphics(data *RendererLayerActionsData) []interface{} {
 }
 
 func GetMenuStructureGraphics(data *RendererLayerActionsData) []interface{} {
-	structures := maps.Values(data.ObjectLayer.Data.(*structure.KurinRendererLayerObjectData).Structures)
+	structures := maps.Values(data.ObjectLayer.Data.(*structure.RendererLayerObjectData).Structures)
 	sort.Slice(structures, func(i, j int) bool {
 		return structures[i].Template.Id < structures[j].Template.Id
 	})
-	structures = filter.Choose(structures, func(item *structure.KurinStructureGraphic) bool {
-		return item.Blueprint != nil && strings.Contains(item.Template.Name, data.Input)
-	}).([]*structure.KurinStructureGraphic)
+	structures = filter.Choose(structures, func(item *structure.StructureGraphic) bool {
+		return item.Blueprint != nil && strings.Contains(strings.ToLower(item.Template.Name), strings.ToLower(data.Input))
+	}).([]*structure.StructureGraphic)
 
 	newStructures := []interface{}{}
 	for _, structure := range structures {
@@ -37,13 +37,13 @@ func GetMenuStructureGraphics(data *RendererLayerActionsData) []interface{} {
 }
 
 func GetMenuTurfGraphics(data *RendererLayerActionsData) []interface{} {
-	turfs := maps.Values(data.TurfLayer.Data.(*turf.KurinRendererLayerTileData).Turfs)
+	turfs := maps.Values(data.TurfLayer.Data.(*turf.RendererLayerTileData).Turfs)
 	sort.Slice(turfs, func(i, j int) bool {
 		return turfs[i].Template.Id < turfs[j].Template.Id
 	})
-	turfs = filter.Choose(turfs, func(item *turf.KurinTurfGraphic) bool {
-		return item.Blueprint != nil && strings.Contains(item.Template.Name, data.Input)
-	}).([]*turf.KurinTurfGraphic)
+	turfs = filter.Choose(turfs, func(item *turf.TurfGraphic) bool {
+		return item.Blueprint != nil && strings.Contains(strings.ToLower(item.Template.Name), strings.ToLower(data.Input))
+	}).([]*turf.TurfGraphic)
 
 	newTurfs := []interface{}{}
 	for _, turf := range turfs {

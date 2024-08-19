@@ -1,11 +1,11 @@
 package timing
 
-type KurinTiming struct {
+type Timing struct {
 	FrameTime float32
 }
 
-var KurinTimingGlobal = NewKurinTiming()
+var TimingGlobal = NewTiming()
 
-func NewKurinTiming() KurinTiming {
-	return KurinTiming{}
+func NewTiming() Timing {
+	return Timing{}
 }

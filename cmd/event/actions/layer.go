@@ -35,6 +35,8 @@ func LoadEventLayerActions(layer *event.EventLayer) error {
 }
 
 func ProcessEventLayerActions(layer *event.EventLayer) error {
+	data := layer.Data.(*EventLayerActionsData)
+	toolData := data.ToolLayer.Data.(*tool.RendererLayerToolData)
 	if event.EventManagerInstance.Keyboard.Pending == nil {
 		return nil
 	}
@@ -50,6 +52,10 @@ func ProcessEventLayerActions(layer *event.EventLayer) error {
 			event.EventManagerInstance.Keyboard.Pending = nil
 		case sdl.K_b:
 			StartEventLayerActionsInput(layer, actions.ActionModeBuild)
+			event.EventManagerInstance.Keyboard.Pending = nil
+		case sdl.K_x:
+			gfx.RendererInstance.Context.State = gfx.RendererContextStateTool
+			toolData.Mode = tool.ToolModeDestroy
 			event.EventManagerInstance.Keyboard.Pending = nil
 		}
 	}
@@ -67,14 +73,15 @@ func StartEventLayerActionsInput(layer *event.EventLayer, mode actions.ActionMod
 }
 
 func ProcessEventLayerActionsInput(layer *event.EventLayer) {
-	actionsData := layer.Data.(*EventLayerActionsData).ActionsLayer.Data.(*actions.RendererLayerActionsData)
+	data := layer.Data.(*EventLayerActionsData)
+	actionsData := data.ActionsLayer.Data.(*actions.RendererLayerActionsData)
 	input := actionsData.Input
 	switch *event.EventManagerInstance.Keyboard.Pending {
 	case sdl.K_ESCAPE:
-		EndKurinEventLayerActionsInput(layer)
+		EndEventLayerActionsInput(layer)
 		return
 	case sdl.K_RETURN:
-		ExecuteKurinEventLayerActionsInput(layer)
+		ExecuteEventLayerActionsInput(layer)
 		return
 	case sdl.K_UP:
 		actionsData.Index = ix.Max(ix.Min(actionsData.Index-1, len(actions.GetMenuGraphics(actionsData))-1), 0)
@@ -102,32 +109,32 @@ func ProcessEventLayerActionsInput(layer *event.EventLayer) {
 	}
 }
 
-func ExecuteKurinEventLayerActionsInput(layer *event.EventLayer) {
+func ExecuteEventLayerActionsInput(layer *event.EventLayer) {
 	data := layer.Data.(*EventLayerActionsData)
 	actionsData := data.ActionsLayer.Data.(*actions.RendererLayerActionsData)
-	toolData := data.ToolLayer.Data.(*tool.KurinRendererLayerToolData)
-	EndKurinEventLayerActionsInput(layer)
+	toolData := data.ToolLayer.Data.(*tool.RendererLayerToolData)
+	EndEventLayerActionsInput(layer)
 	switch actionsData.Mode {
 	case actions.ActionModeBuild:
-		gfx.RendererInstance.Context.State = gfx.KurinRendererContextStateTool
+		gfx.RendererInstance.Context.State = gfx.RendererContextStateTool
 		graphic := actions.GetMenuGraphics(actionsData)[actionsData.Index]
 		switch realGraphic := graphic.(type) {
-		case *structure.KurinStructureGraphic:
-			toolData.Mode = tool.KurinToolModeBuild
-			toolData.Prefab = gameplay.NewKurinObject(&gameplay.KurinTile{}, realGraphic.Template.Id)
-		case *turf.KurinTurfGraphic:
-			toolData.Mode = tool.KurinToolModeBuild
-			toolData.Prefab = gameplay.NewKurinTile(realGraphic.Template.Id, sdlutils.Vector3{})
+		case *structure.StructureGraphic:
+			toolData.Mode = tool.ToolModeBuild
+			toolData.Prefab = gameplay.NewObject(&gameplay.Tile{}, realGraphic.Template.Id)
+		case *turf.TurfGraphic:
+			toolData.Mode = tool.ToolModeBuild
+			toolData.Prefab = gameplay.NewTile(realGraphic.Template.Id, sdlutils.Vector3{})
 		}
 	case actions.ActionModeSay:
 		if len(actionsData.Input) == 0 {
 			return
 		}
-		gameplay.CreateKurinRunechatMessage(&gameplay.GameInstance.RunechatController, gameplay.NewKurinRunechatCharacter(gameplay.GameInstance.SelectedCharacter, actionsData.Input))
+		gameplay.CreateRunechatMessage(&gameplay.GameInstance.RunechatController, gameplay.NewRunechatCharacter(gameplay.GameInstance.SelectedCharacter, actionsData.Input))
 	}
 }
 
-func EndKurinEventLayerActionsInput(layer *event.EventLayer) {
+func EndEventLayerActionsInput(layer *event.EventLayer) {
 	gfx.RendererInstance.Context.State = gfx.RendererContextStateNone
 	event.EventManagerInstance.Keyboard.InputMode = false
 }

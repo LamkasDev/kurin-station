@@ -10,21 +10,21 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinEventLayerBaseData struct{}
+type EventLayerBaseData struct{}
 
-func NewKurinEventLayerBase() *event.EventLayer {
+func NewEventLayerBase() *event.EventLayer {
 	return &event.EventLayer{
-		Load:    LoadKurinEventLayerBase,
-		Process: ProcessKurinEventLayerBase,
-		Data:    &KurinEventLayerBaseData{},
+		Load:    LoadEventLayerBase,
+		Process: ProcessEventLayerBase,
+		Data:    &EventLayerBaseData{},
 	}
 }
 
-func LoadKurinEventLayerBase(layer *event.EventLayer) error {
+func LoadEventLayerBase(layer *event.EventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerBase(layer *event.EventLayer) error {
+func ProcessEventLayerBase(layer *event.EventLayer) error {
 	event.EventManagerInstance.Mouse.Delta = sdl.Point{}
 	for sdlEvent := sdl.PollEvent(); sdlEvent != nil; sdlEvent = sdl.PollEvent() {
 		switch val := sdlEvent.(type) {
@@ -82,7 +82,7 @@ func ProcessKurinEventLayerBase(layer *event.EventLayer) error {
 			event.EventManagerInstance.Keyboard.Input = val.GetText()
 		}
 	}
-	gameplay.ProcessKurinGame()
+	gameplay.ProcessGame()
 
 	return nil
 }

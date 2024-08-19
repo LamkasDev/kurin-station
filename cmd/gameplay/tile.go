@@ -8,34 +8,34 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-var KurinTileSize = sdl.Point{
+var TileSize = sdl.Point{
 	X: 32,
 	Y: 32,
 }
 
-var KurinTileSizeF = sdl.FPoint{
+var TileSizeF = sdl.FPoint{
 	X: 32,
 	Y: 32,
 }
 
-type KurinTile struct {
+type Tile struct {
 	Type     string
 	Position sdlutils.Vector3
 
-	Job     *KurinJobDriver
-	Objects []*KurinObject
+	Job     *JobDriver
+	Objects []*Object
 }
 
-func NewKurinTile(tileType string, position sdlutils.Vector3) *KurinTile {
-	return &KurinTile{
+func NewTile(tileType string, position sdlutils.Vector3) *Tile {
+	return &Tile{
 		Type:     tileType,
 		Position: position,
 		Job:      nil,
-		Objects:  []*KurinObject{},
+		Objects:  []*Object{},
 	}
 }
 
-func GetKurinTileAt(kmap *KurinMap, position sdlutils.Vector3) *KurinTile {
+func GetTileAt(kmap *Map, position sdlutils.Vector3) *Tile {
 	if IsMapPositionOutOfBounds(kmap, position) {
 		return nil
 	}
@@ -43,40 +43,36 @@ func GetKurinTileAt(kmap *KurinMap, position sdlutils.Vector3) *KurinTile {
 	return kmap.Tiles[position.Base.X][position.Base.Y][position.Z]
 }
 
-func GetKurinTileInDirection(kmap *KurinMap, tile *KurinTile, direction common.KurinDirection) *KurinTile {
-	return GetKurinTileAt(kmap, common.GetPositionInDirectionV(tile.Position, direction))
+func GetTileInDirection(kmap *Map, tile *Tile, direction common.Direction) *Tile {
+	return GetTileAt(kmap, common.GetPositionInDirectionV(tile.Position, direction))
 }
 
-func DoesMapPositionHaveKurinTileNeighbour(kmap *KurinMap, position sdlutils.Vector3) bool {
-	if GetKurinTileAt(kmap, common.GetPositionInDirectionV(position, common.KurinDirectionNorth)) != nil {
+func DoesMapPositionHaveTileNeighbour(kmap *Map, position sdlutils.Vector3) bool {
+	if GetTileAt(kmap, common.GetPositionInDirectionV(position, common.DirectionNorth)) != nil {
 		return true
 	}
-	if GetKurinTileAt(kmap, common.GetPositionInDirectionV(position, common.KurinDirectionEast)) != nil {
+	if GetTileAt(kmap, common.GetPositionInDirectionV(position, common.DirectionEast)) != nil {
 		return true
 	}
-	if GetKurinTileAt(kmap, common.GetPositionInDirectionV(position, common.KurinDirectionSouth)) != nil {
+	if GetTileAt(kmap, common.GetPositionInDirectionV(position, common.DirectionSouth)) != nil {
 		return true
 	}
-	if GetKurinTileAt(kmap, common.GetPositionInDirectionV(position, common.KurinDirectionWest)) != nil {
+	if GetTileAt(kmap, common.GetPositionInDirectionV(position, common.DirectionWest)) != nil {
 		return true
 	}
 
 	return false
 }
 
-func CanEnterKurinTile(tile *KurinTile) bool {
-	return len(tile.Objects) == 0
-}
-
-func CanBuildKurinTileAtMapPosition(kmap *KurinMap, position sdlutils.Vector3) bool {
+func CanBuildTileAtMapPosition(kmap *Map, position sdlutils.Vector3) bool {
 	return !IsMapPositionOutOfBounds(kmap, position) &&
-		GetKurinTileAt(kmap, position) == nil &&
-		DoesMapPositionHaveKurinTileNeighbour(kmap, position)
+		GetTileAt(kmap, position) == nil &&
+		DoesMapPositionHaveTileNeighbour(kmap, position)
 }
 
-func GetKurinTileDescription(tile *KurinTile) string {
+func GetTileDescription(tile *Tile) string {
 	text := fmt.Sprintf("[%d_%d] %s", tile.Position.Base.X, tile.Position.Base.Y, tile.Type)
-	object := GetKurinObjectAtTile(tile)
+	object := GetObjectAtTile(tile)
 	if object != nil {
 		text = fmt.Sprintf("%s %s", text, object.Type)
 	}

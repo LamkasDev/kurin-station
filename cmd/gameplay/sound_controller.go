@@ -1,19 +1,19 @@
 package gameplay
 
-type KurinSoundController struct {
-	Pending []*KurinSound
+type SoundController struct {
+	Pending []*Sound
 }
 
-func NewKurinSoundController() KurinSoundController {
-	return KurinSoundController{
-		Pending: []*KurinSound{},
+func NewSoundController() SoundController {
+	return SoundController{
+		Pending: []*Sound{},
 	}
 }
 
-func PlaySound(controller *KurinSoundController, soundType string) {
-	controller.Pending = append(controller.Pending, NewKurinSound(soundType, 1))
+func PlaySound(controller *SoundController, soundType string) {
+	controller.Pending = append(controller.Pending, NewSound(soundType, 1))
 }
 
-func PlaySoundVolume(controller *KurinSoundController, soundType string, volume float32) {
-	controller.Pending = append(controller.Pending, NewKurinSound(soundType, volume))
+func PlaySoundVolume(controller *SoundController, soundType string, volume float32) {
+	controller.Pending = append(controller.Pending, NewSound(soundType, volume))
 }

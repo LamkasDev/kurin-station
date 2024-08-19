@@ -4,21 +4,21 @@ import (
 	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
 )
 
-type KurinRunechat struct {
+type Runechat struct {
 	Message string
 	Ticks   uint32
 	Data    interface{}
 	Texture *sdlutils.TextureWithSize
 }
 
-func NewKurinRunechat(message string) *KurinRunechat {
-	return &KurinRunechat{
+func NewRunechat(message string) *Runechat {
+	return &Runechat{
 		Message: message,
 		Ticks:   360,
 	}
 }
 
-func DestroyKurinRunechat(runechat *KurinRunechat) {
+func DestroyRunechat(runechat *Runechat) {
 	if runechat.Texture != nil {
 		runechat.Texture.Texture.Destroy()
 	}

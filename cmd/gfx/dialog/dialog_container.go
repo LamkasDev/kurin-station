@@ -5,13 +5,13 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx"
 )
 
-func NewKurinDialog(layer *gfx.RendererLayer, request *gameplay.KurinDialogRequest) *KurinDialog {
+func NewDialog(layer *gfx.RendererLayer, request *gameplay.DialogRequest) *Dialog {
 	switch request.Type {
 	case "pod":
-		return NewKurinDialogPod(layer, request.Data)
+		return NewDialogPod(layer, request.Data)
 	case "lathe":
-		return NewKurinDialogLathe(layer, request.Data)
+		return NewDialogLathe(layer, request.Data)
 	}
 
-	return NewKurinDialogRaw(layer, request.Type, "??", "flushed")
+	return NewDialogRaw(layer, request.Type, "??", "flushed")
 }

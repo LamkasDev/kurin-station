@@ -12,15 +12,15 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx"
 )
 
-type KurinTurfGraphic struct {
-	Template  templates.KurinTurfTemplate
+type TurfGraphic struct {
+	Template  templates.TurfTemplate
 	Textures  []*sdlutils.TextureWithSize
 	Blueprint *sdlutils.TextureWithSize
 }
 
-func NewKurinTurfGraphic(tileId string) (*KurinTurfGraphic, error) {
+func NewTurfGraphic(tileId string) (*TurfGraphic, error) {
 	graphicDirectory := path.Join(constants.TexturesPath, "turfs", tileId)
-	graphic := KurinTurfGraphic{
+	graphic := TurfGraphic{
 		Textures: make([]*sdlutils.TextureWithSize, 4),
 	}
 

@@ -1,9 +1,9 @@
 package gameplay
 
-type KurinDialogPodData struct {
-	Pod *KurinObject
+type DialogPodData struct {
+	Pod *Object
 }
 
-type KurinDialogLatheData struct {
-	Lathe *KurinObject
+type DialogLatheData struct {
+	Lathe *Object
 }

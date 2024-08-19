@@ -5,7 +5,7 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gameplay"
 )
 
-type KurinItemData struct {
+type ItemData struct {
 	Id        uint32
 	Type      string
 	Count     uint16
@@ -13,21 +13,21 @@ type KurinItemData struct {
 	Data      []byte
 }
 
-func EncodeKurinItem(item *gameplay.KurinItem) KurinItemData {
-	return KurinItemData{
+func EncodeItem(item *gameplay.Item) ItemData {
+	return ItemData{
 		Id:        item.Id,
 		Type:      item.Type,
 		Count:     item.Count,
 		Transform: item.Transform,
-		Data:      item.EncodeData(item),
+		Data:      item.Template.EncodeData(item),
 	}
 }
 
-func DecodeKurinItem(data KurinItemData) *gameplay.KurinItem {
-	item := gameplay.NewKurinItem(data.Type, data.Count)
+func DecodeItem(data ItemData) *gameplay.Item {
+	item := gameplay.NewItem(data.Type, data.Count)
 	item.Id = data.Id
 	item.Transform = data.Transform
-	item.DecodeData(item, data.Data)
+	item.Template.DecodeData(item, data.Data)
 
 	return item
 }

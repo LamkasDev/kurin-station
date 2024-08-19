@@ -1,15 +1,15 @@
 package gameplay
 
-type KurinParticleController struct {
-	Pending []*KurinParticle
+type ParticleController struct {
+	Pending []*Particle
 }
 
-func NewKurinParticleController() KurinParticleController {
-	return KurinParticleController{
-		Pending: []*KurinParticle{},
+func NewParticleController() ParticleController {
+	return ParticleController{
+		Pending: []*Particle{},
 	}
 }
 
-func CreateKurinParticle(controller *KurinParticleController, particle *KurinParticle) {
+func CreateParticle(controller *ParticleController, particle *Particle) {
 	controller.Pending = append(controller.Pending, particle)
 }

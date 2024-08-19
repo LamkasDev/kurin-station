@@ -10,36 +10,36 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinEventLayerToolData struct {
+type EventLayerToolData struct {
 	Layer *gfx.RendererLayer
 }
 
-func NewKurinEventLayerTool(layer *gfx.RendererLayer) *event.EventLayer {
+func NewEventLayerTool(layer *gfx.RendererLayer) *event.EventLayer {
 	return &event.EventLayer{
-		Load:    LoadKurinEventLayerTool,
-		Process: ProcessKurinEventLayerTool,
-		Data: &KurinEventLayerToolData{
+		Load:    LoadEventLayerTool,
+		Process: ProcessEventLayerTool,
+		Data: &EventLayerToolData{
 			Layer: layer,
 		},
 	}
 }
 
-func LoadKurinEventLayerTool(layer *event.EventLayer) error {
+func LoadEventLayerTool(layer *event.EventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerTool(layer *event.EventLayer) error {
-	if gfx.RendererInstance.Context.State != gfx.KurinRendererContextStateTool {
+func ProcessEventLayerTool(layer *event.EventLayer) error {
+	if gfx.RendererInstance.Context.State != gfx.RendererContextStateTool {
 		return nil
 	}
 
-	ProcessKurinEventLayerToolInput(layer)
+	ProcessEventLayerToolInput(layer)
 	return nil
 }
 
-func ProcessKurinEventLayerToolInput(layer *event.EventLayer) {
-	data := layer.Data.(*KurinEventLayerToolData)
-	toolData := data.Layer.Data.(*tool.KurinRendererLayerToolData)
+func ProcessEventLayerToolInput(layer *event.EventLayer) {
+	data := layer.Data.(*EventLayerToolData)
+	toolData := data.Layer.Data.(*tool.RendererLayerToolData)
 	if event.EventManagerInstance.Keyboard.Pending != nil {
 		switch *event.EventManagerInstance.Keyboard.Pending {
 		case sdl.K_ESCAPE:
@@ -53,30 +53,83 @@ func ProcessKurinEventLayerToolInput(layer *event.EventLayer) {
 		event.EventManagerInstance.Mouse.PendingRight = nil
 	}
 
-	mouseRect := render.ScreenToWorldRect(sdl.Rect{X: gfx.RendererInstance.Context.MousePosition.X, Y: gfx.RendererInstance.Context.MousePosition.Y, W: gameplay.KurinTileSize.X, H: gameplay.KurinTileSize.Y})
-	mousePosition := sdlutils.Vector3{Base: sdl.Point{X: mouseRect.X, Y: mouseRect.Y}, Z: 0}
-	tile := gameplay.GetKurinTileAt(&gameplay.GameInstance.Map, mousePosition)
-	switch realPrefab := toolData.Prefab.(type) {
-	case *gameplay.KurinObject:
-		realPrefab.Tile = tile
-		if realPrefab.Tile == nil || !gameplay.CanBuildKurinObjectAtMapPosition(&gameplay.GameInstance.Map, tile.Position) {
-			return
-		}
-		if event.EventManagerInstance.Mouse.PendingLeft != nil {
-			job := gameplay.NewKurinJobDriverBuild()
-			job.Tile = realPrefab.Tile
-			job.Initialize(job, &gameplay.KurinJobDriverBuildData{
-				Prefab: realPrefab.Type,
+	switch toolData.Mode {
+	case tool.ToolModeBuild:
+		switch realPrefab := toolData.Prefab.(type) {
+		case *gameplay.Object:
+			realPrefab.Tile = gameplay.GameInstance.HoveredTile
+			if realPrefab.Tile == nil {
+				return
+			}
+			if !gameplay.CanBuildObjectAtMapPosition(&gameplay.GameInstance.Map, realPrefab.Tile.Position) && !gameplay.GameInstance.Godmode {
+				return
+			}
+			if event.EventManagerInstance.Mouse.PendingLeft != nil {
+				if gameplay.GameInstance.Godmode {
+					gameplay.ReplaceObjectRaw(&gameplay.GameInstance.Map, gameplay.GetTileAt(&gameplay.GameInstance.Map, realPrefab.Tile.Position), realPrefab.Type)
+					return
+				}
+
+				job := gameplay.NewJobDriver("build", realPrefab.Tile)
+				job.Template.Initialize(job, &gameplay.JobDriverBuildData{
+					ObjectType: realPrefab.Type,
+				})
+				gameplay.PushJobToController(gameplay.GameInstance.JobController[gameplay.FactionPlayer], job)
+			}
+		case *gameplay.Tile:
+			realPrefab.Position = sdlutils.Vector3{Base: render.ScreenToWorldPosition(gfx.RendererInstance.Context.MousePosition), Z: 0}
+			if event.EventManagerInstance.Mouse.PendingLeft == nil {
+				return
+			}
+			if gameplay.IsMapPositionOutOfBounds(&gameplay.GameInstance.Map, realPrefab.Position) {
+				return
+			}
+			if !gameplay.CanBuildTileAtMapPosition(&gameplay.GameInstance.Map, realPrefab.Position) && !gameplay.GameInstance.Godmode {
+				return
+			}
+			if gameplay.DoesBuildFloorJobExistAtPosition(realPrefab.Position) {
+				return
+			}
+			if gameplay.GameInstance.Godmode {
+				tile := gameplay.GetTileAt(&gameplay.GameInstance.Map, realPrefab.Position)
+				if tile != nil {
+					tile.Type = realPrefab.Type
+				} else {
+					gameplay.CreateTileRaw(&gameplay.GameInstance.Map, realPrefab.Position, realPrefab.Type)
+				}
+
+				return
+			}
+			job := gameplay.NewJobDriver("build_floor", nil)
+			job.Template.Initialize(job, &gameplay.JobDriverBuildFloorData{
+				Position: realPrefab.Position,
+				TileType: realPrefab.Type,
 			})
-			gameplay.PushKurinJobToController(gameplay.GameInstance.JobController, job)
+			gameplay.PushJobToController(gameplay.GameInstance.JobController[gameplay.FactionPlayer], job)
 		}
-	case *gameplay.KurinTile:
-		realPrefab.Position = mousePosition
-		if !gameplay.CanBuildKurinTileAtMapPosition(&gameplay.GameInstance.Map, mousePosition) {
+	case tool.ToolModeDestroy:
+		if event.EventManagerInstance.Mouse.PendingLeft == nil {
 			return
 		}
-		if event.EventManagerInstance.Mouse.PendingLeft != nil {
-			gameplay.CreateKurinTile(realPrefab.Position, realPrefab.Type)
+		if gameplay.GameInstance.HoveredObject != nil {
+			if gameplay.GameInstance.Godmode {
+				gameplay.DestroyObjectRaw(&gameplay.GameInstance.Map, gameplay.GameInstance.HoveredObject)
+				return
+			}
+			job := gameplay.NewJobDriver("destroy", gameplay.GameInstance.HoveredObject.Tile)
+			job.Template.Initialize(job, nil)
+			gameplay.PushJobToController(gameplay.GameInstance.JobController[gameplay.FactionPlayer], job)
+			return
+		}
+		if gameplay.GameInstance.HoveredTile != nil {
+			if gameplay.GameInstance.Godmode {
+				gameplay.DestroyTileRaw(&gameplay.GameInstance.Map, gameplay.GameInstance.HoveredTile)
+				return
+			}
+			job := gameplay.NewJobDriver("destroy_floor", gameplay.GameInstance.HoveredTile)
+			job.Template.Initialize(job, nil)
+			gameplay.PushJobToController(gameplay.GameInstance.JobController[gameplay.FactionPlayer], job)
+			return
 		}
 	}
 }

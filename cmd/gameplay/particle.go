@@ -7,7 +7,7 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinParticle struct {
+type Particle struct {
 	Type     string
 	Scale    float32
 	Rotation float64
@@ -19,12 +19,12 @@ type KurinParticle struct {
 	Ticks    uint32
 }
 
-func NewKurinParticleIon(position sdlutils.FVector3) *KurinParticle {
-	return &KurinParticle{
+func NewParticleIon(position sdlutils.FVector3, color sdl.Color) *Particle {
+	return &Particle{
 		Type:     "ion",
 		Scale:    0.75,
 		Rotation: 90,
-		Color:    sdlutils.White,
+		Color:    color,
 		Movement: sdl.FPoint{X: -0.03},
 		Position: position,
 		Index:    0,
@@ -32,8 +32,8 @@ func NewKurinParticleIon(position sdlutils.FVector3) *KurinParticle {
 	}
 }
 
-func NewKurinParticleCross(position sdlutils.FVector3, scale float32, color sdl.Color) *KurinParticle {
-	return &KurinParticle{
+func NewParticleCross(position sdlutils.FVector3, scale float32, color sdl.Color) *Particle {
+	return &Particle{
 		Type:     "cross",
 		Scale:    scale,
 		Rotation: 0,
@@ -45,7 +45,7 @@ func NewKurinParticleCross(position sdlutils.FVector3, scale float32, color sdl.
 	}
 }
 
-func ProcessKurinParticle(particle *KurinParticle) {
+func ProcessParticle(particle *Particle) {
 	particle.Ticks--
 	particle.Position.Base.X += particle.Movement.X
 	particle.Position.Base.Y += particle.Movement.Y

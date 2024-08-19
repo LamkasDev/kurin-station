@@ -2,8 +2,8 @@ package gameplay
 
 import "github.com/veandco/go-sdl2/sdl"
 
-type KurinForce struct {
-	Item   *KurinItem
+type Force struct {
+	Item   *Item
 	Target sdl.FPoint
 	Delta  sdl.FPoint
 }

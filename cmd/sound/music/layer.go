@@ -11,21 +11,21 @@ import (
 	"github.com/veandco/go-sdl2/mix"
 )
 
-type KurinSoundLayerMusicData struct {
-	Tracks map[string]*sound.KurinTrack
+type SoundLayerMusicData struct {
+	Tracks map[string]*sound.Track
 }
 
-func NewKurinSoundLayerMusic() *sound.KurinSoundLayer {
-	return &sound.KurinSoundLayer{
-		Load:    LoadKurinSoundLayerMusic,
-		Process: ProcessKurinSoundLayerMusic,
-		Data: KurinSoundLayerMusicData{
-			Tracks: map[string]*sound.KurinTrack{},
+func NewSoundLayerMusic() *sound.SoundLayer {
+	return &sound.SoundLayer{
+		Load:    LoadSoundLayerMusic,
+		Process: ProcessSoundLayerMusic,
+		Data: SoundLayerMusicData{
+			Tracks: map[string]*sound.Track{},
 		},
 	}
 }
 
-func LoadKurinSoundLayerMusic(manager *sound.KurinSoundManager, layer *sound.KurinSoundLayer) error {
+func LoadSoundLayerMusic(layer *sound.SoundLayer) error {
 	mix.ReserveChannels(0)
 
 	return filepath.WalkDir(path.Join(constants.SoundsPath, "music"), func(path string, d fs.DirEntry, err error) error {
@@ -33,7 +33,7 @@ func LoadKurinSoundLayerMusic(manager *sound.KurinSoundManager, layer *sound.Kur
 			return nil
 		}
 		name := strings.TrimSuffix(d.Name(), filepath.Ext(d.Name()))
-		if layer.Data.(KurinSoundLayerMusicData).Tracks[name], err = sound.NewKurinTrack(manager, "music", name); err != nil {
+		if layer.Data.(SoundLayerMusicData).Tracks[name], err = sound.NewTrack("music", name); err != nil {
 			return err
 		}
 
@@ -41,9 +41,9 @@ func LoadKurinSoundLayerMusic(manager *sound.KurinSoundManager, layer *sound.Kur
 	})
 }
 
-func ProcessKurinSoundLayerMusic(manager *sound.KurinSoundManager, layer *sound.KurinSoundLayer) error {
+func ProcessSoundLayerMusic(layer *sound.SoundLayer) error {
 	if mix.Playing(0) != 1 {
-		track := layer.Data.(KurinSoundLayerMusicData).Tracks["ambiicetheme"]
+		track := layer.Data.(SoundLayerMusicData).Tracks["ambiicetheme"]
 		c, err := track.Data.Play(0, 0)
 		if err != nil {
 			return err

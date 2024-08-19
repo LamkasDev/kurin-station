@@ -5,29 +5,32 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gameplay"
 	"github.com/LamkasDev/kurin/cmd/gfx"
 	"github.com/LamkasDev/kurin/cmd/gfx/structure"
+	"github.com/LamkasDev/kurin/cmd/gfx/turf"
 )
 
-type KurinRendererLayerJobData struct {
+type RendererLayerJobData struct {
+	TurfLayer   *gfx.RendererLayer
 	ObjectLayer *gfx.RendererLayer
 }
 
-func NewKurinRendererLayerJob(objectLayer *gfx.RendererLayer) *gfx.RendererLayer {
+func NewRendererLayerJob(turfLayer *gfx.RendererLayer, objectLayer *gfx.RendererLayer) *gfx.RendererLayer {
 	return &gfx.RendererLayer{
-		Load:   LoadKurinRendererLayerJob,
-		Render: RenderKurinRendererLayerJob,
-		Data: &KurinRendererLayerJobData{
+		Load:   LoadRendererLayerJob,
+		Render: RenderRendererLayerJob,
+		Data: &RendererLayerJobData{
+			TurfLayer:   turfLayer,
 			ObjectLayer: objectLayer,
 		},
 	}
 }
 
-func LoadKurinRendererLayerJob(layer *gfx.RendererLayer) error {
+func LoadRendererLayerJob(layer *gfx.RendererLayer) error {
 	return nil
 }
 
-func RenderKurinRendererLayerJob(layer *gfx.RendererLayer) error {
-	for _, job := range gameplay.GameInstance.JobController.Jobs {
-		if err := RenderKurinJob(gfx.RendererInstance, layer, job); err != nil {
+func RenderRendererLayerJob(layer *gfx.RendererLayer) error {
+	for _, job := range gameplay.GameInstance.JobController[gameplay.FactionPlayer].Jobs {
+		if err := RenderJob(gfx.RendererInstance, layer, job); err != nil {
 			return err
 		}
 	}
@@ -36,7 +39,7 @@ func RenderKurinRendererLayerJob(layer *gfx.RendererLayer) error {
 		if character.JobTracker.Job == nil {
 			continue
 		}
-		if err := RenderKurinJob(gfx.RendererInstance, layer, character.JobTracker.Job); err != nil {
+		if err := RenderJob(gfx.RendererInstance, layer, character.JobTracker.Job); err != nil {
 			return err
 		}
 	}
@@ -44,20 +47,40 @@ func RenderKurinRendererLayerJob(layer *gfx.RendererLayer) error {
 	return nil
 }
 
-func RenderKurinJob(renderer *gfx.KurinRenderer, layer *gfx.RendererLayer, job *gameplay.KurinJobDriver) error {
-	data := layer.Data.(*KurinRendererLayerJobData)
-	switch val := job.Data.(type) {
-	case *gameplay.KurinJobDriverBuildData:
-		color := sdlutils.White
-		if job.TimeoutTicks > gameplay.GameInstance.Ticks {
-			color = sdlutils.Red
-		}
-		if err := structure.RenderKurinObjectBlueprint(data.ObjectLayer, &gameplay.KurinObject{
+func RenderJob(renderer *gfx.Renderer, layer *gfx.RendererLayer, job *gameplay.JobDriver) error {
+	color := sdlutils.White
+	if job.TimeoutTicks > gameplay.GameInstance.Ticks {
+		color = sdlutils.Red
+	}
+
+	jobData := layer.Data.(*RendererLayerJobData)
+	switch data := job.Data.(type) {
+	case *gameplay.JobDriverBuildData:
+		if err := structure.RenderObjectBlueprint(jobData.ObjectLayer, &gameplay.Object{
 			Tile: job.Tile,
-			Type: val.Prefab,
+			Type: data.ObjectType,
 		}, color); err != nil {
 			return err
 		}
+	case *gameplay.JobDriverBuildFloorData:
+		if err := turf.RenderTileBlueprint(jobData.TurfLayer, &gameplay.Tile{
+			Position: data.Position,
+			Type:     data.TileType,
+		}, color); err != nil {
+			return err
+		}
+	}
+	switch job.Type {
+	case "destroy":
+		object := gameplay.GetObjectAtTile(job.Tile)
+		if object == nil {
+			return nil
+		}
+		rect := sdlutils.ScaleRectCentered(structure.GetObjectRect(jobData.ObjectLayer, object), 0.8)
+		sdlutils.RenderTextureRect(gfx.RendererInstance.Renderer, sdlutils.GetTextureFromContainer(gfx.RendererInstance.IconTextures, gfx.RendererInstance.Renderer, "delete"), rect)
+	case "destroy_floor":
+		rect := sdlutils.ScaleRectCentered(turf.GetTileRect(job.Tile), 0.8)
+		sdlutils.RenderTextureRect(gfx.RendererInstance.Renderer, sdlutils.GetTextureFromContainer(gfx.RendererInstance.IconTextures, gfx.RendererInstance.Renderer, "delete_floor"), rect)
 	}
 
 	return nil

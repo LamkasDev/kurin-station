@@ -9,29 +9,29 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinEventLayerDialogData struct {
+type EventLayerDialogData struct {
 	Layer *gfx.RendererLayer
 }
 
-func NewKurinEventLayerDialog(layer *gfx.RendererLayer) *event.EventLayer {
+func NewEventLayerDialog(layer *gfx.RendererLayer) *event.EventLayer {
 	return &event.EventLayer{
-		Load:    LoadKurinEventLayerDialog,
-		Process: ProcessKurinEventLayerDialog,
-		Data: &KurinEventLayerDialogData{
+		Load:    LoadEventLayerDialog,
+		Process: ProcessEventLayerDialog,
+		Data: &EventLayerDialogData{
 			Layer: layer,
 		},
 	}
 }
 
-func LoadKurinEventLayerDialog(layer *event.EventLayer) error {
+func LoadEventLayerDialog(layer *event.EventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerDialog(layer *event.EventLayer) error {
-	data := layer.Data.(*KurinEventLayerDialogData)
-	dialogData := data.Layer.Data.(*dialog.KurinRendererLayerDialogData)
+func ProcessEventLayerDialog(layer *event.EventLayer) error {
+	data := layer.Data.(*EventLayerDialogData)
+	dialogData := data.Layer.Data.(*dialog.RendererLayerDialogData)
 	if gameplay.GameInstance.DialogController.OpenRequest != nil {
-		dialogData.Dialog = dialog.NewKurinDialog(data.Layer, gameplay.GameInstance.DialogController.OpenRequest)
+		dialogData.Dialog = dialog.NewDialog(data.Layer, gameplay.GameInstance.DialogController.OpenRequest)
 		gameplay.GameInstance.DialogController.OpenRequest = nil
 	}
 	if gameplay.GameInstance.DialogController.CloseRequest || gfx.RendererInstance.Context.State != gfx.RendererContextStateNone {

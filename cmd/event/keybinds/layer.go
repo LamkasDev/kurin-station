@@ -14,21 +14,21 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinEventLayerKeybindsData struct{}
+type EventLayerKeybindsData struct{}
 
-func NewKurinEventLayerKeybinds() *event.EventLayer {
+func NewEventLayerKeybinds() *event.EventLayer {
 	return &event.EventLayer{
-		Load:    LoadKurinEventLayerKeybinds,
-		Process: ProcessKurinEventLayerKeybinds,
-		Data:    &KurinEventLayerKeybindsData{},
+		Load:    LoadEventLayerKeybinds,
+		Process: ProcessEventLayerKeybinds,
+		Data:    &EventLayerKeybindsData{},
 	}
 }
 
-func LoadKurinEventLayerKeybinds(layer *event.EventLayer) error {
+func LoadEventLayerKeybinds(layer *event.EventLayer) error {
 	return nil
 }
 
-func ProcessKurinEventLayerKeybinds(layer *event.EventLayer) error {
+func ProcessEventLayerKeybinds(layer *event.EventLayer) error {
 	if event.EventManagerInstance.Keyboard.Pending != nil {
 		switch *event.EventManagerInstance.Keyboard.Pending {
 		case sdl.K_x:
@@ -36,29 +36,28 @@ func ProcessKurinEventLayerKeybinds(layer *event.EventLayer) error {
 				return nil
 			}
 			switch gameplay.GameInstance.SelectedCharacter.ActiveHand {
-			case gameplay.KurinHandLeft:
-				gameplay.GameInstance.SelectedCharacter.ActiveHand = gameplay.KurinHandRight
-			case gameplay.KurinHandRight:
-				gameplay.GameInstance.SelectedCharacter.ActiveHand = gameplay.KurinHandLeft
+			case gameplay.HandLeft:
+				gameplay.GameInstance.SelectedCharacter.ActiveHand = gameplay.HandRight
+			case gameplay.HandRight:
+				gameplay.GameInstance.SelectedCharacter.ActiveHand = gameplay.HandLeft
 			}
 		case sdl.K_q:
 			if gameplay.GameInstance.SelectedCharacter == nil {
 				return nil
 			}
-			gameplay.DropKurinItemFromCharacter(gameplay.GameInstance.SelectedCharacter)
+			gameplay.DropItemFromCharacter(gameplay.GameInstance.SelectedCharacter)
 		case sdl.K_r:
 			if gameplay.GameInstance.SelectedCharacter == nil {
 				return nil
 			}
 			item := gameplay.GameInstance.SelectedCharacter.Inventory.Hands[gameplay.GameInstance.SelectedCharacter.ActiveHand]
-			if !gameplay.DropKurinItemFromCharacter(gameplay.GameInstance.SelectedCharacter) {
+			if !gameplay.DropItemFromCharacter(gameplay.GameInstance.SelectedCharacter) {
 				return nil
 			}
 			// this shit is trash
-			position := render.ScreenToWorldPosition(gfx.RendererInstance.Context.MousePosition)
-			force := gameplay.KurinForce{
+			force := gameplay.Force{
 				Item:   item,
-				Target: sdlutils.PointToFPointCenter(position),
+				Target: sdlutils.PointToFPointCenter(render.ScreenToWorldPosition(gfx.RendererInstance.Context.MousePosition)),
 			}
 			force.Delta = sdlutils.SubtractFPoints(force.Target, item.Transform.Position.Base)
 			distance := sdlutils.GetDistanceF(item.Transform.Position.Base, force.Target)
@@ -66,23 +65,23 @@ func ProcessKurinEventLayerKeybinds(layer *event.EventLayer) error {
 				force.Delta.X /= distance * 3
 				force.Delta.Y /= distance * 3
 			}
-			if gameplay.GetKurinTileAt(&gameplay.GameInstance.Map, sdlutils.Vector3{Base: position, Z: 0}) == nil {
+			if gameplay.GameInstance.HoveredTile == nil {
 				force.Target.X += force.Delta.X * 100
 				force.Target.Y += force.Delta.Y * 100
 			}
 			gameplay.GameInstance.ForceController.Forces[item] = &force
 		case sdl.K_f:
 			switch gfx.RendererInstance.Context.CameraMode {
-			case gfx.KurinRendererCameraModeCharacter:
-				gfx.RendererInstance.Context.CameraMode = gfx.KurinRendererCameraModeFree
+			case gfx.RendererCameraModeCharacter:
+				gfx.RendererInstance.Context.CameraMode = gfx.RendererCameraModeFree
 				gameplay.GameInstance.SelectedCharacter = nil
-			case gfx.KurinRendererCameraModeFree:
-				gfx.RendererInstance.Context.CameraMode = gfx.KurinRendererCameraModeCharacter
+			case gfx.RendererCameraModeFree:
+				gfx.RendererInstance.Context.CameraMode = gfx.RendererCameraModeCharacter
 				gameplay.GameInstance.SelectedCharacter = gameplay.GameInstance.Characters[0]
 			}
 		case sdl.K_s:
 			if event.EventManagerInstance.Keyboard.Pressed[sdl.K_LCTRL] {
-				data := serialization.EncodeKurinGame(gameplay.GameInstance)
+				data := serialization.EncodeGame(gameplay.GameInstance)
 				if _, err := os.Stat(path.Join(constants.TempSavesPath, "save.dat")); err == nil {
 					os.Remove(path.Join(constants.TempSavesPath, "save.dat"))
 				}
@@ -91,7 +90,7 @@ func ProcessKurinEventLayerKeybinds(layer *event.EventLayer) error {
 		case sdl.K_l:
 			if event.EventManagerInstance.Keyboard.Pressed[sdl.K_LCTRL] {
 				data, _ := os.ReadFile(path.Join(constants.TempSavesPath, "save.dat"))
-				serialization.DecodeKurinGame(data, gameplay.GameInstance)
+				serialization.DecodeGame(data, gameplay.GameInstance)
 			}
 		default:
 			return nil

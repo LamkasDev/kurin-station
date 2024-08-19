@@ -1,11 +1,11 @@
 package gameplay
 
-type KurinRunechatSound struct {
-	Runechat *KurinRunechat
+type RunechatSound struct {
+	Runechat *Runechat
 }
 
-func NewKurinRunechatSound(runechat *KurinRunechat) *KurinRunechatSound {
-	return &KurinRunechatSound{
+func NewRunechatSound(runechat *Runechat) *RunechatSound {
+	return &RunechatSound{
 		Runechat: runechat,
 	}
 }

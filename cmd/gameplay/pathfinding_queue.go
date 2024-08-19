@@ -1,29 +1,29 @@
 package gameplay
 
-type KurinPathfindingQueue []*KurinPathfindingNode
+type PathfindingQueue []*PathfindingNode
 
-func (queue KurinPathfindingQueue) Len() int {
+func (queue PathfindingQueue) Len() int {
 	return len(queue)
 }
 
-func (queue KurinPathfindingQueue) Less(i, j int) bool {
+func (queue PathfindingQueue) Less(i, j int) bool {
 	return queue[i].Rank < queue[j].Rank
 }
 
-func (queue KurinPathfindingQueue) Swap(i, j int) {
+func (queue PathfindingQueue) Swap(i, j int) {
 	queue[i], queue[j] = queue[j], queue[i]
 	queue[i].Index = i
 	queue[j].Index = j
 }
 
-func (queue *KurinPathfindingQueue) Push(x interface{}) {
+func (queue *PathfindingQueue) Push(x interface{}) {
 	n := len(*queue)
-	no := x.(*KurinPathfindingNode)
+	no := x.(*PathfindingNode)
 	no.Index = n
 	*queue = append(*queue, no)
 }
 
-func (queue *KurinPathfindingQueue) Pop() interface{} {
+func (queue *PathfindingQueue) Pop() interface{} {
 	old := *queue
 	n := len(old)
 	no := old[n-1]

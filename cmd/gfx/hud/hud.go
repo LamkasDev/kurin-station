@@ -5,19 +5,19 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinHUDElement struct {
+type HUDElement struct {
 	Path        string
 	Hovered     bool
-	GetPosition KurinHUDElementGetRect
-	Click       KurinHUDElementClick
+	GetPosition HUDElementGetRect
+	Click       HUDElementClick
 }
 
 type (
-	KurinHUDElementGetRect func(window sdl.Point) sdl.Point
-	KurinHUDElementClick   func()
+	HUDElementGetRect func(window sdl.Point) sdl.Point
+	HUDElementClick   func()
 )
 
-var KurinHUDElementHandLeft = KurinHUDElement{
+var HUDElementHandLeft = HUDElement{
 	GetPosition: func(windowSize sdl.Point) sdl.Point {
 		return sdl.Point{X: int32(float32(windowSize.X) / 2), Y: windowSize.Y - 72}
 	},
@@ -25,11 +25,11 @@ var KurinHUDElementHandLeft = KurinHUDElement{
 		if gameplay.GameInstance.SelectedCharacter == nil {
 			return
 		}
-		gameplay.GameInstance.SelectedCharacter.ActiveHand = gameplay.KurinHandLeft
+		gameplay.GameInstance.SelectedCharacter.ActiveHand = gameplay.HandLeft
 	},
 }
 
-var KurinHUDElementHandRight = KurinHUDElement{
+var HUDElementHandRight = HUDElement{
 	GetPosition: func(windowSize sdl.Point) sdl.Point {
 		return sdl.Point{X: int32(float32(windowSize.X)/2) - 64, Y: windowSize.Y - 72}
 	},
@@ -37,11 +37,11 @@ var KurinHUDElementHandRight = KurinHUDElement{
 		if gameplay.GameInstance.SelectedCharacter == nil {
 			return
 		}
-		gameplay.GameInstance.SelectedCharacter.ActiveHand = gameplay.KurinHandRight
+		gameplay.GameInstance.SelectedCharacter.ActiveHand = gameplay.HandRight
 	},
 }
 
-var KurinHUDElementPDA = KurinHUDElement{
+var HUDElementPDA = HUDElement{
 	GetPosition: func(windowSize sdl.Point) sdl.Point {
 		return sdl.Point{X: windowSize.X - 72, Y: 8}
 	},
@@ -49,7 +49,7 @@ var KurinHUDElementPDA = KurinHUDElement{
 	},
 }
 
-var KurinHUDElementCredit = KurinHUDElement{
+var HUDElementCredit = HUDElement{
 	GetPosition: func(windowSize sdl.Point) sdl.Point {
 		return sdl.Point{X: 0, Y: 76}
 	},
@@ -57,7 +57,7 @@ var KurinHUDElementCredit = KurinHUDElement{
 	},
 }
 
-var KurinHUDElementGoals = KurinHUDElement{
+var HUDElementGoals = HUDElement{
 	GetPosition: func(windowSize sdl.Point) sdl.Point {
 		return sdl.Point{X: 8, Y: 8}
 	},
@@ -65,4 +65,4 @@ var KurinHUDElementGoals = KurinHUDElement{
 	},
 }
 
-var KurinHUDElements = []*KurinHUDElement{&KurinHUDElementHandLeft, &KurinHUDElementHandRight, &KurinHUDElementPDA}
+var HUDElements = []*HUDElement{&HUDElementHandLeft, &HUDElementHandRight, &HUDElementPDA}

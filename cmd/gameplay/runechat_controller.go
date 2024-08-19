@@ -2,27 +2,27 @@ package gameplay
 
 import "golang.org/x/exp/slices"
 
-type KurinRunechatController struct {
-	Messages []*KurinRunechat
-	Sounds   []*KurinRunechatSound
+type RunechatController struct {
+	Messages []*Runechat
+	Sounds   []*RunechatSound
 }
 
-func NewKurinRunechatController() KurinRunechatController {
-	return KurinRunechatController{
-		Messages: []*KurinRunechat{},
-		Sounds:   []*KurinRunechatSound{},
+func NewRunechatController() RunechatController {
+	return RunechatController{
+		Messages: []*Runechat{},
+		Sounds:   []*RunechatSound{},
 	}
 }
 
-func CreateKurinRunechatMessage(controller *KurinRunechatController, runechat *KurinRunechat) {
+func CreateRunechatMessage(controller *RunechatController, runechat *Runechat) {
 	controller.Messages = append(controller.Messages, runechat)
-	controller.Sounds = append(controller.Sounds, NewKurinRunechatSound(runechat))
+	controller.Sounds = append(controller.Sounds, NewRunechatSound(runechat))
 }
 
-func ProcessKurinRunechat(controller *KurinRunechatController, runechat *KurinRunechat) {
+func ProcessRunechat(controller *RunechatController, runechat *Runechat) {
 	runechat.Ticks--
 	if runechat.Ticks == 0 {
-		DestroyKurinRunechat(runechat)
+		DestroyRunechat(runechat)
 		i := slices.Index(controller.Messages, runechat)
 		controller.Messages = slices.Delete(controller.Messages, i, i+1)
 	}

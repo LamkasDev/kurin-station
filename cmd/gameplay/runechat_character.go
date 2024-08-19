@@ -1,12 +1,12 @@
 package gameplay
 
-type KurinRunechatCharacterData struct {
-	Character *KurinCharacter
+type RunechatCharacterData struct {
+	Character *Character
 }
 
-func NewKurinRunechatCharacter(character *KurinCharacter, message string) *KurinRunechat {
-	runechat := NewKurinRunechat(message)
-	runechat.Data = KurinRunechatCharacterData{
+func NewRunechatCharacter(character *Character, message string) *Runechat {
+	runechat := NewRunechat(message)
+	runechat.Data = RunechatCharacterData{
 		Character: character,
 	}
 

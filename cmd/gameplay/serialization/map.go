@@ -5,18 +5,18 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gameplay"
 )
 
-type KurinMapData struct {
+type MapData struct {
 	Size    sdlutils.Vector3
-	Tiles   []KurinTileData
-	Objects []KurinObjectData
-	Items   []KurinItemData
+	Tiles   []TileData
+	Objects []ObjectData
+	Items   []ItemData
 }
 
-func EncodeKurinMap(kmap *gameplay.KurinMap) KurinMapData {
-	data := KurinMapData{
+func EncodeMap(kmap *gameplay.Map) MapData {
+	data := MapData{
 		Size:  kmap.Size,
-		Tiles: []KurinTileData{},
-		Items: []KurinItemData{},
+		Tiles: []TileData{},
+		Items: []ItemData{},
 	}
 	for x := range kmap.Size.Base.X {
 		for y := range kmap.Size.Base.Y {
@@ -25,30 +25,30 @@ func EncodeKurinMap(kmap *gameplay.KurinMap) KurinMapData {
 				if tile == nil {
 					continue
 				}
-				data.Tiles = append(data.Tiles, EncodeKurinTile(tile))
+				data.Tiles = append(data.Tiles, EncodeTile(tile))
 			}
 		}
 	}
 	for _, obj := range kmap.Objects {
-		data.Objects = append(data.Objects, EncodeKurinObject(obj))
+		data.Objects = append(data.Objects, EncodeObject(obj))
 	}
 	for _, item := range kmap.Items {
-		data.Items = append(data.Items, EncodeKurinItem(item))
+		data.Items = append(data.Items, EncodeItem(item))
 	}
 
 	return data
 }
 
-func DecodeKurinMap(data KurinMapData) gameplay.KurinMap {
-	kmap := gameplay.NewKurinMap(data.Size)
+func DecodeMap(data MapData) gameplay.Map {
+	kmap := gameplay.NewMap(data.Size)
 	for _, tileData := range data.Tiles {
-		DecodeKurinTile(&kmap, tileData)
+		DecodeTile(&kmap, tileData)
 	}
 	for _, objData := range data.Objects {
-		DecodeKurinObject(&kmap, objData)
+		DecodeObject(&kmap, objData)
 	}
 	for _, itemData := range data.Items {
-		kmap.Items = append(kmap.Items, DecodeKurinItem(itemData))
+		kmap.Items = append(kmap.Items, DecodeItem(itemData))
 	}
 
 	return kmap

@@ -8,28 +8,28 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinRendererLayerDialogData struct {
-	Dialog    *KurinDialog
+type RendererLayerDialogData struct {
+	Dialog    *Dialog
 	ItemLayer *gfx.RendererLayer
 }
 
-func NewKurinRendererLayerDialog(itemLayer *gfx.RendererLayer) *gfx.RendererLayer {
+func NewRendererLayerDialog(itemLayer *gfx.RendererLayer) *gfx.RendererLayer {
 	return &gfx.RendererLayer{
-		Load:   LoadKurinRendererLayerDialog,
-		Render: RenderKurinRendererLayerDialog,
-		Data: &KurinRendererLayerDialogData{
+		Load:   LoadRendererLayerDialog,
+		Render: RenderRendererLayerDialog,
+		Data: &RendererLayerDialogData{
 			Dialog:    nil,
 			ItemLayer: itemLayer,
 		},
 	}
 }
 
-func LoadKurinRendererLayerDialog(layer *gfx.RendererLayer) error {
+func LoadRendererLayerDialog(layer *gfx.RendererLayer) error {
 	return nil
 }
 
-func RenderKurinRendererLayerDialog(layer *gfx.RendererLayer) error {
-	data := layer.Data.(*KurinRendererLayerDialogData)
+func RenderRendererLayerDialog(layer *gfx.RendererLayer) error {
+	data := layer.Data.(*RendererLayerDialogData)
 	if data.Dialog == nil {
 		return nil
 	}

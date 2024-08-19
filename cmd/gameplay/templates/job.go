@@ -1,5 +1,5 @@
 package templates
 
-type KurinJobTemplate struct {
+type JobTemplate struct {
 	Id string `json:"id"`
 }

@@ -2,4 +2,4 @@
 
 package arch
 
-const KurinDebug = false
+const Debug = false

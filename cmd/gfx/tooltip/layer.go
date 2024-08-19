@@ -4,20 +4,20 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx"
 )
 
-type KurinRendererLayerTooltipData struct{}
+type RendererLayerTooltipData struct{}
 
-func NewKurinRendererLayerTooltip() *gfx.RendererLayer {
+func NewRendererLayerTooltip() *gfx.RendererLayer {
 	return &gfx.RendererLayer{
-		Load:   LoadKurinRendererLayerTooltip,
-		Render: RenderKurinRendererLayerTooltip,
-		Data:   &KurinRendererLayerTooltipData{},
+		Load:   LoadRendererLayerTooltip,
+		Render: RenderRendererLayerTooltip,
+		Data:   &RendererLayerTooltipData{},
 	}
 }
 
-func LoadKurinRendererLayerTooltip(layer *gfx.RendererLayer) error {
+func LoadRendererLayerTooltip(layer *gfx.RendererLayer) error {
 	return nil
 }
 
-func RenderKurinRendererLayerTooltip(layer *gfx.RendererLayer) error {
+func RenderRendererLayerTooltip(layer *gfx.RendererLayer) error {
 	return nil
 }

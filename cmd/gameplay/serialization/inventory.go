@@ -2,38 +2,38 @@ package serialization
 
 import "github.com/LamkasDev/kurin/cmd/gameplay"
 
-type KurinInventoryData struct {
-	Left  *KurinItemData
-	Right *KurinItemData
+type InventoryData struct {
+	Left  *ItemData
+	Right *ItemData
 }
 
-func EncodeKurinInventory(inventory *gameplay.KurinInventory) KurinInventoryData {
-	data := KurinInventoryData{}
-	left := inventory.Hands[gameplay.KurinHandLeft]
+func EncodeInventory(inventory *gameplay.Inventory) InventoryData {
+	data := InventoryData{}
+	left := inventory.Hands[gameplay.HandLeft]
 	if left != nil {
-		item := EncodeKurinItem(left)
+		item := EncodeItem(left)
 		data.Left = &item
 	}
-	right := inventory.Hands[gameplay.KurinHandRight]
+	right := inventory.Hands[gameplay.HandRight]
 	if right != nil {
-		item := EncodeKurinItem(right)
+		item := EncodeItem(right)
 		data.Right = &item
 	}
 
 	return data
 }
 
-func DecodeKurinInventory(data KurinInventoryData, character *gameplay.KurinCharacter) gameplay.KurinInventory {
-	inventory := gameplay.NewKurinInventory()
+func DecodeInventory(data InventoryData, character *gameplay.Character) gameplay.Inventory {
+	inventory := gameplay.NewInventory()
 	if data.Left != nil {
-		item := DecodeKurinItem(*data.Left)
+		item := DecodeItem(*data.Left)
 		item.Character = character
-		inventory.Hands[gameplay.KurinHandLeft] = item
+		inventory.Hands[gameplay.HandLeft] = item
 	}
 	if data.Right != nil {
-		item := DecodeKurinItem(*data.Right)
+		item := DecodeItem(*data.Right)
 		item.Character = character
-		inventory.Hands[gameplay.KurinHandRight] = item
+		inventory.Hands[gameplay.HandRight] = item
 	}
 
 	return inventory

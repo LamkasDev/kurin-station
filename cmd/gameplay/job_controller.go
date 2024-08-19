@@ -1,18 +1,22 @@
 package gameplay
 
-import "slices"
+import (
+	"slices"
 
-type KurinJobController struct {
-	Jobs []*KurinJobDriver
+	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
+)
+
+type JobController struct {
+	Jobs []*JobDriver
 }
 
-func NewKurinJobController() *KurinJobController {
-	return &KurinJobController{
-		Jobs: []*KurinJobDriver{},
+func NewJobController() *JobController {
+	return &JobController{
+		Jobs: []*JobDriver{},
 	}
 }
 
-func PushKurinJobToController(controller *KurinJobController, job *KurinJobDriver) bool {
+func PushJobToController(controller *JobController, job *JobDriver) bool {
 	if job.Tile != nil {
 		if job.Tile.Job != nil {
 			return false
@@ -24,7 +28,7 @@ func PushKurinJobToController(controller *KurinJobController, job *KurinJobDrive
 	return true
 }
 
-func PopKurinJobFromController(controller *KurinJobController) *KurinJobDriver {
+func PopJobFromController(controller *JobController) *JobDriver {
 	for i, job := range controller.Jobs {
 		if GameInstance.Ticks < job.TimeoutTicks {
 			continue
@@ -35,4 +39,29 @@ func PopKurinJobFromController(controller *KurinJobController) *KurinJobDriver {
 	}
 
 	return nil
+}
+
+func DoesBuildFloorJobExistAtPosition(position sdlutils.Vector3) bool {
+	Matches := func(job *JobDriver) bool {
+		switch data := job.Data.(type) {
+		case *JobDriverBuildFloorData:
+			if sdlutils.CompareVector3(data.Position, position) {
+				return true
+			}
+		}
+
+		return false
+	}
+	for _, character := range GameInstance.Characters {
+		if character.JobTracker.Job != nil && Matches(character.JobTracker.Job) {
+			return true
+		}
+	}
+	for _, job := range GameInstance.JobController[FactionPlayer].Jobs {
+		if Matches(job) {
+			return true
+		}
+	}
+
+	return false
 }

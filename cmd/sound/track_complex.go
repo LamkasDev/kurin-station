@@ -12,16 +12,16 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-type KurinTrackComplex struct {
-	Base        *KurinTrack
+type TrackComplex struct {
+	Base        *Track
 	Buffer      *bytes.Buffer
 	Stream      *ffmpeg_go.Stream
 	FinalStream *sdl.RWops
 }
 
-func NewKurinTrackComplex(manager *KurinSoundManager, trackId string, pitch float32) (*KurinTrackComplex, error) {
-	track := KurinTrackComplex{
-		Base: &KurinTrack{
+func NewTrackComplex(trackId string, pitch float32) (*TrackComplex, error) {
+	track := TrackComplex{
+		Base: &Track{
 			Path: path.Join(constants.SoundsPath, "effects", fmt.Sprintf("%s.ogg", trackId)),
 		},
 	}
@@ -47,9 +47,9 @@ func NewKurinTrackComplex(manager *KurinSoundManager, trackId string, pitch floa
 	return &track, nil
 }
 
-func ConcatKurinTrackComplex(manager *KurinSoundManager, paths []string) (*KurinTrackComplex, error) {
-	track := KurinTrackComplex{
-		Base: &KurinTrack{},
+func ConcatTrackComplex(paths []string) (*TrackComplex, error) {
+	track := TrackComplex{
+		Base: &Track{},
 	}
 
 	streams := []*ffmpeg_go.Stream{}

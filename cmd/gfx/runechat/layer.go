@@ -5,34 +5,34 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx"
 )
 
-type KurinRendererLayerRunechatData struct{}
+type RendererLayerRunechatData struct{}
 
-func NewKurinRendererLayerRunechat() *gfx.RendererLayer {
+func NewRendererLayerRunechat() *gfx.RendererLayer {
 	return &gfx.RendererLayer{
-		Load:   LoadKurinRendererLayerRunechat,
-		Render: RenderKurinRendererLayerRunechat,
-		Data:   &KurinRendererLayerRunechatData{},
+		Load:   LoadRendererLayerRunechat,
+		Render: RenderRendererLayerRunechat,
+		Data:   &RendererLayerRunechatData{},
 	}
 }
 
-func LoadKurinRendererLayerRunechat(layer *gfx.RendererLayer) error {
+func LoadRendererLayerRunechat(layer *gfx.RendererLayer) error {
 	return nil
 }
 
-func RenderKurinRendererLayerRunechat(layer *gfx.RendererLayer) error {
+func RenderRendererLayerRunechat(layer *gfx.RendererLayer) error {
 	if len(gameplay.GameInstance.RunechatController.Messages) > 0 {
-		characterTally := map[*gameplay.KurinCharacter]int32{}
+		characterTally := map[*gameplay.Character]int32{}
 		for i := len(gameplay.GameInstance.RunechatController.Messages) - 1; i >= 0; i-- {
 			runechat := gameplay.GameInstance.RunechatController.Messages[i]
 			switch val := runechat.Data.(type) {
-			case gameplay.KurinRunechatCharacterData:
-				if err := RenderKurinRunechatCharacter(layer, runechat, characterTally[val.Character]); err != nil {
+			case gameplay.RunechatCharacterData:
+				if err := RenderRunechatCharacter(layer, runechat, characterTally[val.Character]); err != nil {
 					return err
 				}
 				characterTally[val.Character]++
 			}
 
-			gameplay.ProcessKurinRunechat(&gameplay.GameInstance.RunechatController, runechat)
+			gameplay.ProcessRunechat(&gameplay.GameInstance.RunechatController, runechat)
 		}
 	}
 
