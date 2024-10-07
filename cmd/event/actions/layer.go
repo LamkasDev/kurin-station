@@ -53,7 +53,7 @@ func ProcessEventLayerActions(layer *event.EventLayer) error {
 		case sdl.K_b:
 			StartEventLayerActionsInput(layer, actions.ActionModeBuild)
 			event.EventManagerInstance.Keyboard.Pending = nil
-		case sdl.K_x:
+		case sdl.K_n:
 			gfx.RendererInstance.Context.State = gfx.RendererContextStateTool
 			toolData.Mode = tool.ToolModeDestroy
 			event.EventManagerInstance.Keyboard.Pending = nil
@@ -130,7 +130,7 @@ func ExecuteEventLayerActionsInput(layer *event.EventLayer) {
 		if len(actionsData.Input) == 0 {
 			return
 		}
-		gameplay.CreateRunechatMessage(&gameplay.GameInstance.RunechatController, gameplay.NewRunechatCharacter(gameplay.GameInstance.SelectedCharacter, actionsData.Input))
+		gameplay.CreateRunechatMessage(&gameplay.GameInstance.RunechatController, gameplay.NewRunechatMob(gameplay.GameInstance.SelectedCharacter, actionsData.Input))
 	}
 }
 

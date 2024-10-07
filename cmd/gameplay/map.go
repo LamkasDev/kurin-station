@@ -55,16 +55,44 @@ func PopulateMap(kmap *Map) {
 	catwalk := "catwalk"
 	window := "window"
 
-	BuildLine(kmap, sdlutils.Vector3{Base: sdl.Point{X: mainRect.X - 1, Y: mainRect.Y + 2}, Z: 0}, common.DirectionWest, 3, &catwalk, &window)
-	BuildLine(kmap, sdlutils.Vector3{Base: sdl.Point{X: mainRect.X - 1, Y: mainRect.Y + 3}, Z: 0}, common.DirectionWest, 3, &catwalk, nil)
-	BuildLine(kmap, sdlutils.Vector3{Base: sdl.Point{X: mainRect.X - 1, Y: mainRect.Y + 4}, Z: 0}, common.DirectionWest, 3, &catwalk, &window)
+	BuildLine(kmap, sdlutils.Vector3{
+		Base: sdl.Point{X: mainRect.X - 1, Y: mainRect.Y + 2},
+		Z:    0,
+	}, common.DirectionWest, 3, &catwalk, &window)
+	BuildLine(kmap, sdlutils.Vector3{
+		Base: sdl.Point{X: mainRect.X - 1, Y: mainRect.Y + 3},
+		Z:    0,
+	}, common.DirectionWest, 3, &catwalk, nil)
+	BuildLine(kmap, sdlutils.Vector3{
+		Base: sdl.Point{X: mainRect.X - 1, Y: mainRect.Y + 4},
+		Z:    0,
+	}, common.DirectionWest, 3, &catwalk, &window)
 
-	ReplaceObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{Base: sdl.Point{X: frontRect.X, Y: frontRect.Y + 2}, Z: 0}), "airlock")
-	ReplaceObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{Base: sdl.Point{X: mainRect.X, Y: mainRect.Y + 3}, Z: 0}), "airlock")
-	ReplaceObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{Base: sdl.Point{X: backRect.X + backRect.W - 1, Y: backRect.Y + 2}, Z: 0}), "airlock")
+	ReplaceObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{
+		Base: sdl.Point{X: frontRect.X, Y: frontRect.Y + 2},
+		Z:    0,
+	}), "airlock")
+	ReplaceObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{
+		Base: sdl.Point{X: mainRect.X, Y: mainRect.Y + 3},
+		Z:    0,
+	}), "airlock")
+	ReplaceObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{
+		Base: sdl.Point{X: backRect.X + backRect.W - 1, Y: backRect.Y + 2},
+		Z:    0,
+	}), "airlock")
 
-	CreateObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{Base: sdl.Point{X: mainRect.X + 1, Y: mainRect.Y + 1}, Z: 0}), "lathe")
-	CreateObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{Base: sdl.Point{X: mainRect.X + 3, Y: mainRect.Y + 3}, Z: 0}), "pod")
+	CreateObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{
+		Base: sdl.Point{X: mainRect.X + 1, Y: mainRect.Y + 1},
+		Z:    0,
+	}), "lathe")
+	CreateObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{
+		Base: sdl.Point{X: mainRect.X + 3, Y: mainRect.Y + 1},
+		Z:    0,
+	}), "console")
+	CreateObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{
+		Base: sdl.Point{X: mainRect.X + 4, Y: mainRect.Y + 1},
+		Z:    0,
+	}), "telepad")
 
 	BuildBigThruster(kmap, sdl.Point{X: mainRect.X + 2, Y: mainRect.Y - 1}, "lattice_l")
 	BuildBigThruster(kmap, sdl.Point{X: mainRect.X + 2, Y: mainRect.Y + mainRect.H}, "lattice_r")
@@ -84,7 +112,11 @@ func GetRandomMapPosition(kmap *Map) sdlutils.Vector3 {
 }
 
 func IsMapPositionOutOfBounds(kmap *Map, position sdlutils.Vector3) bool {
-	if position.Base.X < 0 || position.Base.Y < 0 || position.Base.X >= kmap.Size.Base.X || position.Base.Y >= kmap.Size.Base.Y || position.Z >= kmap.Size.Z {
+	if position.Base.X < 0 ||
+		position.Base.Y < 0 ||
+		position.Base.X >= kmap.Size.Base.X ||
+		position.Base.Y >= kmap.Size.Base.Y ||
+		position.Z >= kmap.Size.Z {
 		return true
 	}
 

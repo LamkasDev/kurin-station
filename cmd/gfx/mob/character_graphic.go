@@ -1,4 +1,4 @@
-package species
+package mob
 
 import (
 	"encoding/json"
@@ -13,31 +13,31 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx"
 )
 
-type SpeciesGraphicContainer struct {
-	Types map[string]*SpeciesGraphic
+type HumanGraphicContainer struct {
+	Genders map[string]*HumanGraphic
 }
 
-type SpeciesGraphic struct {
+type HumanGraphic struct {
 	Template templates.SpeciesTemplate
 	Textures map[string][]*sdlutils.TextureWithSize
 }
 
-func NewSpeciesGraphicContainer(speciesId string) (*SpeciesGraphicContainer, error) {
-	container := SpeciesGraphicContainer{
-		Types: map[string]*SpeciesGraphic{},
+func NewHumanGraphicContainer(speciesId string) (*HumanGraphicContainer, error) {
+	container := HumanGraphicContainer{
+		Genders: map[string]*HumanGraphic{},
 	}
 
-	graphic, err := NewSpeciesGraphic(speciesId, gameplay.DefaultGender)
+	graphic, err := NewHumanGraphic(speciesId, gameplay.DefaultGender)
 	if err != nil {
 		return &container, err
 	}
-	container.Types[gameplay.DefaultGender] = graphic
+	container.Genders[gameplay.DefaultGender] = graphic
 
 	return &container, nil
 }
 
-func NewSpeciesGraphic(speciesId string, speciesType string) (*SpeciesGraphic, error) {
-	graphic := SpeciesGraphic{
+func NewHumanGraphic(speciesId string, speciesGender string) (*HumanGraphic, error) {
+	graphic := HumanGraphic{
 		Textures: map[string][]*sdlutils.TextureWithSize{},
 	}
 
@@ -59,7 +59,7 @@ func NewSpeciesGraphic(speciesId string, speciesType string) (*SpeciesGraphic, e
 
 		partFile := part.Id
 		if part.Type != nil && *part.Type {
-			partFile = fmt.Sprintf("%s_%s", partFile, speciesType)
+			partFile = fmt.Sprintf("%s_%s", partFile, speciesGender)
 		}
 
 		graphic.Textures[part.Id] = make([]*sdlutils.TextureWithSize, 4)

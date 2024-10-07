@@ -6,25 +6,25 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gameplay/templates"
 )
 
-func ProcessCharacterAnimation(character *gameplay.Character, template *templates.AnimationTemplate) {
-	character.AnimationController.Animation.Ticks++
-	character.AnimationController.Position = sdlutils.AddFPoints(character.AnimationController.Position, character.AnimationController.PositionShift)
+func ProcessMobAnimation(mob *gameplay.Mob, template *templates.AnimationTemplate) {
+	mob.AnimationController.Animation.Ticks++
+	mob.AnimationController.Position = sdlutils.AddFPoints(mob.AnimationController.Position, mob.AnimationController.PositionShift)
 
-	step := template.Steps[character.AnimationController.Animation.Step]
-	if character.AnimationController.Animation.Ticks >= step.Ticks {
-		AdvanceCharacterAnimation(character, template)
+	step := template.Steps[mob.AnimationController.Animation.Step]
+	if mob.AnimationController.Animation.Ticks >= step.Ticks {
+		AdvanceMobAnimation(mob, template)
 	}
 }
 
-func AdvanceCharacterAnimation(character *gameplay.Character, template *templates.AnimationTemplate) {
-	character.AnimationController.Animation.Ticks = 0
-	character.AnimationController.Animation.Step++
-	if character.AnimationController.Animation.Step >= len(template.Steps) {
-		gameplay.EndCharacterAnimation(character)
+func AdvanceMobAnimation(mob *gameplay.Mob, template *templates.AnimationTemplate) {
+	mob.AnimationController.Animation.Ticks = 0
+	mob.AnimationController.Animation.Step++
+	if mob.AnimationController.Animation.Step >= len(template.Steps) {
+		gameplay.EndMobAnimation(mob)
 		return
 	}
 
-	step := template.Steps[character.AnimationController.Animation.Step]
-	character.AnimationController.PositionShift = sdlutils.DivideFPoint(step.Offset, float32(step.Ticks))
-	character.AnimationController.Direction = *step.Direction
+	step := template.Steps[mob.AnimationController.Animation.Step]
+	mob.AnimationController.PositionShift = sdlutils.DivideFPoint(step.Offset, float32(step.Ticks))
+	mob.AnimationController.Direction = *step.Direction
 }

@@ -12,7 +12,7 @@ func ProcessJobToilManufacture(driver *JobDriver, toil *JobToil) JobToilStatus {
 	if lathe == nil {
 		return JobToilStatusComplete
 	}
-	if ProgressOrderAtLathe(lathe) {
+	if ProgressOrdersAtLathe(lathe) {
 		return JobToilStatusComplete
 	}
 

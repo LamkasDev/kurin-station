@@ -11,7 +11,7 @@ import (
 func GetRunechatCharacterRect(layer *gfx.RendererLayer, runechat *gameplay.Runechat, offset int32) sdl.Rect {
 	w, h, _ := gfx.RendererInstance.Fonts.Container[gfx.RendererFontPixeled].SizeUTF8(runechat.Message)
 	rect := render.WorldToScreenRect(sdl.FRect{
-		X: runechat.Data.(gameplay.RunechatCharacterData).Character.PositionRender.X + 0.5, Y: runechat.Data.(gameplay.RunechatCharacterData).Character.PositionRender.Y - 0.35,
+		X: runechat.Data.(gameplay.RunechatMobData).Mob.PositionRender.X + 0.5, Y: runechat.Data.(gameplay.RunechatMobData).Mob.PositionRender.Y - 0.35,
 		W: float32(w) / 3, H: float32(h) / 3,
 	})
 

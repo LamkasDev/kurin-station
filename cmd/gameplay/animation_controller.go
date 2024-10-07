@@ -20,15 +20,15 @@ func NewAnimationController() AnimationController {
 	}
 }
 
-func PlayCharacterAnimation(character *Character, atype string) {
-	if character.AnimationController.Animation != nil {
-		EndCharacterAnimation(character)
+func PlayMobAnimation(mob *Mob, atype string) {
+	if mob.AnimationController.Animation != nil {
+		EndMobAnimation(mob)
 	}
-	character.AnimationController.Animation = NewAnimation(atype)
+	mob.AnimationController.Animation = NewAnimation(atype)
 }
 
-func EndCharacterAnimation(character *Character) {
-	character.AnimationController.Animation = nil
-	character.AnimationController.Position = sdl.FPoint{}
-	character.AnimationController.PositionShift = sdl.FPoint{}
+func EndMobAnimation(mob *Mob) {
+	mob.AnimationController.Animation = nil
+	mob.AnimationController.Position = sdl.FPoint{}
+	mob.AnimationController.PositionShift = sdl.FPoint{}
 }

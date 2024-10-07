@@ -25,14 +25,15 @@ func ProcessJobToilBuild(driver *JobDriver, toil *JobToil) JobToilStatus {
 		objectTemplate := ObjectContainer[data.ObjectType]
 		CreateObject(driver.Tile, data.ObjectType)
 		for _, requirement := range objectTemplate.Requirements {
-			if item := FindItemInInventory(&driver.Character.Inventory, requirement.Type); item != nil {
-				RemoveItemFromCharacterRaw(item, driver.Character)
+			if item := FindItemInInventory(driver.Mob.Data.(*MobCharacterData).Inventory, requirement.Type); item != nil {
+				RemoveItemFromCharacterRaw(item, driver.Mob)
 			}
 		}
 		return JobToilStatusComplete
 	}
 	if toil.Ticks%10 == 0 {
-		CreateParticle(&GameInstance.ParticleController, NewParticleCross(sdlutils.Vector3ToFVector3Center(data.Position), 0.35, sdl.Color{R: 210, G: 210, B: 210}))
+		particle := NewParticleCross(sdlutils.Vector3ToFVector3Center(data.Position), 0.35, sdl.Color{R: 210, G: 210, B: 210})
+		CreateParticle(&GameInstance.ParticleController, particle)
 	}
 	if toil.Ticks%90 == 0 {
 		PlaySoundVolume(&GameInstance.SoundController, "welder", 0.5)

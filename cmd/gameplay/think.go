@@ -1,14 +1,14 @@
 package gameplay
 
-type CharacterThinktree struct {
+type Thinktree struct {
 	Ticks int32
 }
 
-func NewCharacterThinktree() CharacterThinktree {
-	return CharacterThinktree{
+func NewThinktree() Thinktree {
+	return Thinktree{
 		Ticks: 0,
 	}
 }
 
-func ProcessCharacterThinktree(character *Character) {
+func ProcessThinktree(mob *Mob) {
 }

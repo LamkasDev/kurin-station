@@ -29,13 +29,13 @@ func LoadRendererLayerAnimation(layer *gfx.RendererLayer) error {
 }
 
 func RenderRendererLayerAnimation(layer *gfx.RendererLayer) error {
-	for _, character := range gameplay.GameInstance.Characters {
-		if character.AnimationController.Animation != nil {
-			graphic := layer.Data.(*RendererLayerAnimationData).Animations[character.AnimationController.Animation.Type]
-			if character.AnimationController.Animation.Step == -1 {
-				AdvanceCharacterAnimation(character, &graphic.Template)
+	for _, mob := range gameplay.GameInstance.Mobs {
+		if mob.AnimationController.Animation != nil {
+			graphic := layer.Data.(*RendererLayerAnimationData).Animations[mob.AnimationController.Animation.Type]
+			if mob.AnimationController.Animation.Step == -1 {
+				AdvanceMobAnimation(mob, &graphic.Template)
 			}
-			ProcessCharacterAnimation(character, &graphic.Template)
+			ProcessMobAnimation(mob, &graphic.Template)
 		}
 	}
 

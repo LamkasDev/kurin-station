@@ -35,11 +35,11 @@ func RenderRendererLayerJob(layer *gfx.RendererLayer) error {
 		}
 	}
 
-	for _, character := range gameplay.GameInstance.Characters {
-		if character.JobTracker.Job == nil {
+	for _, mob := range gameplay.GameInstance.Mobs {
+		if mob.Faction != gameplay.FactionPlayer || mob.JobTracker.Job == nil {
 			continue
 		}
-		if err := RenderJob(gfx.RendererInstance, layer, character.JobTracker.Job); err != nil {
+		if err := RenderJob(gfx.RendererInstance, layer, mob.JobTracker.Job); err != nil {
 			return err
 		}
 	}

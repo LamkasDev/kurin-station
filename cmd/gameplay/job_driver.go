@@ -3,7 +3,7 @@ package gameplay
 type JobDriver struct {
 	Type         string
 	Tile         *Tile
-	Character    *Character
+	Mob          *Mob
 	Toils        []*JobToil
 	ToilIndex    uint8
 	TimeoutTicks uint64

@@ -13,8 +13,8 @@ func ProcessJobToilDestroy(driver *JobDriver, toil *JobToil) JobToilStatus {
 	if object == nil {
 		return JobToilStatusComplete
 	}
-	if driver.Character.Fatigue == 0 {
-		CharacterHitObject(driver.Character, object)
+	if driver.Mob.Fatigue == 0 {
+		MobHitObject(driver.Mob, object)
 	}
 
 	return JobToilStatusWorking

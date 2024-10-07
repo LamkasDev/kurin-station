@@ -14,8 +14,8 @@ func NewJobToilTemplatePanic() *JobToilTemplate {
 }
 
 func ProcessJobToilPanic(driver *JobDriver, toil *JobToil) JobToilStatus {
-	if toil.Ticks > 60 {
-		MoveCharacterDirection(driver.Character, common.Direction(rand.Intn(4)))
+	if toil.Ticks >= MobMovementTicks {
+		MoveMobDirection(driver.Mob, common.Direction(rand.Intn(4)))
 		return JobToilStatusComplete
 	}
 

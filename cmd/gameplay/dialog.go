@@ -1,7 +1,7 @@
 package gameplay
 
-type DialogPodData struct {
-	Pod *Object
+type DialogConsoleData struct {
+	Console *Object
 }
 
 type DialogLatheData struct {

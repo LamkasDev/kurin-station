@@ -25,8 +25,8 @@ func LoadEventLayerMovement(layer *event.EventLayer) error {
 }
 
 func ProcessEventLayerMovement(layer *event.EventLayer) error {
-	for _, character := range gameplay.GameInstance.Characters {
-		character.PositionRender = mathutils.LerpFPoint(character.PositionRender, sdlutils.PointToFPoint(character.Position.Base), 0.2)
+	for _, mob := range gameplay.GameInstance.Mobs {
+		mob.PositionRender = mathutils.LerpFPoint(mob.PositionRender, sdlutils.PointToFPoint(mob.Position.Base), 0.2)
 	}
 	if gfx.RendererInstance.Context.CameraMode != gfx.RendererCameraModeCharacter || event.EventManagerInstance.Keyboard.InputMode {
 		return nil
@@ -55,10 +55,10 @@ func ProcessEventLayerMovement(layer *event.EventLayer) error {
 		gameplay.GameInstance.SelectedCharacter.MovementTicks = 0
 	}
 
-	if gameplay.GameInstance.SelectedCharacter.MovementTicks >= gameplay.CharacterMovementTicks {
+	if gameplay.GameInstance.SelectedCharacter.MovementTicks >= gameplay.MobMovementTicks {
 		position := sdlutils.Vector3{Base: sdlutils.AddPoints(gameplay.GameInstance.SelectedCharacter.Position.Base, gameplay.GameInstance.SelectedCharacter.Movement)}
 		gameplay.GameInstance.SelectedCharacter.MovementTicks = 0
-		gameplay.MoveCharacter(gameplay.GameInstance.SelectedCharacter, position)
+		gameplay.MoveMob(gameplay.GameInstance.SelectedCharacter, position)
 	}
 
 	return nil

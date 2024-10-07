@@ -6,8 +6,8 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gameplay"
 	"github.com/LamkasDev/kurin/cmd/gfx"
 	"github.com/LamkasDev/kurin/cmd/gfx/item"
+	"github.com/LamkasDev/kurin/cmd/gfx/mob"
 	"github.com/LamkasDev/kurin/cmd/gfx/render"
-	"github.com/LamkasDev/kurin/cmd/gfx/species"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -47,7 +47,7 @@ func ProcessEventLayerInteraction(layer *event.EventLayer) error {
 
 	gameplay.GameInstance.HoveredItem = nil
 	for _, currentItem := range gameplay.GameInstance.Map.Items {
-		if !gameplay.CanCharacterInteractWithItem(gameplay.GameInstance.SelectedCharacter, currentItem) {
+		if !gameplay.CanMobInteractWithItem(gameplay.GameInstance.SelectedCharacter, currentItem) {
 			continue
 		}
 		graphic := itemData.Items[currentItem.Type]
@@ -59,14 +59,17 @@ func ProcessEventLayerInteraction(layer *event.EventLayer) error {
 		}
 	}
 
-	gameplay.GameInstance.HoveredCharacter = nil
-	for _, currentCharacter := range gameplay.GameInstance.Characters {
-		if !gameplay.CanCharacterInteractWithCharacter(gameplay.GameInstance.SelectedCharacter, currentCharacter) {
-			continue
-		}
-		hoveredOffset := gfx.GetHoveredOffset(&gfx.RendererInstance.Context, species.GetCharacterRect(currentCharacter))
-		if hoveredOffset.InRect(&sdl.Rect{W: gameplay.TileSize.X, H: gameplay.TileSize.Y}) {
-			gameplay.GameInstance.HoveredCharacter = currentCharacter
+	gameplay.GameInstance.HoveredMob = nil
+	for _, currentCharacter := range gameplay.GameInstance.Mobs {
+		switch currentCharacter.Data.(type) {
+		case *gameplay.MobCharacterData:
+			if !gameplay.CanMobInteractWithMob(gameplay.GameInstance.SelectedCharacter, currentCharacter) {
+				continue
+			}
+			hoveredOffset := gfx.GetHoveredOffset(&gfx.RendererInstance.Context, mob.GetMobRect(currentCharacter))
+			if hoveredOffset.InRect(&sdl.Rect{W: gameplay.TileSize.X, H: gameplay.TileSize.Y}) {
+				gameplay.GameInstance.HoveredMob = currentCharacter
+			}
 		}
 	}
 

@@ -50,10 +50,10 @@ func RenderRendererLayerHUD(layer *gfx.RendererLayer) error {
 	itemData := data.ItemLayer.Data.(*item.RendererLayerItemData)
 
 	sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["hand_l"].Texture, HUDElementHandLeft.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
-	if gameplay.GameInstance.SelectedCharacter.ActiveHand == gameplay.HandLeft {
+	if gameplay.GetActiveHand(gameplay.GameInstance.SelectedCharacter) == gameplay.HandLeft {
 		sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["lhandactive"].Texture, sdl.Point{X: half.X, Y: gfx.RendererInstance.Context.WindowSize.Y - 72}, sdl.FPoint{X: 2, Y: 2})
 	}
-	lhand := gameplay.GameInstance.SelectedCharacter.Inventory.Hands[gameplay.HandLeft]
+	lhand := gameplay.GameInstance.SelectedCharacter.Data.(*gameplay.MobCharacterData).Inventory.Hands[gameplay.HandLeft]
 	if lhand != nil {
 		graphic := itemData.Items[lhand.Type]
 		if graphic.Outline != nil && data.HoveredItem == lhand {
@@ -65,10 +65,10 @@ func RenderRendererLayerHUD(layer *gfx.RendererLayer) error {
 	}
 
 	sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["hand_r"].Texture, HUDElementHandRight.GetPosition(gfx.RendererInstance.Context.WindowSize), sdl.FPoint{X: 2, Y: 2})
-	if gameplay.GameInstance.SelectedCharacter.ActiveHand == gameplay.HandRight {
+	if gameplay.GetActiveHand(gameplay.GameInstance.SelectedCharacter) == gameplay.HandRight {
 		sdlutils.RenderTexture(gfx.RendererInstance.Renderer, data.Icons["rhandactive"].Texture, sdl.Point{X: half.X - 64, Y: gfx.RendererInstance.Context.WindowSize.Y - 72}, sdl.FPoint{X: 2, Y: 2})
 	}
-	rhand := gameplay.GameInstance.SelectedCharacter.Inventory.Hands[gameplay.HandRight]
+	rhand := gameplay.GameInstance.SelectedCharacter.Data.(*gameplay.MobCharacterData).Inventory.Hands[gameplay.HandRight]
 	if rhand != nil {
 		graphic := itemData.Items[rhand.Type]
 		if graphic.Outline != nil && data.HoveredItem == rhand {
@@ -101,7 +101,7 @@ func RenderRendererLayerHUD(layer *gfx.RendererLayer) error {
 			text := "??"
 			switch data := requirement.Data.(type) {
 			case *gameplay.ObjectiveRequirementDataCredits:
-				text = fmt.Sprintf("Earn %d credits (%d/%d)", data.Count, gameplay.GameInstance.Credits, data.Count)
+				text = fmt.Sprintf("Earn %d credits (%d/%d)", data.Count, data.Progress, data.Count)
 			case *gameplay.ObjectiveRequirementDataCreate:
 				text = fmt.Sprintf("Create %d %s (%d/%d)", data.Count, data.ObjectType, data.Progress, data.Count)
 			case *gameplay.ObjectiveRequirementDataDestroy:

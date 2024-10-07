@@ -1,26 +1,26 @@
 package gameplay
 
-type ObjectPodData struct {
+type ObjectConsoleData struct {
 	Enabled bool
 }
 
-func NewObjectTemplatePod() *ObjectTemplate {
-	template := NewObjectTemplate[*ObjectPodData]("pod", false)
+func NewObjectTemplateConsole() *ObjectTemplate {
+	template := NewObjectTemplate[*ObjectConsoleData]("console", false)
 	template.OnInteraction = func(object *Object, item *Item) bool {
 		if item != nil && item.Type == "credit" {
-			if !RemoveItemFromCharacterRaw(item, item.Character) {
+			if !RemoveItemFromCharacterRaw(item, item.Mob) {
 				return false
 			}
 			PlaySound(&GameInstance.SoundController, "jingle")
-			GameInstance.Credits++
+			AddCredits(1)
 			return true
 		}
 
-		OpenDialog(&DialogRequest{Type: "pod", Data: &DialogPodData{Pod: object}})
+		OpenDialog(&DialogRequest{Type: "console", Data: &DialogConsoleData{Console: object}})
 		return true
 	}
 	template.GetDefaultData = func() interface{} {
-		return &ObjectPodData{
+		return &ObjectConsoleData{
 			Enabled: false,
 		}
 	}

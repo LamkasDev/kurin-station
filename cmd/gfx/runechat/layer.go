@@ -21,15 +21,15 @@ func LoadRendererLayerRunechat(layer *gfx.RendererLayer) error {
 
 func RenderRendererLayerRunechat(layer *gfx.RendererLayer) error {
 	if len(gameplay.GameInstance.RunechatController.Messages) > 0 {
-		characterTally := map[*gameplay.Character]int32{}
+		characterTally := map[*gameplay.Mob]int32{}
 		for i := len(gameplay.GameInstance.RunechatController.Messages) - 1; i >= 0; i-- {
 			runechat := gameplay.GameInstance.RunechatController.Messages[i]
 			switch val := runechat.Data.(type) {
-			case gameplay.RunechatCharacterData:
-				if err := RenderRunechatCharacter(layer, runechat, characterTally[val.Character]); err != nil {
+			case gameplay.RunechatMobData:
+				if err := RenderRunechatCharacter(layer, runechat, characterTally[val.Mob]); err != nil {
 					return err
 				}
-				characterTally[val.Character]++
+				characterTally[val.Mob]++
 			}
 
 			gameplay.ProcessRunechat(&gameplay.GameInstance.RunechatController, runechat)

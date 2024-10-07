@@ -26,7 +26,7 @@ func StartJobToilPickup(driver *JobDriver, toil *JobToil) JobToilStatus {
 	if IsJobToilPickupComplete(driver, toil) {
 		return JobToilStatusComplete
 	}
-	data.Item = FindClosestItemOfType(&GameInstance.Map, driver.Character.Position, data.ItemType, true)
+	data.Item = FindClosestItemOfType(&GameInstance.Map, driver.Mob.Position, data.ItemType, true)
 	if data.Item == nil {
 		return JobToilStatusFailed
 	}
@@ -38,13 +38,13 @@ func StartJobToilPickup(driver *JobDriver, toil *JobToil) JobToilStatus {
 
 func ProcessJobToilPickup(driver *JobDriver, toil *JobToil) JobToilStatus {
 	data := toil.Data.(*JobToilPickupData)
-	if data.Item.Character != nil {
+	if data.Item.Mob != nil {
 		return JobToilStatusFailed
 	}
 	status := data.GotoToil.Template.Process(driver, data.GotoToil)
 	switch status {
 	case JobToilStatusComplete:
-		if !TransferItemToCharacter(data.Item, driver.Character) {
+		if !TransferItemToCharacter(data.Item, driver.Mob) {
 			return JobToilStatusFailed
 		}
 		if !IsJobToilPickupComplete(driver, toil) {
@@ -61,7 +61,7 @@ func ProcessJobToilPickup(driver *JobDriver, toil *JobToil) JobToilStatus {
 
 func IsJobToilPickupComplete(driver *JobDriver, toil *JobToil) bool {
 	data := toil.Data.(*JobToilPickupData)
-	item := FindItemInInventory(&driver.Character.Inventory, data.ItemType)
+	item := FindItemInInventory(GetInventory(driver.Mob), data.ItemType)
 	if item != nil && item.Count >= data.ItemCount {
 		return true
 	}

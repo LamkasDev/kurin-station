@@ -45,7 +45,7 @@ func ProcessEventLayerHUD(layer *event.EventLayer) error {
 	hudData := data.HudLayer.Data.(*hud.RendererLayerHUDData)
 	hudData.HoveredItem = nil
 
-	lhand := gameplay.GameInstance.SelectedCharacter.Inventory.Hands[gameplay.HandLeft]
+	lhand := gameplay.GameInstance.SelectedCharacter.Data.(*gameplay.MobCharacterData).Inventory.Hands[gameplay.HandLeft]
 	if lhand != nil {
 		hoveredOffset := sdlutils.DividePoints(gfx.GetHoveredOffsetUnscaled(&gfx.RendererInstance.Context, hud.HUDElementHandLeft.GetPosition(gfx.RendererInstance.Context.WindowSize)), sdl.Point{X: 2, Y: 2})
 		if gfx.IsHoveredOffsetSolid(itemData.Items[lhand.Type].Textures[0], hoveredOffset) {
@@ -57,7 +57,7 @@ func ProcessEventLayerHUD(layer *event.EventLayer) error {
 			}
 		}
 	}
-	rhand := gameplay.GameInstance.SelectedCharacter.Inventory.Hands[gameplay.HandRight]
+	rhand := gameplay.GameInstance.SelectedCharacter.Data.(*gameplay.MobCharacterData).Inventory.Hands[gameplay.HandRight]
 	if rhand != nil {
 		hoveredOffset := sdlutils.DividePoints(gfx.GetHoveredOffsetUnscaled(&gfx.RendererInstance.Context, hud.HUDElementHandRight.GetPosition(gfx.RendererInstance.Context.WindowSize)), sdl.Point{X: 2, Y: 2})
 		if gfx.IsHoveredOffsetSolid(itemData.Items[rhand.Type].Textures[0], hoveredOffset) {

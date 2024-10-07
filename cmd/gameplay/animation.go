@@ -19,28 +19,28 @@ func NewAnimation(animationType string) *Animation {
 	}
 }
 
-func GetAnimationOffset(character *Character) sdl.FPoint {
-	if character.AnimationController.Direction {
-		switch character.Direction {
+func GetAnimationOffset(mob *Mob) sdl.FPoint {
+	if mob.AnimationController.Direction {
+		switch mob.Direction {
 		case common.DirectionNorth:
 			return sdl.FPoint{
-				X: -character.AnimationController.Position.X,
-				Y: -character.AnimationController.Position.Y,
+				X: -mob.AnimationController.Position.X,
+				Y: -mob.AnimationController.Position.Y,
 			}
 		case common.DirectionSouth:
-			return character.AnimationController.Position
+			return mob.AnimationController.Position
 		case common.DirectionEast:
 			return sdl.FPoint{
-				X: character.AnimationController.Position.Y,
-				Y: character.AnimationController.Position.X,
+				X: mob.AnimationController.Position.Y,
+				Y: mob.AnimationController.Position.X,
 			}
 		case common.DirectionWest:
 			return sdl.FPoint{
-				X: -character.AnimationController.Position.Y,
-				Y: -character.AnimationController.Position.X,
+				X: -mob.AnimationController.Position.Y,
+				Y: -mob.AnimationController.Position.X,
 			}
 		}
 	}
 
-	return character.AnimationController.Position
+	return mob.AnimationController.Position
 }

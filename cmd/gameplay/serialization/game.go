@@ -13,7 +13,7 @@ type GameData struct {
 	Map               MapData
 	Ticks             uint64
 	Credits           uint32
-	Characters        []CharacterData
+	Mobs              []MobData
 	SelectedCharacter uint32
 	Narrator          NarratorData
 	JobController     map[gameplay.Faction]JobControllerData
@@ -25,12 +25,12 @@ func EncodeGame(game *gameplay.Game) []byte {
 		Map:           EncodeMap(&game.Map),
 		Ticks:         game.Ticks,
 		Credits:       game.Credits,
-		Characters:    []CharacterData{},
+		Mobs:          []MobData{},
 		Narrator:      EncodeNarrator(game.Narrator),
 		JobController: map[gameplay.Faction]JobControllerData{},
 	}
-	for _, character := range game.Characters {
-		data.Characters = append(data.Characters, EncodeCharacter(character))
+	for _, mob := range game.Mobs {
+		data.Mobs = append(data.Mobs, EncodeMob(mob))
 	}
 	if game.SelectedCharacter != nil {
 		data.SelectedCharacter = game.SelectedCharacter.Id
@@ -57,17 +57,17 @@ func DecodeGame(buffer []byte, game *gameplay.Game) {
 	game.Map = DecodeMap(data.Map)
 	game.Ticks = data.Ticks
 	game.Credits = data.Credits
-	game.Characters = []*gameplay.Character{}
-	for _, characterData := range data.Characters {
-		game.Characters = append(game.Characters, DecodeCharacter(characterData))
+	game.Mobs = []*gameplay.Mob{}
+	for _, mobData := range data.Mobs {
+		game.Mobs = append(game.Mobs, DecodeMob(mobData))
 	}
 	if data.SelectedCharacter != 0 {
-		i := slices.IndexFunc(game.Characters, func(character *gameplay.Character) bool {
-			return character.Id == data.SelectedCharacter
+		i := slices.IndexFunc(game.Mobs, func(mob *gameplay.Mob) bool {
+			return mob.Id == data.SelectedCharacter
 		})
-		game.SelectedCharacter = game.Characters[i]
+		game.SelectedCharacter = game.Mobs[i]
 	}
-	game.HoveredCharacter = nil
+	game.HoveredMob = nil
 	game.HoveredItem = nil
 	for faction, controllerData := range data.JobController {
 		game.JobController[faction] = DecodeJobController(controllerData)

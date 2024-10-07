@@ -26,7 +26,8 @@ func ProcessJobToilBuildFloor(driver *JobDriver, toil *JobToil) JobToilStatus {
 		return JobToilStatusComplete
 	}
 	if toil.Ticks%10 == 0 {
-		CreateParticle(&GameInstance.ParticleController, NewParticleCross(sdlutils.Vector3ToFVector3Center(data.Position), 0.35, sdl.Color{R: 210, G: 210, B: 210}))
+		particle := NewParticleCross(sdlutils.Vector3ToFVector3Center(data.Position), 0.35, sdl.Color{R: 210, G: 210, B: 210})
+		CreateParticle(&GameInstance.ParticleController, particle)
 	}
 	if toil.Ticks%90 == 0 {
 		PlaySoundVolume(&GameInstance.SoundController, "welder", 0.5)

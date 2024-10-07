@@ -7,8 +7,8 @@ import (
 
 func NewDialog(layer *gfx.RendererLayer, request *gameplay.DialogRequest) *Dialog {
 	switch request.Type {
-	case "pod":
-		return NewDialogPod(layer, request.Data)
+	case "console":
+		return NewDialogConsole(layer, request.Data)
 	case "lathe":
 		return NewDialogLathe(layer, request.Data)
 	}

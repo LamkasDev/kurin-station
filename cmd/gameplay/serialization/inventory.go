@@ -3,12 +3,15 @@ package serialization
 import "github.com/LamkasDev/kurin/cmd/gameplay"
 
 type InventoryData struct {
-	Left  *ItemData
-	Right *ItemData
+	ActiveHand gameplay.Hand
+	Left       *ItemData
+	Right      *ItemData
 }
 
 func EncodeInventory(inventory *gameplay.Inventory) InventoryData {
-	data := InventoryData{}
+	data := InventoryData{
+		ActiveHand: inventory.ActiveHand,
+	}
 	left := inventory.Hands[gameplay.HandLeft]
 	if left != nil {
 		item := EncodeItem(left)
@@ -23,16 +26,17 @@ func EncodeInventory(inventory *gameplay.Inventory) InventoryData {
 	return data
 }
 
-func DecodeInventory(data InventoryData, character *gameplay.Character) gameplay.Inventory {
+func DecodeInventory(data InventoryData, character *gameplay.Mob) *gameplay.Inventory {
 	inventory := gameplay.NewInventory()
+	inventory.ActiveHand = data.ActiveHand
 	if data.Left != nil {
 		item := DecodeItem(*data.Left)
-		item.Character = character
+		item.Mob = character
 		inventory.Hands[gameplay.HandLeft] = item
 	}
 	if data.Right != nil {
 		item := DecodeItem(*data.Right)
-		item.Character = character
+		item.Mob = character
 		inventory.Hands[gameplay.HandRight] = item
 	}
 

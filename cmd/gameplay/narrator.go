@@ -53,6 +53,17 @@ func ProcessNarrator() {
 	}
 }
 
+func NarratorOnAddCredits(amount uint32) {
+	for _, objective := range GameInstance.Narrator.Objectives {
+		for _, requirement := range objective.Requirements {
+			switch data := requirement.Data.(type) {
+			case *ObjectiveRequirementDataCredits:
+				data.Progress += amount
+			}
+		}
+	}
+}
+
 func NarratorOnCreateObject(object *Object) {
 	for _, objective := range GameInstance.Narrator.Objectives {
 		for _, requirement := range objective.Requirements {
@@ -62,7 +73,6 @@ func NarratorOnCreateObject(object *Object) {
 					continue
 				}
 				data.Progress++
-				requirement.Data = data
 			}
 		}
 	}
@@ -77,7 +87,6 @@ func NarratorOnDestroyObject(object *Object) {
 					continue
 				}
 				data.Progress++
-				requirement.Data = data
 			}
 		}
 	}

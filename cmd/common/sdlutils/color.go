@@ -10,6 +10,7 @@ var (
 	White      = sdl.Color{R: 255, G: 255, B: 255}
 	LightBlack = sdl.Color{R: 36, G: 36, B: 36}
 	Black      = sdl.Color{R: 0, G: 0, B: 0}
+	Orange     = sdl.Color{R: 255, G: 140, B: 0}
 )
 
 func SetDrawColor(renderer *sdl.Renderer, color sdl.Color) error {

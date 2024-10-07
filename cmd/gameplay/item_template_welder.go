@@ -9,7 +9,7 @@ type ItemWelderData struct {
 }
 
 func NewItemTemplateWelder() *ItemTemplate {
-	template := NewItemTemplate[*ItemWelderData]("welder", 1)
+	template := NewItemTemplate[*ItemWelderData]("welder", 1, 3)
 	template.GetTextures = func(item *Item) []int {
 		if item.Data.(*ItemWelderData).Enabled {
 			if int64(math.Floor(float64(GameInstance.Ticks)/8))%2 == 0 {

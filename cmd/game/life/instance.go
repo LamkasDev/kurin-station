@@ -25,10 +25,10 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gfx/hud"
 	"github.com/LamkasDev/kurin/cmd/gfx/item"
 	"github.com/LamkasDev/kurin/cmd/gfx/job"
+	"github.com/LamkasDev/kurin/cmd/gfx/mob"
 	"github.com/LamkasDev/kurin/cmd/gfx/particle"
 	"github.com/LamkasDev/kurin/cmd/gfx/render"
 	"github.com/LamkasDev/kurin/cmd/gfx/runechat"
-	"github.com/LamkasDev/kurin/cmd/gfx/species"
 	"github.com/LamkasDev/kurin/cmd/gfx/structure"
 	"github.com/LamkasDev/kurin/cmd/gfx/tool"
 	"github.com/LamkasDev/kurin/cmd/gfx/tooltip"
@@ -62,7 +62,7 @@ func InitializeSystems() error {
 	gfx.RendererInstance.Layers = append(gfx.RendererInstance.Layers, objectLayer)
 	gfx.RendererInstance.Layers = append(gfx.RendererInstance.Layers, itemLayer)
 	gfx.RendererInstance.Layers = append(gfx.RendererInstance.Layers, job.NewRendererLayerJob(turfLayer, objectLayer))
-	gfx.RendererInstance.Layers = append(gfx.RendererInstance.Layers, species.NewRendererLayerCharacter(itemLayer))
+	gfx.RendererInstance.Layers = append(gfx.RendererInstance.Layers, mob.NewRendererLayerMob(itemLayer))
 	gfx.RendererInstance.Layers = append(gfx.RendererInstance.Layers, particle.NewRendererLayerParticle())
 	gfx.RendererInstance.Layers = append(gfx.RendererInstance.Layers, runechat.NewRendererLayerRunechat())
 	gfx.RendererInstance.Layers = append(gfx.RendererInstance.Layers, toolLayer)

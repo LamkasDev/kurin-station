@@ -1,11 +1,11 @@
 package gameplay
 
 type JobTracker struct {
-	Character *Character
+	Character *Mob
 	Job       *JobDriver
 }
 
-func NewJobTracker(character *Character) *JobTracker {
+func NewJobTracker(character *Mob) *JobTracker {
 	return &JobTracker{
 		Character: character,
 		Job:       nil,
@@ -69,7 +69,7 @@ func EndTrackerJobToil(tracker *JobTracker) {
 }
 
 func AssignTrackerJob(tracker *JobTracker, job *JobDriver) {
-	job.Character = tracker.Character
+	job.Mob = tracker.Character
 	tracker.Job = job
 }
 
@@ -77,7 +77,7 @@ func UnassignTrackerJob(tracker *JobTracker) {
 	if tracker.Job.Tile != nil && tracker.Job.Tile.Job == tracker.Job {
 		tracker.Job.Tile.Job = nil
 	}
-	tracker.Job.Character = nil
+	tracker.Job.Mob = nil
 	for _, toil := range tracker.Job.Toils {
 		toil.Started = false
 	}

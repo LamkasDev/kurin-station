@@ -35,11 +35,11 @@ func ProcessEventLayerKeybinds(layer *event.EventLayer) error {
 			if gameplay.GameInstance.SelectedCharacter == nil {
 				return nil
 			}
-			switch gameplay.GameInstance.SelectedCharacter.ActiveHand {
+			switch gameplay.GetActiveHand(gameplay.GameInstance.SelectedCharacter) {
 			case gameplay.HandLeft:
-				gameplay.GameInstance.SelectedCharacter.ActiveHand = gameplay.HandRight
+				gameplay.GetInventory(gameplay.GameInstance.SelectedCharacter).ActiveHand = gameplay.HandRight
 			case gameplay.HandRight:
-				gameplay.GameInstance.SelectedCharacter.ActiveHand = gameplay.HandLeft
+				gameplay.GetInventory(gameplay.GameInstance.SelectedCharacter).ActiveHand = gameplay.HandLeft
 			}
 		case sdl.K_q:
 			if gameplay.GameInstance.SelectedCharacter == nil {
@@ -50,7 +50,7 @@ func ProcessEventLayerKeybinds(layer *event.EventLayer) error {
 			if gameplay.GameInstance.SelectedCharacter == nil {
 				return nil
 			}
-			item := gameplay.GameInstance.SelectedCharacter.Inventory.Hands[gameplay.GameInstance.SelectedCharacter.ActiveHand]
+			item := gameplay.GetHeldItem(gameplay.GameInstance.SelectedCharacter)
 			if !gameplay.DropItemFromCharacter(gameplay.GameInstance.SelectedCharacter) {
 				return nil
 			}
@@ -77,7 +77,7 @@ func ProcessEventLayerKeybinds(layer *event.EventLayer) error {
 				gameplay.GameInstance.SelectedCharacter = nil
 			case gfx.RendererCameraModeFree:
 				gfx.RendererInstance.Context.CameraMode = gfx.RendererCameraModeCharacter
-				gameplay.GameInstance.SelectedCharacter = gameplay.GameInstance.Characters[0]
+				gameplay.GameInstance.SelectedCharacter = gameplay.GameInstance.Mobs[0]
 			}
 		case sdl.K_s:
 			if event.EventManagerInstance.Keyboard.Pressed[sdl.K_LCTRL] {

@@ -15,11 +15,12 @@ func RemoveItemFromMapRaw(kmap *Map, item *Item) bool {
 	return true
 }
 
-func RemoveItemFromCharacterRaw(item *Item, character *Character) bool {
-	for hand := range character.Inventory.Hands {
-		if character.Inventory.Hands[hand] == item {
-			item.Character = nil
-			character.Inventory.Hands[hand] = nil
+func RemoveItemFromCharacterRaw(item *Item, character *Mob) bool {
+	characterData := character.Data.(*MobCharacterData)
+	for hand := range characterData.Inventory.Hands {
+		if characterData.Inventory.Hands[hand] == item {
+			item.Mob = nil
+			characterData.Inventory.Hands[hand] = nil
 			return true
 		}
 	}
@@ -32,11 +33,11 @@ func AddItemToMapRaw(item *Item, kmap *Map, transform *sdlutils.Transform) {
 	kmap.Items = append(kmap.Items, item)
 }
 
-func AddItemToCharacterRaw(item *Item, character *Character) bool {
-	handItem := character.Inventory.Hands[character.ActiveHand]
+func AddItemToCharacterRaw(item *Item, character *Mob) bool {
+	handItem := GetHeldItem(character)
 	if handItem == nil {
-		character.Inventory.Hands[character.ActiveHand] = item
-		item.Character = character
+		GetInventory(character).Hands[GetActiveHand(character)] = item
+		item.Mob = character
 		return true
 	} else if handItem.Type == item.Type {
 		transfer := min(handItem.Template.MaxCount-handItem.Count, item.Count)
@@ -51,7 +52,7 @@ func AddItemToCharacterRaw(item *Item, character *Character) bool {
 	return false
 }
 
-func TransferItemToCharacterRaw(item *Item, kmap *Map, character *Character) bool {
+func TransferItemToCharacterRaw(item *Item, kmap *Map, character *Mob) bool {
 	if !AddItemToCharacterRaw(item, character) {
 		return false
 	}
@@ -61,7 +62,7 @@ func TransferItemToCharacterRaw(item *Item, kmap *Map, character *Character) boo
 	return true
 }
 
-func TransferItemFromCharacterRaw(item *Item, kmap *Map, character *Character) bool {
+func TransferItemFromCharacterRaw(item *Item, kmap *Map, character *Mob) bool {
 	if !RemoveItemFromCharacterRaw(item, character) {
 		return false
 	}

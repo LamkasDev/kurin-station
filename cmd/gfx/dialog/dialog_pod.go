@@ -7,9 +7,8 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-func NewDialogPod(layer *gfx.RendererLayer, data interface{}) *Dialog {
-	// dialogData := data.(*gameplay.DialogPodData)
-	dialog := NewDialogRaw(layer, "pod", "Pod", "flushed")
+func NewDialogConsole(layer *gfx.RendererLayer, data interface{}) *Dialog {
+	dialog := NewDialogRaw(layer, "console", "Console", "flushed")
 	testButton := NewDialogElementButton(sdl.Point{X: 8, Y: 8}, "test", func(dialog *Dialog) {
 		gameplay.PlaySound(&gameplay.GameInstance.SoundController, "grillehit")
 	})
@@ -23,8 +22,8 @@ func NewDialogPod(layer *gfx.RendererLayer, data interface{}) *Dialog {
 			return true
 		}
 
-		dialogData := dialog.Data.(*gameplay.DialogPodData)
-		return sdlutils.GetDistanceSimpleF(sdlutils.PointToFPointCenter(gameplay.GameInstance.SelectedCharacter.Position.Base), gameplay.GetObjectCenter(dialogData.Pod)) > 1.5
+		dialogData := dialog.Data.(*gameplay.DialogConsoleData)
+		return sdlutils.GetDistanceSimpleF(sdlutils.PointToFPointCenter(gameplay.GameInstance.SelectedCharacter.Position.Base), gameplay.GetObjectCenter(dialogData.Console)) > 1.5
 	}
 	dialog.Data = data
 

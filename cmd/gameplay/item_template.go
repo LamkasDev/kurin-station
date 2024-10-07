@@ -14,6 +14,7 @@ type ItemTemplate struct {
 	GetDefaultData    ItemGetDefaultData
 	CanHit            bool
 	MaxCount          uint16
+	Price             uint32
 }
 
 type (
@@ -27,7 +28,7 @@ type (
 	ItemGetDefaultData    func() interface{}
 )
 
-func NewItemTemplate[D any](itemType string, maxCount uint16) *ItemTemplate {
+func NewItemTemplate[D any](itemType string, maxCount uint16, price uint32) *ItemTemplate {
 	return &ItemTemplate{
 		Type:    itemType,
 		Process: func(item *Item) {},
@@ -64,5 +65,6 @@ func NewItemTemplate[D any](itemType string, maxCount uint16) *ItemTemplate {
 		},
 		CanHit:   true,
 		MaxCount: maxCount,
+		Price:    price,
 	}
 }

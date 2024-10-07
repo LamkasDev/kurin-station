@@ -25,7 +25,7 @@ var HUDElementHandLeft = HUDElement{
 		if gameplay.GameInstance.SelectedCharacter == nil {
 			return
 		}
-		gameplay.GameInstance.SelectedCharacter.ActiveHand = gameplay.HandLeft
+		gameplay.GetInventory(gameplay.GameInstance.SelectedCharacter).ActiveHand = gameplay.HandLeft
 	},
 }
 
@@ -37,7 +37,7 @@ var HUDElementHandRight = HUDElement{
 		if gameplay.GameInstance.SelectedCharacter == nil {
 			return
 		}
-		gameplay.GameInstance.SelectedCharacter.ActiveHand = gameplay.HandRight
+		gameplay.GetInventory(gameplay.GameInstance.SelectedCharacter).ActiveHand = gameplay.HandRight
 	},
 }
 

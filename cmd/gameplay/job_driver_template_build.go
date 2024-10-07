@@ -11,7 +11,14 @@ func NewJobDriverTemplateBuild() *JobDriverTemplate {
 		job.Toils = []*JobToil{}
 		objectTemplate := ObjectContainer[buildData.ObjectType]
 		for _, requirement := range objectTemplate.Requirements {
-			job.Toils = append(job.Toils, NewJobToil("pickup", &JobToilPickupData{ItemType: requirement.Type, ItemCount: requirement.Count}))
+			pickupToil := NewJobToil(
+				"pickup",
+				&JobToilPickupData{
+					ItemType:  requirement.Type,
+					ItemCount: requirement.Count,
+				},
+			)
+			job.Toils = append(job.Toils, pickupToil)
 		}
 		job.Toils = append(job.Toils, NewJobToil("goto", &JobToilGotoData{Target: job.Tile.Position}))
 		job.Toils = append(job.Toils, NewJobToil("build", &JobToilBuildData{ObjectType: buildData.ObjectType}))

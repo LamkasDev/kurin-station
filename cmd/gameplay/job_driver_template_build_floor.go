@@ -15,7 +15,14 @@ func NewJobDriverTemplateBuildFloor() *JobDriverTemplate {
 		buildData := data.(*JobDriverBuildFloorData)
 		job.Toils = []*JobToil{}
 		job.Toils = append(job.Toils, NewJobToil("goto", &JobToilGotoData{Target: buildData.Position}))
-		job.Toils = append(job.Toils, NewJobToil("build_floor", &JobToilBuildFloorData{Position: buildData.Position, TileType: buildData.TileType}))
+		buildToil := NewJobToil(
+			"build_floor",
+			&JobToilBuildFloorData{
+				Position: buildData.Position,
+				TileType: buildData.TileType,
+			},
+		)
+		job.Toils = append(job.Toils, buildToil)
 		job.Data = data
 	}
 

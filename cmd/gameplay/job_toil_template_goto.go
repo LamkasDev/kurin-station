@@ -19,7 +19,7 @@ func NewJobToilTemplateGoto() *JobToilTemplate {
 
 func StartJobToilGoto(driver *JobDriver, toil *JobToil) JobToilStatus {
 	data := toil.Data.(*JobToilGotoData)
-	data.Path = FindPathAdjacent(&GameInstance.Map.Pathfinding, driver.Character.Position, data.Target)
+	data.Path = FindPathAdjacent(&GameInstance.Map.Pathfinding, driver.Mob.Position, data.Target)
 	if data.Path == nil {
 		return JobToilStatusFailed
 	}
@@ -29,7 +29,7 @@ func StartJobToilGoto(driver *JobDriver, toil *JobToil) JobToilStatus {
 
 func ProcessJobToilGoto(driver *JobDriver, toil *JobToil) JobToilStatus {
 	data := toil.Data.(*JobToilGotoData)
-	if FollowPath(driver.Character, data.Path) {
+	if FollowPath(driver.Mob, data.Path) {
 		return JobToilStatusComplete
 	}
 
