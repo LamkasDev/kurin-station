@@ -1,4 +1,5 @@
 {
   "id": "blank",
-  "name": "Blank"
+  "name": "Blank",
+  "transparent": true
 }

@@ -41,6 +41,9 @@ func LoadRendererLayerItem(layer *gfx.RendererLayer) error {
 
 func RenderRendererLayerItem(layer *gfx.RendererLayer) error {
 	for _, item := range gameplay.GameInstance.Map.Items {
+		if item.Transform.Position.Z != gameplay.GameInstance.SelectedCharacter.Position.Z {
+			continue
+		}
 		RenderItem(layer, item)
 	}
 

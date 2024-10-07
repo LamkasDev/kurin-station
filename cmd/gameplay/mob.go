@@ -4,6 +4,7 @@ import (
 	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
 	"github.com/LamkasDev/kurin/cmd/gameplay/common"
 	"github.com/veandco/go-sdl2/sdl"
+	"robpike.io/filter"
 )
 
 const (
@@ -38,4 +39,10 @@ func ProcessMob(mob *Mob) {
 	if !ProcessJobTracker(mob.JobTracker) {
 		ProcessThinktree(mob)
 	}
+}
+
+func GetMobsOnTile(kmap *Map, tile *Tile) []*Mob {
+	return filter.Choose(GameInstance.Mobs, func(mob *Mob) bool {
+		return sdlutils.CompareVector3(mob.Position, tile.Position)
+	}).([]*Mob)
 }

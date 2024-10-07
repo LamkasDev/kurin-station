@@ -23,16 +23,18 @@ func RenderRendererLayerRunechat(layer *gfx.RendererLayer) error {
 	if len(gameplay.GameInstance.RunechatController.Messages) > 0 {
 		characterTally := map[*gameplay.Mob]int32{}
 		for i := len(gameplay.GameInstance.RunechatController.Messages) - 1; i >= 0; i-- {
-			runechat := gameplay.GameInstance.RunechatController.Messages[i]
-			switch val := runechat.Data.(type) {
+			rawRunechat := gameplay.GameInstance.RunechatController.Messages[i]
+			switch runechat := rawRunechat.Data.(type) {
 			case gameplay.RunechatMobData:
-				if err := RenderRunechatCharacter(layer, runechat, characterTally[val.Mob]); err != nil {
-					return err
+				if runechat.Mob.Position.Z == gameplay.GameInstance.SelectedCharacter.Position.Z {
+					if err := RenderRunechatCharacter(layer, rawRunechat, characterTally[runechat.Mob]); err != nil {
+						return err
+					}
 				}
-				characterTally[val.Mob]++
+				characterTally[runechat.Mob]++
 			}
 
-			gameplay.ProcessRunechat(&gameplay.GameInstance.RunechatController, runechat)
+			gameplay.ProcessRunechat(&gameplay.GameInstance.RunechatController, rawRunechat)
 		}
 	}
 

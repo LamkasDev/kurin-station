@@ -4,6 +4,7 @@ import (
 	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
 	"github.com/LamkasDev/kurin/cmd/gameplay/common"
 	"github.com/veandco/go-sdl2/sdl"
+	"robpike.io/filter"
 )
 
 type Object struct {
@@ -108,4 +109,10 @@ func HitObject(object *Object) {
 	if object.Health <= 0 {
 		DestroyObject(object)
 	}
+}
+
+func FindObjectsOfType(kmap *Map, z uint8, objectType string) []*Object {
+	return filter.Choose(kmap.Objects, func(object *Object) bool {
+		return object.Tile.Position.Z == z && object.Type == objectType
+	}).([]*Object)
 }

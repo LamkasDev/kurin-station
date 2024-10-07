@@ -56,7 +56,7 @@ func ProcessEventLayerMovement(layer *event.EventLayer) error {
 	}
 
 	if gameplay.GameInstance.SelectedCharacter.MovementTicks >= gameplay.MobMovementTicks {
-		position := sdlutils.Vector3{Base: sdlutils.AddPoints(gameplay.GameInstance.SelectedCharacter.Position.Base, gameplay.GameInstance.SelectedCharacter.Movement)}
+		position := sdlutils.Vector3{Base: sdlutils.AddPoints(gameplay.GameInstance.SelectedCharacter.Position.Base, gameplay.GameInstance.SelectedCharacter.Movement), Z: gameplay.GameInstance.SelectedCharacter.Position.Z}
 		gameplay.GameInstance.SelectedCharacter.MovementTicks = 0
 		gameplay.MoveMob(gameplay.GameInstance.SelectedCharacter, position)
 	}

@@ -32,7 +32,7 @@ type Game struct {
 
 func InitializeGame() {
 	GameInstance = &Game{
-		Map:   NewMap(sdlutils.Vector3{Base: sdl.Point{X: 50, Y: 50}, Z: 1}),
+		Map:   NewMap(sdlutils.Vector3{Base: sdl.Point{X: 200, Y: 200}, Z: 2}, 1),
 		Ticks: 0,
 		Mobs:  []*Mob{},
 		JobController: map[Faction]*JobController{

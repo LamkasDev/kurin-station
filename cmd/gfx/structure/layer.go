@@ -39,6 +39,9 @@ func LoadRendererLayerObject(layer *gfx.RendererLayer) error {
 
 func RenderRendererLayerObject(layer *gfx.RendererLayer) error {
 	for _, obj := range gameplay.GameInstance.Map.Objects {
+		if obj.Tile.Position.Z != gameplay.GameInstance.SelectedCharacter.Position.Z {
+			continue
+		}
 		RenderObject(layer, obj)
 	}
 

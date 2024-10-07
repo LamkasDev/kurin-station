@@ -14,7 +14,7 @@ func NewObjectTemplateThruster(thrusterType string, particleColor sdl.Color) *Ob
 					X: float32(object.Tile.Position.Base.X) - 0.3,
 					Y: float32(object.Tile.Position.Base.Y) + 0.5,
 				},
-				Z: 0,
+				Z: object.Tile.Position.Z,
 			}
 			CreateParticle(&GameInstance.ParticleController, NewParticleIon(pos, particleColor))
 		}

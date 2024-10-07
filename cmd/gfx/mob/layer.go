@@ -37,6 +37,9 @@ func LoadRendererLayerMob(layer *gfx.RendererLayer) error {
 
 func RenderRendererLayerMob(layer *gfx.RendererLayer) error {
 	for _, mob := range gameplay.GameInstance.Mobs {
+		if mob.Position.Z != gameplay.GameInstance.SelectedCharacter.Position.Z {
+			continue
+		}
 		switch mob.Data.(type) {
 		case *gameplay.MobCharacterData:
 			RenderCharacter(layer, mob)

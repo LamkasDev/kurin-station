@@ -7,6 +7,7 @@ import (
 
 type MapData struct {
 	Size    sdlutils.Vector3
+	BaseZ   uint8
 	Tiles   []TileData
 	Objects []ObjectData
 	Items   []ItemData
@@ -15,6 +16,7 @@ type MapData struct {
 func EncodeMap(kmap *gameplay.Map) MapData {
 	data := MapData{
 		Size:  kmap.Size,
+		BaseZ: kmap.BaseZ,
 		Tiles: []TileData{},
 		Items: []ItemData{},
 	}
@@ -40,7 +42,7 @@ func EncodeMap(kmap *gameplay.Map) MapData {
 }
 
 func DecodeMap(data MapData) gameplay.Map {
-	kmap := gameplay.NewMap(data.Size)
+	kmap := gameplay.NewMap(data.Size, data.BaseZ)
 	for _, tileData := range data.Tiles {
 		DecodeTile(&kmap, tileData)
 	}

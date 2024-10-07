@@ -27,7 +27,7 @@ type ItemRequirement struct {
 func NewItemRandom(kmap *Map, itemType string, count uint16) *Item {
 	item := NewItem(itemType, count)
 	for {
-		position := GetRandomMapPosition(kmap)
+		position := GetRandomMapPosition(kmap, kmap.BaseZ)
 		if CanEnterMapPosition(kmap, position) == EnteranceStatusYes {
 			item.Transform = &sdlutils.Transform{
 				Position: sdlutils.Vector3ToFVector3Center(position),
@@ -53,6 +53,7 @@ func FindItemsOfType(kmap *Map, itemType string, reservation bool) []*Item {
 	}).([]*Item)
 }
 
+// TODO: z-levels
 func FindClosestItemOfType(kmap *Map, position sdlutils.Vector3, itemType string, reservation bool) *Item {
 	items := FindItemsOfType(kmap, itemType, reservation)
 	start := sdlutils.PointToFPoint(position.Base)

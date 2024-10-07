@@ -22,6 +22,7 @@ func RegisterObjects() {
 	ObjectContainer["small_thruster_l"] = NewObjectTemplateThruster("small_thruster_l", sdlutils.Blue)
 	ObjectContainer["small_thruster_r"] = NewObjectTemplateThruster("small_thruster_r", sdlutils.Blue)
 	ObjectContainer["telepad"] = NewObjectTemplateTelepad()
+	ObjectContainer["teleporter"] = NewObjectTemplateTeleporter()
 	ObjectContainer["wall"] = NewObjectTemplateWall("wall")
 	ObjectContainer["window"] = NewObjectTemplate[interface{}]("window", false)
 }

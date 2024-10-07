@@ -39,7 +39,7 @@ func ProcessEventLayerInteraction(layer *event.EventLayer) error {
 	gameplay.GameInstance.HoveredTile = nil
 	gameplay.GameInstance.HoveredObject = nil
 	mousePosition := render.ScreenToWorldPosition(gfx.RendererInstance.Context.MousePosition)
-	tile := gameplay.GetTileAt(&gameplay.GameInstance.Map, sdlutils.Vector3{Base: mousePosition, Z: 0})
+	tile := gameplay.GetTileAt(&gameplay.GameInstance.Map, sdlutils.Vector3{Base: mousePosition, Z: gameplay.GameInstance.SelectedCharacter.Position.Z})
 	if tile != nil {
 		gameplay.GameInstance.HoveredTile = tile
 		gameplay.GameInstance.HoveredObject = gameplay.GetObjectAtTile(tile)

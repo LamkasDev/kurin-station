@@ -30,6 +30,9 @@ func LoadRendererLayerJob(layer *gfx.RendererLayer) error {
 
 func RenderRendererLayerJob(layer *gfx.RendererLayer) error {
 	for _, job := range gameplay.GameInstance.JobController[gameplay.FactionPlayer].Jobs {
+		if job.Tile != nil && job.Tile.Position.Z != gameplay.GameInstance.SelectedCharacter.Position.Z {
+			continue
+		}
 		if err := RenderJob(gfx.RendererInstance, layer, job); err != nil {
 			return err
 		}
@@ -37,6 +40,9 @@ func RenderRendererLayerJob(layer *gfx.RendererLayer) error {
 
 	for _, mob := range gameplay.GameInstance.Mobs {
 		if mob.Faction != gameplay.FactionPlayer || mob.JobTracker.Job == nil {
+			continue
+		}
+		if mob.JobTracker.Job.Tile != nil && mob.JobTracker.Job.Tile.Position.Z != gameplay.GameInstance.SelectedCharacter.Position.Z {
 			continue
 		}
 		if err := RenderJob(gfx.RendererInstance, layer, mob.JobTracker.Job); err != nil {

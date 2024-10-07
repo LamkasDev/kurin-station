@@ -8,7 +8,7 @@ import (
 
 func TeleportMobRandom(mob *Mob) {
 	for {
-		position := GetRandomMapPosition(&GameInstance.Map)
+		position := GetRandomMapPosition(&GameInstance.Map, GameInstance.Map.BaseZ)
 		if MoveMob(mob, position) {
 			mob.PositionRender = sdlutils.PointToFPoint(position.Base)
 			break
@@ -53,6 +53,9 @@ func FollowPath(mob *Mob, path *Path) bool {
 	if mob.MovementTicks >= MobMovementTicks {
 		node := path.Nodes[path.Index]
 		mob.MovementTicks = 0
+		if node.Position.Z != mob.Position.Z {
+			return false
+		}
 		if !MoveMob(mob, node.Position) {
 			return false
 		}

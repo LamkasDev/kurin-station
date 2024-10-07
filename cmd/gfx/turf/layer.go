@@ -30,6 +30,9 @@ func LoadRendererLayerTile(layer *gfx.RendererLayer) error {
 	if layer.Data.(*RendererLayerTileData).Turfs["catwalk"], err = NewTurfGraphic("catwalk"); err != nil {
 		return err
 	}
+	if layer.Data.(*RendererLayerTileData).Turfs["asteroid"], err = NewTurfGraphic("asteroid"); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -37,11 +40,12 @@ func LoadRendererLayerTile(layer *gfx.RendererLayer) error {
 func RenderRendererLayerTile(layer *gfx.RendererLayer) error {
 	for x := range gameplay.GameInstance.Map.Size.Base.X {
 		for y := range gameplay.GameInstance.Map.Size.Base.Y {
-			tile := gameplay.GameInstance.Map.Tiles[x][y][0]
-			if tile == nil {
-				continue
+			for z := uint8(0); z <= gameplay.GameInstance.SelectedCharacter.Position.Z; z++ {
+				tile := gameplay.GameInstance.Map.Tiles[x][y][z]
+				if tile != nil {
+					RenderTile(layer, tile, z != gameplay.GameInstance.SelectedCharacter.Position.Z)
+				}
 			}
-			RenderTile(layer, tile)
 		}
 	}
 

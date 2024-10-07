@@ -12,6 +12,7 @@ import (
 type Map struct {
 	Seed    int64
 	Size    sdlutils.Vector3
+	BaseZ   uint8
 	Tiles   [][][]*Tile
 	Objects []*Object
 	Items   []*Item
@@ -20,10 +21,11 @@ type Map struct {
 	Pathfinding PathfindingGrid
 }
 
-func NewMap(size sdlutils.Vector3) Map {
+func NewMap(size sdlutils.Vector3, baseZ uint8) Map {
 	kmap := Map{
 		Seed:  0,
 		Size:  size,
+		BaseZ: baseZ,
 		Tiles: make([][][]*Tile, size.Base.X),
 		Items: []*Item{},
 	}
@@ -40,15 +42,19 @@ func NewMap(size sdlutils.Vector3) Map {
 }
 
 func PopulateMap(kmap *Map) {
-	size := sdl.Point{X: 7, Y: 7}
-	start := sdl.Point{X: 32, Y: 22}
+	PlaceFloors(kmap, sdlutils.Rect3{Base: sdl.Rect{X: 0, Y: 0, W: kmap.Size.Base.X, H: kmap.Size.Base.Y}, Z: kmap.BaseZ - 1}, "asteroid")
 
-	mainRect := sdl.Rect{X: start.X, Y: start.Y, W: size.X, H: size.Y}
-	frontRect := sdl.Rect{X: start.X + size.X - 1, Y: start.Y + 1, W: 5, H: 5}
-	backRect := sdl.Rect{X: start.X - 9, Y: start.Y + 1, W: 6, H: 5}
+	size := sdl.Point{X: 7, Y: 7}
+	start := sdl.Point{X: 22, Y: 22}
+
+	mainRect := sdlutils.Rect3{Base: sdl.Rect{X: start.X, Y: start.Y, W: size.X, H: size.Y}, Z: kmap.BaseZ}
+	frontRect := sdlutils.Rect3{Base: sdl.Rect{X: start.X + size.X - 1, Y: start.Y + 1, W: 5, H: 5}, Z: kmap.BaseZ}
+	backRect := sdlutils.Rect3{Base: sdl.Rect{X: start.X - 9, Y: start.Y + 1, W: 6, H: 5}, Z: kmap.BaseZ}
+	// bottomRect := sdlutils.Rect3{Base: backRect.Base, Z: kmap.BaseZ - 1}
 	BuildRoom(kmap, frontRect, "floor", "shuttle_wall", true)
 	BuildRoom(kmap, mainRect, "floor", "shuttle_wall", true)
 	BuildRoom(kmap, backRect, "floor", "shuttle_wall", true)
+	// BuildRoom(kmap, bottomRect, "floor", "shuttle_wall", true)
 
 	// shuttleWall := "shuttle_wall"
 	// floor := "floor"
@@ -56,59 +62,73 @@ func PopulateMap(kmap *Map) {
 	window := "window"
 
 	BuildLine(kmap, sdlutils.Vector3{
-		Base: sdl.Point{X: mainRect.X - 1, Y: mainRect.Y + 2},
-		Z:    0,
+		Base: sdl.Point{X: mainRect.Base.X - 1, Y: mainRect.Base.Y + 2},
+		Z:    kmap.BaseZ,
 	}, common.DirectionWest, 3, &catwalk, &window)
 	BuildLine(kmap, sdlutils.Vector3{
-		Base: sdl.Point{X: mainRect.X - 1, Y: mainRect.Y + 3},
-		Z:    0,
+		Base: sdl.Point{X: mainRect.Base.X - 1, Y: mainRect.Base.Y + 3},
+		Z:    kmap.BaseZ,
 	}, common.DirectionWest, 3, &catwalk, nil)
 	BuildLine(kmap, sdlutils.Vector3{
-		Base: sdl.Point{X: mainRect.X - 1, Y: mainRect.Y + 4},
-		Z:    0,
+		Base: sdl.Point{X: mainRect.Base.X - 1, Y: mainRect.Base.Y + 4},
+		Z:    kmap.BaseZ,
 	}, common.DirectionWest, 3, &catwalk, &window)
 
 	ReplaceObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{
-		Base: sdl.Point{X: frontRect.X, Y: frontRect.Y + 2},
-		Z:    0,
+		Base: sdl.Point{X: frontRect.Base.X, Y: frontRect.Base.Y + 2},
+		Z:    kmap.BaseZ,
 	}), "airlock")
 	ReplaceObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{
-		Base: sdl.Point{X: mainRect.X, Y: mainRect.Y + 3},
-		Z:    0,
+		Base: sdl.Point{X: mainRect.Base.X, Y: mainRect.Base.Y + 3},
+		Z:    kmap.BaseZ,
 	}), "airlock")
 	ReplaceObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{
-		Base: sdl.Point{X: backRect.X + backRect.W - 1, Y: backRect.Y + 2},
-		Z:    0,
+		Base: sdl.Point{X: backRect.Base.X + backRect.Base.W - 1, Y: backRect.Base.Y + 2},
+		Z:    kmap.BaseZ,
 	}), "airlock")
+	teleporter := CreateObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{
+		Base: sdl.Point{X: backRect.Base.X + 1, Y: backRect.Base.Y + 2},
+		Z:    kmap.BaseZ,
+	}), "teleporter")
+	teleporter2 := CreateObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{
+		Base: sdl.Point{X: backRect.Base.X + 1, Y: backRect.Base.Y + 2},
+		Z:    kmap.BaseZ - 1,
+	}), "teleporter")
+	teleporter.Data.(*ObjectTeleporterData).Target = teleporter2.Tile.Position
+	teleporter2.Data.(*ObjectTeleporterData).Target = teleporter.Tile.Position
 
 	CreateObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{
-		Base: sdl.Point{X: mainRect.X + 1, Y: mainRect.Y + 1},
-		Z:    0,
+		Base: sdl.Point{X: mainRect.Base.X + 1, Y: mainRect.Base.Y + 1},
+		Z:    kmap.BaseZ,
 	}), "lathe")
 	CreateObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{
-		Base: sdl.Point{X: mainRect.X + 3, Y: mainRect.Y + 1},
-		Z:    0,
+		Base: sdl.Point{X: mainRect.Base.X + 3, Y: mainRect.Base.Y + 1},
+		Z:    kmap.BaseZ,
 	}), "console")
 	CreateObjectRaw(kmap, GetTileAt(kmap, sdlutils.Vector3{
-		Base: sdl.Point{X: mainRect.X + 4, Y: mainRect.Y + 1},
-		Z:    0,
+		Base: sdl.Point{X: mainRect.Base.X + 4, Y: mainRect.Base.Y + 1},
+		Z:    kmap.BaseZ,
 	}), "telepad")
 
-	BuildBigThruster(kmap, sdl.Point{X: mainRect.X + 2, Y: mainRect.Y - 1}, "lattice_l")
-	BuildBigThruster(kmap, sdl.Point{X: mainRect.X + 2, Y: mainRect.Y + mainRect.H}, "lattice_r")
+	BuildBigThruster(kmap, sdlutils.Vector3{Base: sdl.Point{X: mainRect.Base.X + 2, Y: mainRect.Base.Y - 1}, Z: kmap.BaseZ}, "lattice_l")
+	BuildBigThruster(kmap, sdlutils.Vector3{Base: sdl.Point{X: mainRect.Base.X + 2, Y: mainRect.Base.Y + mainRect.Base.H}, Z: kmap.BaseZ}, "lattice_r")
 
-	BuildSmallThruster(kmap, sdl.Point{X: backRect.X + 2, Y: backRect.Y - 1}, "small_thruster_l")
-	BuildSmallThruster(kmap, sdl.Point{X: backRect.X + 2, Y: backRect.Y + backRect.H}, "small_thruster_r")
+	BuildSmallThruster(kmap, sdlutils.Vector3{Base: sdl.Point{X: backRect.Base.X + 2, Y: backRect.Base.Y - 1}, Z: kmap.BaseZ}, "small_thruster_l")
+	BuildSmallThruster(kmap, sdlutils.Vector3{Base: sdl.Point{X: backRect.Base.X + 2, Y: backRect.Base.Y + backRect.Base.H}, Z: kmap.BaseZ}, "small_thruster_r")
 }
 
-func GetRandomMapPosition(kmap *Map) sdlutils.Vector3 {
+func GetRandomMapPosition(kmap *Map, z uint8) sdlutils.Vector3 {
 	return sdlutils.Vector3{
 		Base: sdl.Point{
 			X: int32(rand.Float32() * float32(GameInstance.Map.Size.Base.X)),
 			Y: int32(rand.Float32() * float32(GameInstance.Map.Size.Base.Y)),
 		},
-		Z: 0,
+		Z: kmap.BaseZ,
 	}
+}
+
+func GetRandomMapZ(kmap *Map) uint8 {
+	return uint8(rand.Float32() * float32(GameInstance.Map.Size.Z))
 }
 
 func IsMapPositionOutOfBounds(kmap *Map, position sdlutils.Vector3) bool {

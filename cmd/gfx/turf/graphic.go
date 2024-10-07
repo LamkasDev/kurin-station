@@ -13,15 +13,17 @@ import (
 )
 
 type TurfGraphic struct {
-	Template  templates.TurfTemplate
-	Textures  []*sdlutils.TextureWithSize
-	Blueprint *sdlutils.TextureWithSize
+	Template     templates.TurfTemplate
+	Textures     []*sdlutils.TextureWithSize
+	BlurTextures []*sdlutils.TextureWithSize
+	Blueprint    *sdlutils.TextureWithSize
 }
 
 func NewTurfGraphic(tileId string) (*TurfGraphic, error) {
 	graphicDirectory := path.Join(constants.TexturesPath, "turfs", tileId)
 	graphic := TurfGraphic{
-		Textures: make([]*sdlutils.TextureWithSize, 4),
+		Textures:     make([]*sdlutils.TextureWithSize, 4),
+		BlurTextures: make([]*sdlutils.TextureWithSize, 4),
 	}
 
 	templateBytes, err := os.ReadFile(path.Join(constants.DataPath, "templates", "turfs", fmt.Sprintf("%s.json", tileId)))
@@ -34,6 +36,10 @@ func NewTurfGraphic(tileId string) (*TurfGraphic, error) {
 
 	partPath := path.Join(graphicDirectory, fmt.Sprintf("%s.png", tileId))
 	if graphic.Textures[0], err = sdlutils.LoadTexture(gfx.RendererInstance.Renderer, partPath); err != nil {
+		return &graphic, err
+	}
+	blurPartPath := path.Join(graphicDirectory, fmt.Sprintf("%s_blur.png", tileId))
+	if graphic.BlurTextures[0], err = sdlutils.LoadTexture(gfx.RendererInstance.Renderer, blurPartPath); err != nil {
 		return &graphic, err
 	}
 

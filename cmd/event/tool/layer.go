@@ -77,7 +77,7 @@ func ProcessEventLayerToolInput(layer *event.EventLayer) {
 				gameplay.PushJobToController(gameplay.GameInstance.JobController[gameplay.FactionPlayer], job)
 			}
 		case *gameplay.Tile:
-			realPrefab.Position = sdlutils.Vector3{Base: render.ScreenToWorldPosition(gfx.RendererInstance.Context.MousePosition), Z: 0}
+			realPrefab.Position = sdlutils.Vector3{Base: render.ScreenToWorldPosition(gfx.RendererInstance.Context.MousePosition), Z: gameplay.GameInstance.SelectedCharacter.Position.Z}
 			if event.EventManagerInstance.Mouse.PendingLeft == nil {
 				return
 			}

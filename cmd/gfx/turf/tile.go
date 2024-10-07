@@ -21,10 +21,14 @@ func GetTileRect(tile *gameplay.Tile) sdl.Rect {
 	})
 }
 
-func RenderTile(layer *gfx.RendererLayer, tile *gameplay.Tile) error {
+func RenderTile(layer *gfx.RendererLayer, tile *gameplay.Tile, blur bool) error {
 	graphic := layer.Data.(*RendererLayerTileData).Turfs[tile.Type]
+	texture := graphic.Textures[0].Texture
+	if blur {
+		texture = graphic.BlurTextures[0].Texture
+	}
 	rect := GetTileRect(tile)
-	if err := gfx.RendererInstance.Renderer.Copy(graphic.Textures[0].Texture, nil, &rect); err != nil {
+	if err := gfx.RendererInstance.Renderer.Copy(texture, nil, &rect); err != nil {
 		return err
 	}
 

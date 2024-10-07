@@ -1,4 +1,5 @@
 {
   "id": "catwalk",
-  "name": "Catwalk"
+  "name": "Catwalk",
+  "transparent": true
 }

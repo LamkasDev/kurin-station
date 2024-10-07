@@ -34,7 +34,7 @@ func ProcessEventLayerDebug(layer *event.EventLayer) error {
 	data := layer.Data.(*EventLayerDebugData).Layer.Data.(*debug.RendererLayerDebugData)
 	switch *event.EventManagerInstance.Keyboard.Pending {
 	case sdl.K_p:
-		data.Path = gameplay.FindPath(&gameplay.GameInstance.Map.Pathfinding, gameplay.GameInstance.SelectedCharacter.Position, sdlutils.Vector3{Base: sdl.Point{X: 0, Y: 0}, Z: 0})
+		data.Path = gameplay.FindPath(&gameplay.GameInstance.Map.Pathfinding, gameplay.GameInstance.SelectedCharacter.Position, sdlutils.Vector3{Base: sdl.Point{X: 0, Y: 0}, Z: gameplay.GameInstance.Map.BaseZ})
 		event.EventManagerInstance.Keyboard.Pending = nil
 	case sdl.K_o:
 		if len(gameplay.GameInstance.Narrator.Objectives) > 0 {

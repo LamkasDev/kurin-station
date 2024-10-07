@@ -1,13 +1,13 @@
 package serialization
 
 import (
+	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
 	"github.com/LamkasDev/kurin/cmd/gameplay"
-	"github.com/veandco/go-sdl2/sdl"
 )
 
 type JobDriverData struct {
 	Type      string
-	Position  *sdl.Point
+	Position  *sdlutils.Vector3
 	ToilIndex uint8
 	Data      []byte
 }
@@ -19,7 +19,7 @@ func EncodeJobDriver(jobDriver *gameplay.JobDriver) JobDriverData {
 		Data:      jobDriver.Template.EncodeData(jobDriver),
 	}
 	if jobDriver.Tile != nil {
-		data.Position = &jobDriver.Tile.Position.Base
+		data.Position = &jobDriver.Tile.Position
 	}
 
 	return data
@@ -28,7 +28,7 @@ func EncodeJobDriver(jobDriver *gameplay.JobDriver) JobDriverData {
 func DecodeJobDriver(data JobDriverData) *gameplay.JobDriver {
 	jobDriver := gameplay.NewJobDriver(data.Type, nil)
 	if data.Position != nil {
-		jobDriver.Tile = gameplay.GameInstance.Map.Tiles[data.Position.X][data.Position.Y][0]
+		jobDriver.Tile = gameplay.GameInstance.Map.Tiles[data.Position.Base.X][data.Position.Base.Y][data.Position.Z]
 	}
 	jobDriver.ToilIndex = data.ToilIndex
 	jobDriver.Template.DecodeData(jobDriver, data.Data)
