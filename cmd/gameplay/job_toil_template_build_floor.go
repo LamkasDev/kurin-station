@@ -7,7 +7,7 @@ import (
 
 type JobToilBuildFloorData struct {
 	Position sdlutils.Vector3
-	TileType string
+	TileType uint8
 }
 
 func NewJobToilTemplateBuildFloor() *JobToilTemplate {

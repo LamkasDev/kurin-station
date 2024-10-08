@@ -6,7 +6,7 @@ import (
 )
 
 type RendererLayerTileData struct {
-	Turfs map[string]*TurfGraphic
+	Turfs map[uint8]*TurfGraphic
 }
 
 func NewRendererLayerTile() *gfx.RendererLayer {
@@ -14,23 +14,23 @@ func NewRendererLayerTile() *gfx.RendererLayer {
 		Load:   LoadRendererLayerTile,
 		Render: RenderRendererLayerTile,
 		Data: &RendererLayerTileData{
-			Turfs: map[string]*TurfGraphic{},
+			Turfs: map[uint8]*TurfGraphic{},
 		},
 	}
 }
 
 func LoadRendererLayerTile(layer *gfx.RendererLayer) error {
 	var err error
-	if layer.Data.(*RendererLayerTileData).Turfs["floor"], err = NewTurfGraphic("floor"); err != nil {
+	if layer.Data.(*RendererLayerTileData).Turfs[gameplay.TileIdFloor], err = NewTurfGraphic("floor"); err != nil {
 		return err
 	}
-	if layer.Data.(*RendererLayerTileData).Turfs["blank"], err = NewTurfGraphic("blank"); err != nil {
+	if layer.Data.(*RendererLayerTileData).Turfs[gameplay.TileIdBlank], err = NewTurfGraphic("blank"); err != nil {
 		return err
 	}
-	if layer.Data.(*RendererLayerTileData).Turfs["catwalk"], err = NewTurfGraphic("catwalk"); err != nil {
+	if layer.Data.(*RendererLayerTileData).Turfs[gameplay.TileIdCatwalk], err = NewTurfGraphic("catwalk"); err != nil {
 		return err
 	}
-	if layer.Data.(*RendererLayerTileData).Turfs["asteroid"], err = NewTurfGraphic("asteroid"); err != nil {
+	if layer.Data.(*RendererLayerTileData).Turfs[gameplay.TileIdAsteroid], err = NewTurfGraphic("asteroid"); err != nil {
 		return err
 	}
 

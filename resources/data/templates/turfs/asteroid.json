@@ -1,5 +1,6 @@
 {
-  "id": "asteroid",
+  "id": 0,
   "name": "Asteroid",
-  "transparent": false
+  "transparent": false,
+  "states": 2
 }

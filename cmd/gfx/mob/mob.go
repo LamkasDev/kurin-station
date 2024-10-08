@@ -10,7 +10,7 @@ import (
 
 func GetMobRect(mob *gameplay.Mob) sdl.Rect {
 	position := sdlutils.AddFPoints(mob.PositionRender, gameplay.GetAnimationOffset(mob))
-	return render.WorldToScreenRect(sdl.FRect{
+	return render.WorldToScreenRectF(sdl.FRect{
 		X: position.X, Y: position.Y,
 		W: gameplay.TileSizeF.X, H: gameplay.TileSizeF.Y,
 	})

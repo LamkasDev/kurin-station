@@ -6,7 +6,7 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-func BuildLine(kmap *Map, start sdlutils.Vector3, direction common.Direction, length uint8, floor *string, wall *string) {
+func BuildLine(kmap *Map, start sdlutils.Vector3, direction common.Direction, length uint8, floor *uint8, wall *string) {
 	pos := start
 	for range length {
 		if floor != nil {
@@ -19,7 +19,7 @@ func BuildLine(kmap *Map, start sdlutils.Vector3, direction common.Direction, le
 	}
 }
 
-func PlaceFloors(kmap *Map, rect sdlutils.Rect3, floor string) {
+func PlaceFloors(kmap *Map, rect sdlutils.Rect3, floor uint8) {
 	for x := rect.Base.X; x < rect.Base.X+rect.Base.W; x++ {
 		for y := rect.Base.Y; y < rect.Base.Y+rect.Base.H; y++ {
 			pos := sdlutils.Vector3{Base: sdl.Point{X: x, Y: y}, Z: rect.Z}
@@ -33,13 +33,13 @@ func PlaceFloors(kmap *Map, rect sdlutils.Rect3, floor string) {
 	}
 }
 
-func BuildRoom(kmap *Map, rect sdlutils.Rect3, floor string, wall string, blanks bool) {
+func BuildRoom(kmap *Map, rect sdlutils.Rect3, floor uint8, wall string, blanks bool) {
 	PlaceFloors(kmap, rect, floor)
 	if blanks {
-		CreateTileRaw(kmap, sdlutils.Vector3{Base: sdl.Point{X: rect.Base.X, Y: rect.Base.Y}, Z: rect.Z}, "blank")
-		CreateTileRaw(kmap, sdlutils.Vector3{Base: sdl.Point{X: rect.Base.X + rect.Base.W - 1, Y: rect.Base.Y}, Z: rect.Z}, "blank")
-		CreateTileRaw(kmap, sdlutils.Vector3{Base: sdl.Point{X: rect.Base.X + rect.Base.W - 1, Y: rect.Base.Y + rect.Base.H - 1}, Z: rect.Z}, "blank")
-		CreateTileRaw(kmap, sdlutils.Vector3{Base: sdl.Point{X: rect.Base.X, Y: rect.Base.Y + rect.Base.H - 1}, Z: rect.Z}, "blank")
+		CreateTileRaw(kmap, sdlutils.Vector3{Base: sdl.Point{X: rect.Base.X, Y: rect.Base.Y}, Z: rect.Z}, TileIdBlank)
+		CreateTileRaw(kmap, sdlutils.Vector3{Base: sdl.Point{X: rect.Base.X + rect.Base.W - 1, Y: rect.Base.Y}, Z: rect.Z}, TileIdBlank)
+		CreateTileRaw(kmap, sdlutils.Vector3{Base: sdl.Point{X: rect.Base.X + rect.Base.W - 1, Y: rect.Base.Y + rect.Base.H - 1}, Z: rect.Z}, TileIdBlank)
+		CreateTileRaw(kmap, sdlutils.Vector3{Base: sdl.Point{X: rect.Base.X, Y: rect.Base.Y + rect.Base.H - 1}, Z: rect.Z}, TileIdBlank)
 	}
 	for x := rect.Base.X + 1; x < rect.Base.X+rect.Base.W; x++ {
 		tile := GetTileAt(kmap, sdlutils.Vector3{Base: sdl.Point{X: x, Y: rect.Base.Y}, Z: rect.Z})
@@ -60,7 +60,7 @@ func BuildRoom(kmap *Map, rect sdlutils.Rect3, floor string, wall string, blanks
 }
 
 func BuildSmallThruster(kmap *Map, position sdlutils.Vector3, thrusterType string) {
-	CreateTileRaw(kmap, position, "blank")
+	CreateTileRaw(kmap, position, TileIdBlank)
 	thruster := CreateObjectRaw(kmap, GetTileAt(kmap, position), thrusterType)
 	thruster.Direction = common.DirectionWest
 }
@@ -68,9 +68,9 @@ func BuildSmallThruster(kmap *Map, position sdlutils.Vector3, thrusterType strin
 func BuildBigThruster(kmap *Map, position1 sdlutils.Vector3, lattice string) {
 	position2 := sdlutils.Vector3{Base: sdl.Point{X: position1.Base.X + 1, Y: position1.Base.Y}, Z: position1.Z}
 	position3 := sdlutils.Vector3{Base: sdl.Point{X: position1.Base.X + 2, Y: position1.Base.Y}, Z: position1.Z}
-	CreateTileRaw(kmap, position1, "blank")
-	CreateTileRaw(kmap, position2, "blank")
-	CreateTileRaw(kmap, position3, "blank")
+	CreateTileRaw(kmap, position1, TileIdBlank)
+	CreateTileRaw(kmap, position2, TileIdBlank)
+	CreateTileRaw(kmap, position3, TileIdBlank)
 	CreateObjectRaw(kmap, GetTileAt(kmap, position1), lattice)
 	CreateObjectRaw(kmap, GetTileAt(kmap, position3), lattice)
 	thruster := CreateObjectRaw(kmap, GetTileAt(kmap, position1), "big_thruster")

@@ -10,7 +10,7 @@ import (
 func GetObjectRect(layer *gfx.RendererLayer, obj *gameplay.Object) sdl.Rect {
 	graphic := layer.Data.(*RendererLayerObjectData).Structures[obj.Type]
 	texture := graphic.Textures[obj.Direction][0]
-	return render.WorldToScreenRect(sdl.FRect{
+	return render.WorldToScreenRectF(sdl.FRect{
 		X: float32(obj.Tile.Position.Base.X), Y: float32(obj.Tile.Position.Base.Y),
 		W: float32(texture.Size.W), H: float32(texture.Size.H),
 	})

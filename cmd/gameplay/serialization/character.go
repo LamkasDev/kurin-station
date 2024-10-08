@@ -5,11 +5,10 @@ import (
 )
 
 type CharacterData struct {
-	Inventory  InventoryData
-	JobTracker JobTrackerData
+	Inventory InventoryData
 }
 
-func EncodeCharacter(character *gameplay.Mob) CharacterData {
+func EncodeCharacterData(character *gameplay.Mob) CharacterData {
 	characterData := character.Data.(*gameplay.MobCharacterData)
 	data := CharacterData{
 		Inventory: EncodeInventory(characterData.Inventory),
@@ -18,9 +17,6 @@ func EncodeCharacter(character *gameplay.Mob) CharacterData {
 	return data
 }
 
-func DecodeCharacter(data CharacterData) *gameplay.Mob {
-	character := gameplay.NewMob("character", gameplay.FactionPlayer)
+func DecodeCharacterData(data CharacterData, character *gameplay.Mob) {
 	character.Data.(*gameplay.MobCharacterData).Inventory = DecodeInventory(data.Inventory, character)
-
-	return character
 }

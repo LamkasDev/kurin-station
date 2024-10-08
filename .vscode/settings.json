@@ -3,5 +3,6 @@
   "go.useLanguageServer": true,
   "gopls": {
     "formatting.gofumpt": true
-  }
+  },
+  "makefile.configureOnOpen": false
 }

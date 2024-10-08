@@ -1,6 +1,7 @@
 package life
 
 import (
+	"github.com/LamkasDev/kurin/cmd/common/sdlutils"
 	"github.com/LamkasDev/kurin/cmd/event"
 	eventActions "github.com/LamkasDev/kurin/cmd/event/actions"
 	eventBase "github.com/LamkasDev/kurin/cmd/event/base"
@@ -117,8 +118,10 @@ func RunSystems() error {
 		return err
 	}
 
-	gfx.RendererInstance.Context.CameraTileSize = render.GetCameraTileSize()
-	gfx.RendererInstance.Context.CameraOffset = render.GetCameraOffset()
+	gfx.RendererInstance.Context.CameraTileSizeF = render.GetCameraTileSize()
+	gfx.RendererInstance.Context.CameraTileSize = sdlutils.FPointToPoint(gfx.RendererInstance.Context.CameraTileSizeF)
+	gfx.RendererInstance.Context.CameraOffsetF = render.GetCameraOffset()
+	gfx.RendererInstance.Context.CameraOffset = sdlutils.FPointToPoint(gfx.RendererInstance.Context.CameraOffsetF)
 	if err := gfx.ClearRenderer(); err != nil {
 		return err
 	}

@@ -14,8 +14,10 @@ type RendererContext struct {
 	CameraPositionDestination sdl.FPoint
 	CameraZoom                sdl.FPoint
 	CameraZoomDestination     sdl.FPoint
-	CameraTileSize            sdl.FPoint
-	CameraOffset              sdl.FPoint
+	CameraTileSize            sdl.Point
+	CameraTileSizeF           sdl.FPoint
+	CameraOffset              sdl.Point
+	CameraOffsetF             sdl.FPoint
 	State                     RendererContextState
 }
 
@@ -44,8 +46,10 @@ func NewRendererContext() RendererContext {
 		CameraPositionDestination: sdl.FPoint{},
 		CameraZoom:                sdl.FPoint{X: 4, Y: 4},
 		CameraZoomDestination:     sdl.FPoint{X: 4, Y: 4},
-		CameraTileSize:            sdl.FPoint{},
-		CameraOffset:              sdl.FPoint{},
+		CameraTileSize:            sdl.Point{},
+		CameraTileSizeF:           sdl.FPoint{},
+		CameraOffset:              sdl.Point{},
+		CameraOffsetF:             sdl.FPoint{},
 		State:                     RendererContextStateNone,
 	}
 }

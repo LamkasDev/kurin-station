@@ -6,7 +6,7 @@ import (
 )
 
 type TileData struct {
-	Type     string
+	Type     uint8
 	Position sdlutils.Vector3
 }
 

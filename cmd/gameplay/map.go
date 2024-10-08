@@ -42,7 +42,7 @@ func NewMap(size sdlutils.Vector3, baseZ uint8) Map {
 }
 
 func PopulateMap(kmap *Map) {
-	PlaceFloors(kmap, sdlutils.Rect3{Base: sdl.Rect{X: 0, Y: 0, W: kmap.Size.Base.X, H: kmap.Size.Base.Y}, Z: kmap.BaseZ - 1}, "asteroid")
+	PlaceFloors(kmap, sdlutils.Rect3{Base: sdl.Rect{X: 0, Y: 0, W: kmap.Size.Base.X, H: kmap.Size.Base.Y}, Z: kmap.BaseZ - 1}, TileIdAsteroid)
 
 	size := sdl.Point{X: 7, Y: 7}
 	start := sdl.Point{X: 22, Y: 22}
@@ -51,14 +51,14 @@ func PopulateMap(kmap *Map) {
 	frontRect := sdlutils.Rect3{Base: sdl.Rect{X: start.X + size.X - 1, Y: start.Y + 1, W: 5, H: 5}, Z: kmap.BaseZ}
 	backRect := sdlutils.Rect3{Base: sdl.Rect{X: start.X - 9, Y: start.Y + 1, W: 6, H: 5}, Z: kmap.BaseZ}
 	// bottomRect := sdlutils.Rect3{Base: backRect.Base, Z: kmap.BaseZ - 1}
-	BuildRoom(kmap, frontRect, "floor", "shuttle_wall", true)
-	BuildRoom(kmap, mainRect, "floor", "shuttle_wall", true)
-	BuildRoom(kmap, backRect, "floor", "shuttle_wall", true)
-	// BuildRoom(kmap, bottomRect, "floor", "shuttle_wall", true)
+	BuildRoom(kmap, frontRect, TileIdFloor, "shuttle_wall", true)
+	BuildRoom(kmap, mainRect, TileIdFloor, "shuttle_wall", true)
+	BuildRoom(kmap, backRect, TileIdFloor, "shuttle_wall", true)
+	// BuildRoom(kmap, bottomRect, TileIdFloor, "shuttle_wall", true)
 
 	// shuttleWall := "shuttle_wall"
-	// floor := "floor"
-	catwalk := "catwalk"
+	// floor := TileIdFloor
+	catwalk := TileIdCatwalk
 	window := "window"
 
 	BuildLine(kmap, sdlutils.Vector3{
@@ -143,7 +143,7 @@ func IsMapPositionOutOfBounds(kmap *Map, position sdlutils.Vector3) bool {
 	return false
 }
 
-func CreateTileRaw(kmap *Map, position sdlutils.Vector3, tileType string) *Tile {
+func CreateTileRaw(kmap *Map, position sdlutils.Vector3, tileType uint8) *Tile {
 	tile := NewTile(tileType, position)
 	kmap.Tiles[position.Base.X][position.Base.Y][position.Z] = tile
 

@@ -18,21 +18,28 @@ var TileSizeF = sdl.FPoint{
 	Y: 32,
 }
 
-type Tile struct {
-	Type     string
-	Position sdlutils.Vector3
+const (
+	TileIdFloor    = uint8(0)
+	TileIdBlank    = uint8(1)
+	TileIdCatwalk  = uint8(2)
+	TileIdAsteroid = uint8(3)
+)
 
-	Job     *JobDriver
-	Objects []*Object
+var TileIdMap = map[uint8]string{
+	TileIdFloor:    "floor",
+	TileIdBlank:    "blank",
+	TileIdCatwalk:  "catwalk",
+	TileIdAsteroid: "asteroid",
 }
 
-func NewTile(tileType string, position sdlutils.Vector3) *Tile {
-	return &Tile{
-		Type:     tileType,
-		Position: position,
-		Job:      nil,
-		Objects:  []*Object{},
-	}
+type Tile struct {
+	Type     uint8
+	Position sdlutils.Vector3
+	Seed     uint8
+	Job      *JobDriver
+	Objects  []*Object
+
+	Template *TileTemplate
 }
 
 func GetTileAt(kmap *Map, position sdlutils.Vector3) *Tile {
@@ -70,8 +77,17 @@ func CanBuildTileAtMapPosition(kmap *Map, position sdlutils.Vector3) bool {
 		DoesMapPositionHaveTileNeighbour(kmap, position)
 }
 
+func CanDestroyTileAtMapPosition(kmap *Map, position sdlutils.Vector3) bool {
+	if !IsMapPositionOutOfBounds(kmap, position) {
+		return false
+	}
+	tile := GetTileAt(kmap, position)
+
+	return tile.Type != TileIdAsteroid
+}
+
 func GetTileDescription(tile *Tile) string {
-	text := fmt.Sprintf("[%d_%d] %s", tile.Position.Base.X, tile.Position.Base.Y, tile.Type)
+	text := fmt.Sprintf("[%d_%d] %s", tile.Position.Base.X, tile.Position.Base.Y, TileIdMap[tile.Type])
 	object := GetObjectAtTile(tile)
 	if object != nil {
 		text = fmt.Sprintf("%s %s", text, object.Type)

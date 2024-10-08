@@ -122,6 +122,9 @@ func ProcessEventLayerToolInput(layer *event.EventLayer) {
 			return
 		}
 		if gameplay.GameInstance.HoveredTile != nil {
+			if !gameplay.CanDestroyTileAtMapPosition(&gameplay.GameInstance.Map, gameplay.GameInstance.HoveredTile.Position) {
+				return
+			}
 			if gameplay.GameInstance.Godmode {
 				gameplay.DestroyTileRaw(&gameplay.GameInstance.Map, gameplay.GameInstance.HoveredTile)
 				return

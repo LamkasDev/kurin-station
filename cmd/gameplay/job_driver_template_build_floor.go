@@ -6,7 +6,7 @@ import (
 
 type JobDriverBuildFloorData struct {
 	Position sdlutils.Vector3
-	TileType string
+	TileType uint8
 }
 
 func NewJobDriverTemplateBuildFloor() *JobDriverTemplate {

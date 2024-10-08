@@ -8,7 +8,7 @@ import (
 )
 
 func GetParticleRect(layer *gfx.RendererLayer, particle *gameplay.Particle) sdl.Rect {
-	return render.WorldToScreenRect(sdl.FRect{
+	return render.WorldToScreenRectF(sdl.FRect{
 		X: particle.Position.Base.X - 0.5*particle.Scale, Y: particle.Position.Base.Y - 0.5*particle.Scale,
 		W: gameplay.TileSizeF.X * particle.Scale, H: gameplay.TileSizeF.Y * particle.Scale,
 	})

@@ -10,7 +10,7 @@ import (
 func GetItemRect(layer *gfx.RendererLayer, item *gameplay.Item) sdl.Rect {
 	graphic := layer.Data.(*RendererLayerItemData).Items[item.Type]
 	texture := graphic.Textures[0]
-	return render.WorldToScreenRect(sdl.FRect{
+	return render.WorldToScreenRectF(sdl.FRect{
 		X: float32(item.Transform.Position.Base.X) - 0.5, Y: float32(item.Transform.Position.Base.Y) - 0.5,
 		W: float32(texture.Base.Size.W), H: float32(texture.Base.Size.H),
 	})

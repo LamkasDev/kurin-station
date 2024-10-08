@@ -48,6 +48,7 @@ func InitializeGame() {
 		Narrator:              NewNarrator(),
 	}
 	RegisterItems()
+	RegisterTiles()
 	RegisterObjects()
 	RegisterMobs()
 	RegisterJobToils()
@@ -108,7 +109,7 @@ func DropItemFromCharacter(character *Mob) bool {
 	return TransferItemFromCharacter(item, character)
 }
 
-func CreateTile(position sdlutils.Vector3, tileType string) *Tile {
+func CreateTile(position sdlutils.Vector3, tileType uint8) *Tile {
 	if !CanBuildTileAtMapPosition(&GameInstance.Map, position) {
 		return nil
 	}
