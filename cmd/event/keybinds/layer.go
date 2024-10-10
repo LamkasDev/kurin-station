@@ -11,6 +11,7 @@ import (
 	"github.com/LamkasDev/kurin/cmd/gameplay/serialization"
 	"github.com/LamkasDev/kurin/cmd/gfx"
 	"github.com/LamkasDev/kurin/cmd/gfx/render"
+	"github.com/kelindar/binary"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -42,34 +43,20 @@ func ProcessEventLayerKeybinds(layer *event.EventLayer) error {
 				gameplay.GetInventory(gameplay.GameInstance.SelectedCharacter).ActiveHand = gameplay.HandLeft
 			}
 		case sdl.K_q:
-			if gameplay.GameInstance.SelectedCharacter == nil {
+			if gameplay.GameInstance.SelectedCharacter == nil || gameplay.GameInstance.SelectedCharacter.Health.Dead {
 				return nil
 			}
 			gameplay.DropItemFromCharacter(gameplay.GameInstance.SelectedCharacter)
 		case sdl.K_r:
-			if gameplay.GameInstance.SelectedCharacter == nil {
+			if gameplay.GameInstance.SelectedCharacter == nil || gameplay.GameInstance.SelectedCharacter.Health.Dead {
 				return nil
 			}
 			item := gameplay.GetHeldItem(gameplay.GameInstance.SelectedCharacter)
 			if !gameplay.DropItemFromCharacter(gameplay.GameInstance.SelectedCharacter) {
 				return nil
 			}
-			// this shit is trash
-			force := gameplay.Force{
-				Item:   item,
-				Target: sdlutils.PointToFPointCenter(render.ScreenToWorldPosition(gfx.RendererInstance.Context.MousePosition)),
-			}
-			force.Delta = sdlutils.SubtractFPoints(force.Target, item.Transform.Position.Base)
-			distance := sdlutils.GetDistanceF(item.Transform.Position.Base, force.Target)
-			if distance != 0 {
-				force.Delta.X /= distance * 3
-				force.Delta.Y /= distance * 3
-			}
-			if gameplay.GameInstance.HoveredTile == nil {
-				force.Target.X += force.Delta.X * 100
-				force.Target.Y += force.Delta.Y * 100
-			}
-			gameplay.GameInstance.ForceController.Forces[item] = &force
+			force := gameplay.NewForce(item.Transform.Position, sdlutils.PointToFPointCenter(render.ScreenToWorldPosition(gfx.RendererInstance.Context.MousePosition)), gameplay.GameInstance.SelectedCharacter.Id, item)
+			gameplay.GameInstance.ForceController.Items[item] = force
 		case sdl.K_f:
 			switch gfx.RendererInstance.Context.CameraMode {
 			case gfx.RendererCameraModeCharacter:
@@ -77,11 +64,11 @@ func ProcessEventLayerKeybinds(layer *event.EventLayer) error {
 				gameplay.GameInstance.SelectedCharacter = nil
 			case gfx.RendererCameraModeFree:
 				gfx.RendererInstance.Context.CameraMode = gfx.RendererCameraModeCharacter
-				gameplay.GameInstance.SelectedCharacter = gameplay.GameInstance.Mobs[0]
+				gameplay.GameInstance.SelectedCharacter = gameplay.GameInstance.Map.Mobs[0]
 			}
 		case sdl.K_s:
 			if event.EventManagerInstance.Keyboard.Pressed[sdl.K_LCTRL] {
-				data := serialization.EncodeGame(gameplay.GameInstance)
+				data := serialization.EncodeGame()
 				if _, err := os.Stat(path.Join(constants.TempSavesPath, "save.dat")); err == nil {
 					os.Remove(path.Join(constants.TempSavesPath, "save.dat"))
 				}
@@ -89,8 +76,14 @@ func ProcessEventLayerKeybinds(layer *event.EventLayer) error {
 			}
 		case sdl.K_l:
 			if event.EventManagerInstance.Keyboard.Pressed[sdl.K_LCTRL] {
-				data, _ := os.ReadFile(path.Join(constants.TempSavesPath, "save.dat"))
-				serialization.DecodeGame(data, gameplay.GameInstance)
+				rawData, _ := os.ReadFile(path.Join(constants.TempSavesPath, "save.dat"))
+				var data serialization.GameData
+				if err := binary.Unmarshal(rawData, &data); err != nil {
+					panic(err)
+				}
+				gameplay.CloseDialog()
+				serialization.PredecodeGame(data)
+				serialization.DecodeGame(data)
 			}
 		default:
 			return nil

@@ -19,7 +19,7 @@ func EncodeTile(tile *gameplay.Tile) TileData {
 	return data
 }
 
-func DecodeTile(kmap *gameplay.Map, data TileData) *gameplay.Tile {
+func PredecodeTile(kmap *gameplay.Map, data TileData) *gameplay.Tile {
 	tile := gameplay.CreateTileRaw(kmap, data.Position, data.Type)
 
 	return tile

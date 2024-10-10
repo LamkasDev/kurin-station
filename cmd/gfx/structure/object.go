@@ -21,7 +21,7 @@ func RenderObject(layer *gfx.RendererLayer, obj *gameplay.Object) error {
 	rect := GetObjectRect(layer, obj)
 	texture := graphic.Textures[obj.Direction][obj.Template.GetTexture(obj)]
 	if graphic.Template.Smooth != nil && *graphic.Template.Smooth {
-		texture = graphic.TexturesSmooth[gameplay.GetObjectDirectionHint(&gameplay.GameInstance.Map, obj)]
+		texture = graphic.TexturesSmooth[gameplay.GetObjectDirectionHint(gameplay.GameInstance.Map, obj)]
 	}
 	if err := gfx.RendererInstance.Renderer.Copy(texture.Texture, nil, &rect); err != nil {
 		return err

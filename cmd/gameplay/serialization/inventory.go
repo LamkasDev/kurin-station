@@ -30,12 +30,12 @@ func DecodeInventory(data InventoryData, character *gameplay.Mob) *gameplay.Inve
 	inventory := gameplay.NewInventory()
 	inventory.ActiveHand = data.ActiveHand
 	if data.Left != nil {
-		item := DecodeItem(*data.Left)
+		item := PredecodeItem(*data.Left)
 		item.Mob = character
 		inventory.Hands[gameplay.HandLeft] = item
 	}
 	if data.Right != nil {
-		item := DecodeItem(*data.Right)
+		item := PredecodeItem(*data.Right)
 		item.Mob = character
 		inventory.Hands[gameplay.HandRight] = item
 	}

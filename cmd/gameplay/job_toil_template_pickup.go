@@ -26,7 +26,7 @@ func StartJobToilPickup(driver *JobDriver, toil *JobToil) JobToilStatus {
 	if IsJobToilPickupComplete(driver, toil) {
 		return JobToilStatusComplete
 	}
-	data.Item = FindClosestItemOfType(&GameInstance.Map, driver.Mob.Position, data.ItemType, true)
+	data.Item = FindClosestItemOfType(GameInstance.Map, driver.Mob.Position, data.ItemType, true)
 	if data.Item == nil {
 		return JobToilStatusFailed
 	}

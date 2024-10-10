@@ -31,21 +31,25 @@ func LoadRendererLayerMob(layer *gfx.RendererLayer) error {
 	if layer.Data.(*RendererLayerMobData).Mobs["cat"], err = NewMobGraphic("cat"); err != nil {
 		return err
 	}
+	if layer.Data.(*RendererLayerMobData).Mobs["tarantula"], err = NewMobGraphic("tarantula"); err != nil {
+		return err
+	}
 
 	return nil
 }
 
 func RenderRendererLayerMob(layer *gfx.RendererLayer) error {
-	for _, mob := range gameplay.GameInstance.Mobs {
-		if mob.Position.Z != gameplay.GameInstance.SelectedCharacter.Position.Z {
+	for _, mob := range gameplay.GameInstance.Map.Mobs {
+		if mob.Type == "character" || mob.Position.Z != gameplay.GameInstance.SelectedZ {
 			continue
 		}
-		switch mob.Data.(type) {
-		case *gameplay.MobCharacterData:
-			RenderCharacter(layer, mob)
-		default:
-			RenderMob(layer, mob)
+		RenderMob(layer, mob)
+	}
+	for _, mob := range gameplay.GameInstance.Map.Mobs {
+		if mob.Type != "character" || mob.Position.Z != gameplay.GameInstance.SelectedZ {
+			continue
 		}
+		RenderCharacter(layer, mob)
 	}
 
 	return nil

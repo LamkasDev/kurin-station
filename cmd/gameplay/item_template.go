@@ -13,6 +13,7 @@ type ItemTemplate struct {
 	DecodeData        ItemDecodeData
 	GetDefaultData    ItemGetDefaultData
 	CanHit            bool
+	CanPickup         bool
 	MaxCount          uint16
 	Price             uint32
 }
@@ -63,8 +64,9 @@ func NewItemTemplate[D any](itemType string, maxCount uint16, price uint32) *Ite
 		GetDefaultData: func() interface{} {
 			return nil
 		},
-		CanHit:   true,
-		MaxCount: maxCount,
-		Price:    price,
+		CanHit:    true,
+		CanPickup: true,
+		MaxCount:  maxCount,
+		Price:     price,
 	}
 }

@@ -61,50 +61,52 @@ func ProcessEventLayerToolInput(layer *event.EventLayer) {
 			if realPrefab.Tile == nil {
 				return
 			}
-			if !gameplay.CanBuildObjectAtMapPosition(&gameplay.GameInstance.Map, realPrefab.Tile.Position) && !gameplay.GameInstance.Godmode {
+			if !gameplay.CanBuildObjectAtMapPosition(gameplay.GameInstance.Map, realPrefab.Tile.Position) && !gameplay.GameInstance.Godmode {
 				return
 			}
 			if event.EventManagerInstance.Mouse.PendingLeft != nil {
 				if gameplay.GameInstance.Godmode {
-					gameplay.ReplaceObjectRaw(&gameplay.GameInstance.Map, gameplay.GetTileAt(&gameplay.GameInstance.Map, realPrefab.Tile.Position), realPrefab.Type)
+					gameplay.ReplaceObjectRaw(gameplay.GameInstance.Map, gameplay.GetTileAt(gameplay.GameInstance.Map, realPrefab.Tile.Position), realPrefab.Type)
 					return
 				}
 
 				job := gameplay.NewJobDriver("build", realPrefab.Tile)
-				job.Template.Initialize(job, &gameplay.JobDriverBuildData{
+				job.Data = &gameplay.JobDriverBuildData{
 					ObjectType: realPrefab.Type,
-				})
+				}
+				job.Template.Initialize(job)
 				gameplay.PushJobToController(gameplay.GameInstance.JobController[gameplay.FactionPlayer], job)
 			}
 		case *gameplay.Tile:
-			realPrefab.Position = sdlutils.Vector3{Base: render.ScreenToWorldPosition(gfx.RendererInstance.Context.MousePosition), Z: gameplay.GameInstance.SelectedCharacter.Position.Z}
+			realPrefab.Position = sdlutils.Vector3{Base: render.ScreenToWorldPosition(gfx.RendererInstance.Context.MousePosition), Z: gameplay.GameInstance.SelectedZ}
 			if event.EventManagerInstance.Mouse.PendingLeft == nil {
 				return
 			}
-			if gameplay.IsMapPositionOutOfBounds(&gameplay.GameInstance.Map, realPrefab.Position) {
+			if gameplay.IsMapPositionOutOfBounds(gameplay.GameInstance.Map, realPrefab.Position) {
 				return
 			}
-			if !gameplay.CanBuildTileAtMapPosition(&gameplay.GameInstance.Map, realPrefab.Position) && !gameplay.GameInstance.Godmode {
+			if !gameplay.CanBuildTileAtMapPosition(gameplay.GameInstance.Map, realPrefab.Position) && !gameplay.GameInstance.Godmode {
 				return
 			}
 			if gameplay.DoesBuildFloorJobExistAtPosition(realPrefab.Position) {
 				return
 			}
 			if gameplay.GameInstance.Godmode {
-				tile := gameplay.GetTileAt(&gameplay.GameInstance.Map, realPrefab.Position)
+				tile := gameplay.GetTileAt(gameplay.GameInstance.Map, realPrefab.Position)
 				if tile != nil {
 					tile.Type = realPrefab.Type
 				} else {
-					gameplay.CreateTileRaw(&gameplay.GameInstance.Map, realPrefab.Position, realPrefab.Type)
+					gameplay.CreateTileRaw(gameplay.GameInstance.Map, realPrefab.Position, realPrefab.Type)
 				}
 
 				return
 			}
 			job := gameplay.NewJobDriver("build_floor", nil)
-			job.Template.Initialize(job, &gameplay.JobDriverBuildFloorData{
+			job.Data = &gameplay.JobDriverBuildFloorData{
 				Position: realPrefab.Position,
 				TileType: realPrefab.Type,
-			})
+			}
+			job.Template.Initialize(job)
 			gameplay.PushJobToController(gameplay.GameInstance.JobController[gameplay.FactionPlayer], job)
 		}
 	case tool.ToolModeDestroy:
@@ -113,24 +115,24 @@ func ProcessEventLayerToolInput(layer *event.EventLayer) {
 		}
 		if gameplay.GameInstance.HoveredObject != nil {
 			if gameplay.GameInstance.Godmode {
-				gameplay.DestroyObjectRaw(&gameplay.GameInstance.Map, gameplay.GameInstance.HoveredObject)
+				gameplay.DestroyObjectRaw(gameplay.GameInstance.Map, gameplay.GameInstance.HoveredObject)
 				return
 			}
 			job := gameplay.NewJobDriver("destroy", gameplay.GameInstance.HoveredObject.Tile)
-			job.Template.Initialize(job, nil)
+			job.Template.Initialize(job)
 			gameplay.PushJobToController(gameplay.GameInstance.JobController[gameplay.FactionPlayer], job)
 			return
 		}
 		if gameplay.GameInstance.HoveredTile != nil {
-			if !gameplay.CanDestroyTileAtMapPosition(&gameplay.GameInstance.Map, gameplay.GameInstance.HoveredTile.Position) {
+			if !gameplay.CanDestroyTileAtMapPosition(gameplay.GameInstance.Map, gameplay.GameInstance.HoveredTile.Position) {
 				return
 			}
 			if gameplay.GameInstance.Godmode {
-				gameplay.DestroyTileRaw(&gameplay.GameInstance.Map, gameplay.GameInstance.HoveredTile)
+				gameplay.DestroyTileRaw(gameplay.GameInstance.Map, gameplay.GameInstance.HoveredTile)
 				return
 			}
 			job := gameplay.NewJobDriver("destroy_floor", gameplay.GameInstance.HoveredTile)
-			job.Template.Initialize(job, nil)
+			job.Template.Initialize(job)
 			gameplay.PushJobToController(gameplay.GameInstance.JobController[gameplay.FactionPlayer], job)
 			return
 		}

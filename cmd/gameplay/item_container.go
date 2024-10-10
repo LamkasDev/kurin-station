@@ -7,6 +7,8 @@ func RegisterItems() {
 	ItemContainer["credit"] = NewItemTemplate[interface{}]("credit", 1, 1)
 	ItemContainer["survivalknife"] = NewItemTemplate[interface{}]("survivalknife", 1, 2)
 	ItemContainer["welder"] = NewItemTemplateWelder()
+	ItemContainer["corpse"] = NewItemTemplateCorpse()
+	ItemContainer["gun"] = NewItemTemplateGun()
 }
 
 func NewItem(itemType string, count uint16) *Item {

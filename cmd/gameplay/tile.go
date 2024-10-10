@@ -78,7 +78,7 @@ func CanBuildTileAtMapPosition(kmap *Map, position sdlutils.Vector3) bool {
 }
 
 func CanDestroyTileAtMapPosition(kmap *Map, position sdlutils.Vector3) bool {
-	if !IsMapPositionOutOfBounds(kmap, position) {
+	if IsMapPositionOutOfBounds(kmap, position) {
 		return false
 	}
 	tile := GetTileAt(kmap, position)

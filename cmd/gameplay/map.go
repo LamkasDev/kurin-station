@@ -14,6 +14,7 @@ type Map struct {
 	Size    sdlutils.Vector3
 	BaseZ   uint8
 	Tiles   [][][]*Tile
+	Mobs    []*Mob
 	Objects []*Object
 	Items   []*Item
 
@@ -21,13 +22,15 @@ type Map struct {
 	Pathfinding PathfindingGrid
 }
 
-func NewMap(size sdlutils.Vector3, baseZ uint8) Map {
-	kmap := Map{
-		Seed:  0,
-		Size:  size,
-		BaseZ: baseZ,
-		Tiles: make([][][]*Tile, size.Base.X),
-		Items: []*Item{},
+func NewMap(size sdlutils.Vector3, baseZ uint8) *Map {
+	kmap := &Map{
+		Seed:    0,
+		Size:    size,
+		BaseZ:   baseZ,
+		Tiles:   make([][][]*Tile, size.Base.X),
+		Mobs:    []*Mob{},
+		Objects: []*Object{},
+		Items:   []*Item{},
 	}
 	kmap.Random = rand.New(rand.NewSource(kmap.Seed))
 	for x := range kmap.Size.Base.X {
@@ -36,7 +39,7 @@ func NewMap(size sdlutils.Vector3, baseZ uint8) Map {
 			kmap.Tiles[x][y] = make([]*Tile, size.Z)
 		}
 	}
-	kmap.Pathfinding = NewPathfindingGrid(&kmap)
+	kmap.Pathfinding = NewPathfindingGrid(kmap)
 
 	return kmap
 }
@@ -115,6 +118,33 @@ func PopulateMap(kmap *Map) {
 
 	BuildSmallThruster(kmap, sdlutils.Vector3{Base: sdl.Point{X: backRect.Base.X + 2, Y: backRect.Base.Y - 1}, Z: kmap.BaseZ}, "small_thruster_l")
 	BuildSmallThruster(kmap, sdlutils.Vector3{Base: sdl.Point{X: backRect.Base.X + 2, Y: backRect.Base.Y + backRect.Base.H}, Z: kmap.BaseZ}, "small_thruster_r")
+
+	playerCharacter := NewMob("character", FactionPlayer)
+	PopulateCharacter(playerCharacter)
+	TeleportMobRandom(playerCharacter, GameInstance.Map.BaseZ)
+	kmap.Mobs = append(kmap.Mobs, playerCharacter)
+	GameInstance.SelectedCharacter = playerCharacter
+	GameInstance.SelectedZ = GameInstance.SelectedCharacter.Position.Z
+
+	npcCharacter := NewMob("character", FactionPlayer)
+	TeleportMobRandom(npcCharacter, GameInstance.Map.BaseZ)
+	kmap.Mobs = append(kmap.Mobs, npcCharacter)
+
+	cat := NewMob("cat", FactionPlayer)
+	TeleportMobRandom(cat, GameInstance.Map.BaseZ)
+	kmap.Mobs = append(kmap.Mobs, cat)
+
+	for range 1 {
+		tarantula := NewMob("tarantula", FactionWild)
+		TeleportMobRandom(tarantula, GameInstance.Map.BaseZ)
+		kmap.Mobs = append(kmap.Mobs, tarantula)
+	}
+
+	for range 5 {
+		tarantula := NewMob("tarantula", FactionWild)
+		TeleportMobRandom(tarantula, GameInstance.Map.BaseZ-1)
+		kmap.Mobs = append(kmap.Mobs, tarantula)
+	}
 }
 
 func GetRandomMapPosition(kmap *Map, z uint8) sdlutils.Vector3 {
@@ -123,7 +153,7 @@ func GetRandomMapPosition(kmap *Map, z uint8) sdlutils.Vector3 {
 			X: int32(rand.Float32() * float32(GameInstance.Map.Size.Base.X)),
 			Y: int32(rand.Float32() * float32(GameInstance.Map.Size.Base.Y)),
 		},
-		Z: kmap.BaseZ,
+		Z: z,
 	}
 }
 

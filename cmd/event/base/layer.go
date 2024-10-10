@@ -37,6 +37,7 @@ func ProcessEventLayerBase(layer *event.EventLayer) error {
 			case sdl.WINDOWEVENT_RESIZED:
 				w, h := gfx.RendererInstance.Window.GetSize()
 				gfx.RendererInstance.Context.WindowSize = sdl.Point{X: w, Y: h}
+				gfx.RendererInstance.Context.WindowScale = sdl.FPoint{X: float32(w) / 960, Y: float32(h) / 540}
 			}
 		case sdl.MouseMotionEvent:
 			event.EventManagerInstance.Mouse.Delta = sdl.Point{

@@ -22,18 +22,27 @@ func EncodeObject(obj *gameplay.Object) ObjectData {
 		Position:  obj.Tile.Position,
 		Direction: obj.Direction,
 		Health:    obj.Health,
-		Data:      obj.Template.EncodeData(obj),
+	}
+	if obj.Data != nil {
+		data.Data = obj.Template.EncodeData(obj)
 	}
 
 	return data
 }
 
-func DecodeObject(kmap *gameplay.Map, data ObjectData) *gameplay.Object {
+func PredecodeObject(kmap *gameplay.Map, data ObjectData) *gameplay.Object {
 	obj := gameplay.CreateObjectRaw(kmap, kmap.Tiles[data.Position.Base.X][data.Position.Base.Y][data.Position.Z], data.Type)
 	obj.Id = data.Id
 	obj.Direction = data.Direction
 	obj.Health = data.Health
-	obj.Template.DecodeData(obj, data.Data)
+
+	return obj
+}
+
+func DecodeObject(kmap *gameplay.Map, obj *gameplay.Object, data ObjectData) *gameplay.Object {
+	if data.Data != nil {
+		obj.Template.DecodeData(obj, data.Data)
+	}
 
 	return obj
 }

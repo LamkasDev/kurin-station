@@ -19,10 +19,10 @@ func EncodeJobController(controller *gameplay.JobController) JobControllerData {
 	return data
 }
 
-func DecodeJobController(data JobControllerData) *gameplay.JobController {
+func DecodeJobController(kmap *gameplay.Map, data JobControllerData) *gameplay.JobController {
 	controller := gameplay.NewJobController()
 	for _, jobData := range data.Jobs {
-		gameplay.PushJobToController(controller, DecodeJobDriver(jobData))
+		gameplay.PushJobToController(controller, DecodeJobDriver(kmap, jobData))
 	}
 
 	return controller

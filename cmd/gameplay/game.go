@@ -8,11 +8,11 @@ import (
 var GameInstance *Game
 
 type Game struct {
-	Map               Map
+	Map               *Map
 	Ticks             uint64
 	Credits           uint32
-	Mobs              []*Mob
 	SelectedCharacter *Mob
+	SelectedZ         uint8
 
 	JobController         map[Faction]*JobController
 	ParticleController    ParticleController
@@ -34,10 +34,10 @@ func InitializeGame() {
 	GameInstance = &Game{
 		Map:   NewMap(sdlutils.Vector3{Base: sdl.Point{X: 200, Y: 200}, Z: 2}, 1),
 		Ticks: 0,
-		Mobs:  []*Mob{},
 		JobController: map[Faction]*JobController{
 			FactionPlayer: NewJobController(),
 			FactionTrader: NewJobController(),
+			FactionWild:   NewJobController(),
 		},
 		ParticleController:    NewParticleController(),
 		RunechatController:    NewRunechatController(),
@@ -54,28 +54,17 @@ func InitializeGame() {
 	RegisterJobToils()
 	RegisterJobDrivers()
 	RegisterObjectiveRequirements()
-	PopulateMap(&GameInstance.Map)
-
-	playerCharacter := NewMob("character", FactionPlayer)
-	PopulateCharacter(playerCharacter)
-	TeleportMobRandom(playerCharacter)
-	GameInstance.Mobs = append(GameInstance.Mobs, playerCharacter)
-	GameInstance.SelectedCharacter = playerCharacter
-
-	npcCharacter := NewMob("character", FactionPlayer)
-	TeleportMobRandom(npcCharacter)
-	GameInstance.Mobs = append(GameInstance.Mobs, npcCharacter)
-
-	cat := NewMob("cat", FactionPlayer)
-	TeleportMobRandom(cat)
-	GameInstance.Mobs = append(GameInstance.Mobs, cat)
+	PopulateMap(GameInstance.Map)
 }
 
 func ProcessGame() {
 	for _, object := range GameInstance.Map.Objects {
 		object.Template.Process(object)
 	}
-	for _, mob := range GameInstance.Mobs {
+	for _, mob := range GameInstance.Map.Mobs {
+		if mob.Health.Dead {
+			continue
+		}
 		mob.Template.Process(mob)
 	}
 	ProcessNarrator()
@@ -88,8 +77,8 @@ func AddCredits(amount uint32) {
 }
 
 func TransferItemToCharacter(item *Item, character *Mob) bool {
-	if TransferItemToCharacterRaw(item, &GameInstance.Map, character) {
-		delete(GameInstance.ForceController.Forces, item)
+	if TransferItemToCharacterRaw(item, GameInstance.Map, character) {
+		delete(GameInstance.ForceController.Items, item)
 		return true
 	}
 
@@ -97,7 +86,7 @@ func TransferItemToCharacter(item *Item, character *Mob) bool {
 }
 
 func TransferItemFromCharacter(item *Item, character *Mob) bool {
-	return TransferItemFromCharacterRaw(item, &GameInstance.Map, character)
+	return TransferItemFromCharacterRaw(item, GameInstance.Map, character)
 }
 
 func DropItemFromCharacter(character *Mob) bool {
@@ -110,23 +99,23 @@ func DropItemFromCharacter(character *Mob) bool {
 }
 
 func CreateTile(position sdlutils.Vector3, tileType uint8) *Tile {
-	if !CanBuildTileAtMapPosition(&GameInstance.Map, position) {
+	if !CanBuildTileAtMapPosition(GameInstance.Map, position) {
 		return nil
 	}
-	tile := CreateTileRaw(&GameInstance.Map, position, tileType)
+	tile := CreateTileRaw(GameInstance.Map, position, tileType)
 
 	return tile
 }
 
 func DestroyTile(tile *Tile) {
-	DestroyTileRaw(&GameInstance.Map, tile)
+	DestroyTileRaw(GameInstance.Map, tile)
 }
 
 func CreateObject(tile *Tile, objectType string) *Object {
-	if !CanBuildObjectAtMapPosition(&GameInstance.Map, tile.Position) {
+	if !CanBuildObjectAtMapPosition(GameInstance.Map, tile.Position) {
 		return nil
 	}
-	obj := CreateObjectRaw(&GameInstance.Map, tile, objectType)
+	obj := CreateObjectRaw(GameInstance.Map, tile, objectType)
 	obj.Template.OnCreate(obj)
 	NarratorOnCreateObject(obj)
 
@@ -134,7 +123,11 @@ func CreateObject(tile *Tile, objectType string) *Object {
 }
 
 func DestroyObject(obj *Object) {
-	DestroyObjectRaw(&GameInstance.Map, obj)
+	DestroyObjectRaw(GameInstance.Map, obj)
 	obj.Template.OnDestroy(obj)
 	NarratorOnDestroyObject(obj)
+}
+
+func KillMob(mob *Mob) {
+	mob.Template.OnDeath(mob)
 }

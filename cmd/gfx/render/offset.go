@@ -23,8 +23,8 @@ func GetCameraOffset() sdl.FPoint {
 
 func WorldToScreenPosition(world sdl.Point) sdl.Point {
 	return sdl.Point{
-		X: (world.X * gfx.RendererInstance.Context.CameraTileSize.X) - gfx.RendererInstance.Context.CameraOffset.X,
-		Y: (world.Y * gfx.RendererInstance.Context.CameraTileSize.Y) - gfx.RendererInstance.Context.CameraOffset.Y,
+		X: int32((float32(world.X) * gfx.RendererInstance.Context.CameraTileSizeF.X) - gfx.RendererInstance.Context.CameraOffsetF.X),
+		Y: int32((float32(world.Y) * gfx.RendererInstance.Context.CameraTileSizeF.Y) - gfx.RendererInstance.Context.CameraOffsetF.Y),
 	}
 }
 

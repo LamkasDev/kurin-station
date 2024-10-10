@@ -46,8 +46,9 @@ func ProcessEventLayerHUD(layer *event.EventLayer) error {
 	hudData.HoveredItem = nil
 
 	lhand := gameplay.GameInstance.SelectedCharacter.Data.(*gameplay.MobCharacterData).Inventory.Hands[gameplay.HandLeft]
+	lhandRect := gfx.GetUIRect(hudData.Icons["hand_l"].Texture, hud.HUDElementHandLeft.GetPosition(gfx.RendererInstance.Context.WindowSize), hud.HUDElementHandLeft.Scale, hud.HUDElementHandLeft.Anchor)
 	if lhand != nil {
-		hoveredOffset := sdlutils.DividePoints(gfx.GetHoveredOffsetUnscaled(&gfx.RendererInstance.Context, hud.HUDElementHandLeft.GetPosition(gfx.RendererInstance.Context.WindowSize)), sdl.Point{X: 2, Y: 2})
+		hoveredOffset := sdlutils.DividePoints(sdlutils.SubtractPoints(gfx.RendererInstance.Context.MousePosition, sdl.Point{X: lhandRect.X, Y: lhandRect.Y}), sdlutils.FPointToPoint(sdlutils.MultiplyFPoints(hud.HUDElementHandLeft.Scale, gfx.RendererInstance.Context.WindowScale)))
 		if gfx.IsHoveredOffsetSolid(itemData.Items[lhand.Type].Textures[0], hoveredOffset) {
 			event.EventManagerInstance.Mouse.Cursor = sdl.SYSTEM_CURSOR_HAND
 			hudData.HoveredItem = lhand
@@ -58,8 +59,9 @@ func ProcessEventLayerHUD(layer *event.EventLayer) error {
 		}
 	}
 	rhand := gameplay.GameInstance.SelectedCharacter.Data.(*gameplay.MobCharacterData).Inventory.Hands[gameplay.HandRight]
+	rhandRect := gfx.GetUIRect(hudData.Icons["hand_r"].Texture, hud.HUDElementHandRight.GetPosition(gfx.RendererInstance.Context.WindowSize), hud.HUDElementHandRight.Scale, hud.HUDElementHandRight.Anchor)
 	if rhand != nil {
-		hoveredOffset := sdlutils.DividePoints(gfx.GetHoveredOffsetUnscaled(&gfx.RendererInstance.Context, hud.HUDElementHandRight.GetPosition(gfx.RendererInstance.Context.WindowSize)), sdl.Point{X: 2, Y: 2})
+		hoveredOffset := sdlutils.DividePoints(sdlutils.SubtractPoints(gfx.RendererInstance.Context.MousePosition, sdl.Point{X: rhandRect.X, Y: rhandRect.Y}), sdlutils.FPointToPoint(sdlutils.MultiplyFPoints(hud.HUDElementHandRight.Scale, gfx.RendererInstance.Context.WindowScale)))
 		if gfx.IsHoveredOffsetSolid(itemData.Items[rhand.Type].Textures[0], hoveredOffset) {
 			event.EventManagerInstance.Mouse.Cursor = sdl.SYSTEM_CURSOR_HAND
 			hudData.HoveredItem = rhand
@@ -71,8 +73,8 @@ func ProcessEventLayerHUD(layer *event.EventLayer) error {
 	}
 
 	for _, element := range hud.HUDElements {
-		pos := element.GetPosition(gfx.RendererInstance.Context.WindowSize)
-		if gfx.RendererInstance.Context.MousePosition.InRect(&sdl.Rect{X: pos.X, Y: pos.Y, W: 64, H: 64}) {
+		rect := gfx.GetUIRect(hudData.Icons[element.Path].Texture, element.GetPosition(gfx.RendererInstance.Context.WindowSize), element.Scale, element.Anchor)
+		if gfx.RendererInstance.Context.MousePosition.InRect(&rect) {
 			element.Hovered = true
 			if event.EventManagerInstance.Mouse.PendingLeft != nil {
 				element.Click()

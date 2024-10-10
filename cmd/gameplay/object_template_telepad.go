@@ -16,12 +16,12 @@ func NewObjectTemplateTelepad() *ObjectTemplate {
 		}
 		data.Ticks++
 		if data.Ticks >= 90 {
-			items := GetItemsOnTile(&GameInstance.Map, object.Tile)
+			items := GetItemsOnTile(GameInstance.Map, object.Tile)
 			items = filter.Choose(items, func(item *Item) bool {
 				return item.Template.Price > 0
 			}).([]*Item)
 			for _, item := range items {
-				if !RemoveItemFromMapRaw(&GameInstance.Map, item) {
+				if !RemoveItemFromMapRaw(GameInstance.Map, item) {
 					continue
 				}
 				AddCredits(item.Template.Price * uint32(item.Count))

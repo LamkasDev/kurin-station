@@ -47,9 +47,11 @@ func NewItemGraphic(itemId string) (*ItemGraphic, error) {
 		}
 	}
 
-	graphicOutlinePath := path.Join(graphicDirectory, fmt.Sprintf("%s_0_outline.png", itemId))
-	if outline, err := sdlutils.LoadTexture(gfx.RendererInstance.Renderer, graphicOutlinePath); err == nil {
-		graphic.Outline = outline
+	if graphic.Template.Outline == nil || *graphic.Template.Outline {
+		graphicOutlinePath := path.Join(graphicDirectory, fmt.Sprintf("%s_0_outline.png", itemId))
+		if outline, err := sdlutils.LoadTexture(gfx.RendererInstance.Renderer, graphicOutlinePath); err == nil {
+			graphic.Outline = outline
+		}
 	}
 
 	if graphic.Template.Hand != nil && *graphic.Template.Hand {

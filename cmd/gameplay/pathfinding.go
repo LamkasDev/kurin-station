@@ -43,7 +43,7 @@ func FindPathAdjacent(grid *PathfindingGrid, from sdlutils.Vector3, to sdlutils.
 func FindPath(grid *PathfindingGrid, from sdlutils.Vector3, to sdlutils.Vector3) *Path {
 	if to.Z != from.Z {
 		// TODO: finish this
-		teleporters := filter.Choose(FindObjectsOfType(&GameInstance.Map, from.Z, "teleporter"), func(object *Object) bool {
+		teleporters := filter.Choose(FindObjectsOfType(GameInstance.Map, from.Z, "teleporter"), func(object *Object) bool {
 			return object.Data.(*ObjectTeleporterData).Target.Z == to.Z
 		}).([]*Object)
 		if len(teleporters) == 0 {

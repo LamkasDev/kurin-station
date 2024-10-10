@@ -52,7 +52,7 @@ func DoesBuildFloorJobExistAtPosition(position sdlutils.Vector3) bool {
 
 		return false
 	}
-	for _, mob := range GameInstance.Mobs {
+	for _, mob := range GameInstance.Map.Mobs {
 		if mob.JobTracker.Job != nil && Matches(mob.JobTracker.Job) {
 			return true
 		}

@@ -23,7 +23,7 @@ func EncodeItem(item *gameplay.Item) ItemData {
 	}
 }
 
-func DecodeItem(data ItemData) *gameplay.Item {
+func PredecodeItem(data ItemData) *gameplay.Item {
 	item := gameplay.NewItem(data.Type, data.Count)
 	item.Id = data.Id
 	item.Transform = data.Transform

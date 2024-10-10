@@ -50,10 +50,10 @@ func RenderRendererLayerTool(layer *gfx.RendererLayer) error {
 		switch realPrefab := data.Prefab.(type) {
 		case *gameplay.Object:
 			if realPrefab.Tile == nil {
-				return nil
+				break
 			}
 			color := sdlutils.White
-			if !gameplay.CanBuildObjectAtMapPosition(&gameplay.GameInstance.Map, realPrefab.Tile.Position) {
+			if !gameplay.CanBuildObjectAtMapPosition(gameplay.GameInstance.Map, realPrefab.Tile.Position) {
 				color = sdl.Color{R: 128, G: 0, B: 0}
 			}
 			if err := structure.RenderObjectBlueprint(data.ObjectLayer, realPrefab, color); err != nil {
@@ -61,7 +61,7 @@ func RenderRendererLayerTool(layer *gfx.RendererLayer) error {
 			}
 		case *gameplay.Tile:
 			color := sdlutils.White
-			if !gameplay.CanBuildTileAtMapPosition(&gameplay.GameInstance.Map, realPrefab.Position) {
+			if !gameplay.CanBuildTileAtMapPosition(gameplay.GameInstance.Map, realPrefab.Position) {
 				color = sdl.Color{R: 128, G: 0, B: 0}
 			}
 			if err := turf.RenderTileBlueprint(data.TurfLayer, realPrefab, color); err != nil {
@@ -73,6 +73,9 @@ func RenderRendererLayerTool(layer *gfx.RendererLayer) error {
 			rect := sdlutils.ScaleRectCentered(structure.GetObjectRect(data.ObjectLayer, gameplay.GameInstance.HoveredObject), 0.8)
 			sdlutils.RenderTextureRect(gfx.RendererInstance.Renderer, sdlutils.GetTextureFromContainer(gfx.RendererInstance.IconTextures, gfx.RendererInstance.Renderer, "delete"), rect)
 		} else if gameplay.GameInstance.HoveredTile != nil {
+			if !gameplay.CanDestroyTileAtMapPosition(gameplay.GameInstance.Map, gameplay.GameInstance.HoveredTile.Position) {
+				break
+			}
 			rect := sdlutils.ScaleRectCentered(turf.GetTileRect(gameplay.GameInstance.HoveredTile), 0.8)
 			sdlutils.RenderTextureRect(gfx.RendererInstance.Renderer, sdlutils.GetTextureFromContainer(gfx.RendererInstance.IconTextures, gfx.RendererInstance.Renderer, "delete_floor"), rect)
 		}

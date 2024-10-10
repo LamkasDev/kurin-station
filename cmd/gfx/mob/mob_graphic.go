@@ -11,6 +11,7 @@ import (
 
 type MobGraphic struct {
 	Textures []*sdlutils.TextureWithSize
+	Dead     *sdlutils.TextureWithSize
 }
 
 func NewMobGraphic(speciesId string) (*MobGraphic, error) {
@@ -25,6 +26,9 @@ func NewMobGraphic(speciesId string) (*MobGraphic, error) {
 			return &graphic, err
 		}
 	}
+
+	deadGraphicPath := path.Join(constants.TexturesPath, "mob", speciesId, fmt.Sprintf("%s_dead.png", speciesId))
+	graphic.Dead, _ = sdlutils.LoadTexture(gfx.RendererInstance.Renderer, deadGraphicPath)
 
 	return &graphic, nil
 }

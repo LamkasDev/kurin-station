@@ -29,6 +29,7 @@ func NewTile(tileType uint8, position sdlutils.Vector3) *Tile {
 	TileHasher.Write([]byte{byte(tile.Position.Base.X >> 8), byte(tile.Position.Base.X), byte(tile.Position.Base.Y >> 8), byte(tile.Position.Base.Y)})
 	tile.Seed = uint8(TileHasher.Sum32() % 100)
 	TileHasher.Reset()
+	tile.Template.OnCreate(tile)
 
 	return tile
 }

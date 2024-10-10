@@ -1,11 +1,14 @@
 package gameplay
 
-import "github.com/kelindar/binary"
+import (
+	"github.com/kelindar/binary"
+)
 
 type MobTemplate struct {
 	Type       string
 	Initialize MobInitialize
 	Process    MobProcess
+	OnDeath    MobOnDeath
 	EncodeData MobEncodeData
 	DecodeData MobDecodeData
 }
@@ -13,6 +16,7 @@ type MobTemplate struct {
 type (
 	MobInitialize func(mob *Mob)
 	MobProcess    func(mob *Mob)
+	MobOnDeath    func(mob *Mob)
 	MobEncodeData func(mob *Mob) []byte
 	MobDecodeData func(mob *Mob, data []byte)
 )
@@ -23,6 +27,7 @@ func NewMobTemplateRaw[D any](mobType string) *MobTemplate {
 		Initialize: func(mob *Mob) {
 		},
 		Process: ProcessMob,
+		OnDeath: func(mob *Mob) {},
 		EncodeData: func(mob *Mob) []byte {
 			if mob.Data == nil {
 				return []byte{}

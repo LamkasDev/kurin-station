@@ -9,6 +9,7 @@ func RegisterJobDrivers() {
 	JobDriverContainer["destroy"] = NewJobDriverTemplateDestroy()
 	JobDriverContainer["manufacture"] = NewJobDriverTemplateManufacture()
 	JobDriverContainer["panic"] = NewJobDriverTemplatePanic()
+	JobDriverContainer["wander"] = NewJobDriverTemplateWander()
 }
 
 func NewJobDriver(jobType string, tile *Tile) *JobDriver {

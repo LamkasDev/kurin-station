@@ -26,7 +26,7 @@ func RenderRendererLayerRunechat(layer *gfx.RendererLayer) error {
 			rawRunechat := gameplay.GameInstance.RunechatController.Messages[i]
 			switch runechat := rawRunechat.Data.(type) {
 			case gameplay.RunechatMobData:
-				if runechat.Mob.Position.Z == gameplay.GameInstance.SelectedCharacter.Position.Z {
+				if runechat.Mob.Position.Z == gameplay.GameInstance.SelectedZ {
 					if err := RenderRunechatCharacter(layer, rawRunechat, characterTally[runechat.Mob]); err != nil {
 						return err
 					}

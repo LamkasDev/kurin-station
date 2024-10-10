@@ -25,10 +25,17 @@ func LoadEventLayerMovement(layer *event.EventLayer) error {
 }
 
 func ProcessEventLayerMovement(layer *event.EventLayer) error {
-	for _, mob := range gameplay.GameInstance.Mobs {
+	for _, mob := range gameplay.GameInstance.Map.Mobs {
 		mob.PositionRender = mathutils.LerpFPoint(mob.PositionRender, sdlutils.PointToFPoint(mob.Position.Base), 0.2)
 	}
-	if gfx.RendererInstance.Context.CameraMode != gfx.RendererCameraModeCharacter || event.EventManagerInstance.Keyboard.InputMode {
+	if gfx.RendererInstance.Context.CameraMode != gfx.RendererCameraModeCharacter {
+		return nil
+	}
+	gameplay.GameInstance.SelectedZ = gameplay.GameInstance.SelectedCharacter.Position.Z
+	if event.EventManagerInstance.Keyboard.InputMode {
+		return nil
+	}
+	if gameplay.GameInstance.SelectedCharacter.Health.Dead {
 		return nil
 	}
 

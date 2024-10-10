@@ -64,13 +64,13 @@ func GetTextureRect(renderer *sdl.Renderer, texture *TextureWithSize, position s
 	}
 }
 
-func RenderTexture(renderer *sdl.Renderer, texture *TextureWithSize, position sdl.Point, scale sdl.FPoint) error {
+func RenderTexture(renderer *sdl.Renderer, texture *TextureWithSize, position sdl.Point, scale sdl.FPoint) (sdl.Rect, error) {
 	rect := GetTextureRect(renderer, texture, position, scale)
 	if err := renderer.Copy(texture.Texture, nil, &rect); err != nil {
-		return err
+		return rect, err
 	}
 
-	return nil
+	return rect, nil
 }
 
 func RenderTextureRect(renderer *sdl.Renderer, texture *TextureWithSize, rect sdl.Rect) error {

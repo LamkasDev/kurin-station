@@ -9,8 +9,8 @@ func NewObjectTemplateBrokenGrille() *ObjectTemplate {
 			if !RemoveItemFromCharacterRaw(item, item.Mob) {
 				return false
 			}
-			DestroyObjectRaw(&GameInstance.Map, object)
-			CreateObjectRaw(&GameInstance.Map, object.Tile, "grille")
+			DestroyObjectRaw(GameInstance.Map, object)
+			CreateObjectRaw(GameInstance.Map, object.Tile, "grille")
 			return true
 		}
 
@@ -19,7 +19,7 @@ func NewObjectTemplateBrokenGrille() *ObjectTemplate {
 	template.OnDestroy = func(object *Object) {
 		AddItemToMapRaw(
 			NewItem("rod", 1),
-			&GameInstance.Map,
+			GameInstance.Map,
 			&sdlutils.Transform{Position: sdlutils.Vector3ToFVector3Center(object.Tile.Position)},
 		)
 	}

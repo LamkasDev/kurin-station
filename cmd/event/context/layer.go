@@ -46,7 +46,7 @@ func ProcessEventLayerContext(layer *event.EventLayer) error {
 		}
 	}
 	if event.EventManagerInstance.Mouse.PendingRight != nil {
-		tile := gameplay.GetTileAt(&gameplay.GameInstance.Map, sdlutils.Vector3{Base: *event.EventManagerInstance.Mouse.PendingRight, Z: gameplay.GameInstance.SelectedCharacter.Position.Z})
+		tile := gameplay.GetTileAt(gameplay.GameInstance.Map, sdlutils.Vector3{Base: *event.EventManagerInstance.Mouse.PendingRight, Z: gameplay.GameInstance.SelectedZ})
 		if tile != nil {
 			position := gfx.RendererInstance.Context.MousePosition
 			contextData.Position = &position

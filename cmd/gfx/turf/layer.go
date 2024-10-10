@@ -40,10 +40,10 @@ func LoadRendererLayerTile(layer *gfx.RendererLayer) error {
 func RenderRendererLayerTile(layer *gfx.RendererLayer) error {
 	for x := range gameplay.GameInstance.Map.Size.Base.X {
 		for y := range gameplay.GameInstance.Map.Size.Base.Y {
-			for z := uint8(0); z <= gameplay.GameInstance.SelectedCharacter.Position.Z; z++ {
+			for z := uint8(0); z <= gameplay.GameInstance.SelectedZ; z++ {
 				tile := gameplay.GameInstance.Map.Tiles[x][y][z]
 				if tile != nil {
-					RenderTile(layer, tile, z != gameplay.GameInstance.SelectedCharacter.Position.Z)
+					RenderTile(layer, tile, z != gameplay.GameInstance.SelectedZ)
 				}
 			}
 		}

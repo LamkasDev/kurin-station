@@ -7,6 +7,7 @@ import (
 
 type RendererContext struct {
 	WindowSize                sdl.Point
+	WindowScale               sdl.FPoint
 	MousePosition             sdl.Point
 	Frame                     uint64
 	CameraMode                RendererCameraMode
@@ -39,6 +40,7 @@ const (
 func NewRendererContext() RendererContext {
 	return RendererContext{
 		WindowSize:                sdl.Point{},
+		WindowScale:               sdl.FPoint{},
 		MousePosition:             sdl.Point{},
 		Frame:                     0,
 		CameraMode:                RendererCameraModeCharacter,
@@ -65,13 +67,6 @@ func GetHoveredOffset(context *RendererContext, base sdl.Rect) sdl.Point {
 	return sdl.Point{
 		X: int32(float32(context.MousePosition.X-base.X) / context.CameraZoom.X),
 		Y: int32(float32(context.MousePosition.Y-base.Y) / context.CameraZoom.Y),
-	}
-}
-
-func GetHoveredOffsetUnscaled(context *RendererContext, base sdl.Point) sdl.Point {
-	return sdl.Point{
-		X: context.MousePosition.X - base.X,
-		Y: context.MousePosition.Y - base.Y,
 	}
 }
 

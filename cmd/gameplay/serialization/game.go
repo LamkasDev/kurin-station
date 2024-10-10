@@ -13,29 +13,26 @@ type GameData struct {
 	Map               MapData
 	Ticks             uint64
 	Credits           uint32
-	Mobs              []MobData
 	SelectedCharacter uint32
+	SelectedZ         uint8
 	Narrator          NarratorData
 	JobController     map[gameplay.Faction]JobControllerData
 }
 
-func EncodeGame(game *gameplay.Game) []byte {
+func EncodeGame() []byte {
 	data := &GameData{
 		NextId:        gameplay.NextId,
-		Map:           EncodeMap(&game.Map),
-		Ticks:         game.Ticks,
-		Credits:       game.Credits,
-		Mobs:          []MobData{},
-		Narrator:      EncodeNarrator(game.Narrator),
+		Map:           EncodeMap(gameplay.GameInstance.Map),
+		Ticks:         gameplay.GameInstance.Ticks,
+		Credits:       gameplay.GameInstance.Credits,
+		SelectedZ:     gameplay.GameInstance.SelectedZ,
+		Narrator:      EncodeNarrator(gameplay.GameInstance.Narrator),
 		JobController: map[gameplay.Faction]JobControllerData{},
 	}
-	for _, mob := range game.Mobs {
-		data.Mobs = append(data.Mobs, EncodeMob(mob))
+	if gameplay.GameInstance.SelectedCharacter != nil {
+		data.SelectedCharacter = gameplay.GameInstance.SelectedCharacter.Id
 	}
-	if game.SelectedCharacter != nil {
-		data.SelectedCharacter = game.SelectedCharacter.Id
-	}
-	for faction, controller := range game.JobController {
+	for faction, controller := range gameplay.GameInstance.JobController {
 		data.JobController[faction] = EncodeJobController(controller)
 	}
 
@@ -47,35 +44,31 @@ func EncodeGame(game *gameplay.Game) []byte {
 	return buffer
 }
 
-func DecodeGame(buffer []byte, game *gameplay.Game) {
-	var data GameData
-	if err := binary.Unmarshal(buffer, &data); err != nil {
-		panic(err)
-	}
-
+func PredecodeGame(data GameData) {
 	gameplay.NextId = 0
-	game.Map = DecodeMap(data.Map)
-	game.Ticks = data.Ticks
-	game.Credits = data.Credits
-	game.Mobs = []*gameplay.Mob{}
-	for _, mobData := range data.Mobs {
-		game.Mobs = append(game.Mobs, DecodeMob(mobData))
-	}
+	gameplay.GameInstance.Map = PredecodeMap(data.Map)
+	gameplay.GameInstance.Ticks = data.Ticks
+	gameplay.GameInstance.Credits = data.Credits
 	if data.SelectedCharacter != 0 {
-		i := slices.IndexFunc(game.Mobs, func(mob *gameplay.Mob) bool {
+		i := slices.IndexFunc(gameplay.GameInstance.Map.Mobs, func(mob *gameplay.Mob) bool {
 			return mob.Id == data.SelectedCharacter
 		})
-		game.SelectedCharacter = game.Mobs[i]
+		gameplay.GameInstance.SelectedCharacter = gameplay.GameInstance.Map.Mobs[i]
 	}
-	game.HoveredMob = nil
-	game.HoveredItem = nil
+	gameplay.GameInstance.SelectedZ = data.SelectedZ
+	gameplay.GameInstance.HoveredMob = nil
+	gameplay.GameInstance.HoveredItem = nil
 	for faction, controllerData := range data.JobController {
-		game.JobController[faction] = DecodeJobController(controllerData)
+		gameplay.GameInstance.JobController[faction] = DecodeJobController(gameplay.GameInstance.Map, controllerData)
 	}
-	game.ParticleController = gameplay.NewParticleController()
-	game.RunechatController = gameplay.NewRunechatController()
-	game.SoundController = gameplay.NewSoundController()
-	game.ForceController = gameplay.NewForceController()
-	game.Narrator = DecodeNarrator(data.Narrator)
+	gameplay.GameInstance.ParticleController = gameplay.NewParticleController()
+	gameplay.GameInstance.RunechatController = gameplay.NewRunechatController()
+	gameplay.GameInstance.SoundController = gameplay.NewSoundController()
+	gameplay.GameInstance.ForceController = gameplay.NewForceController()
+	gameplay.GameInstance.Narrator = DecodeNarrator(data.Narrator)
 	gameplay.NextId = data.NextId
+}
+
+func DecodeGame(data GameData) {
+	DecodeMap(gameplay.GameInstance.Map, data.Map)
 }

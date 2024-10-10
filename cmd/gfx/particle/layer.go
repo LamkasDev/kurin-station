@@ -36,7 +36,7 @@ func RenderRendererLayerParticle(layer *gfx.RendererLayer) error {
 	if len(gameplay.GameInstance.ParticleController.Pending) > 0 {
 		for i := len(gameplay.GameInstance.ParticleController.Pending) - 1; i >= 0; i-- {
 			particle := gameplay.GameInstance.ParticleController.Pending[i]
-			if particle.Position.Z == gameplay.GameInstance.SelectedCharacter.Position.Z {
+			if particle.Position.Z == gameplay.GameInstance.SelectedZ {
 				if err := RenderParticle(layer, particle); err != nil {
 					return err
 				}

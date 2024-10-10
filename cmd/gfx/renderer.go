@@ -34,10 +34,11 @@ func InitializeRenderer() error {
 	}
 
 	if RendererInstance.Window, err = sdl.CreateWindow(constants.ApplicationName, sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
-		800, 600, sdl.WINDOW_SHOWN|sdl.WINDOW_RESIZABLE); err != nil {
+		960, 540, sdl.WINDOW_SHOWN|sdl.WINDOW_RESIZABLE); err != nil {
 		return err
 	}
-	RendererInstance.Context.WindowSize = sdl.Point{X: 800, Y: 600}
+	RendererInstance.Context.WindowSize = sdl.Point{X: 960, Y: 540}
+	RendererInstance.Context.WindowScale = sdl.FPoint{X: 1, Y: 1}
 
 	if RendererInstance.Renderer, err = sdl.CreateRenderer(RendererInstance.Window, -1, sdl.RENDERER_ACCELERATED); err != nil {
 		return err

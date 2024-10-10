@@ -16,22 +16,27 @@ func EncodeJobDriver(jobDriver *gameplay.JobDriver) JobDriverData {
 	data := JobDriverData{
 		Type:      jobDriver.Type,
 		ToilIndex: jobDriver.ToilIndex,
-		Data:      jobDriver.Template.EncodeData(jobDriver),
 	}
 	if jobDriver.Tile != nil {
 		data.Position = &jobDriver.Tile.Position
+	}
+	if jobDriver.Data != nil {
+		data.Data = jobDriver.Template.EncodeData(jobDriver)
 	}
 
 	return data
 }
 
-func DecodeJobDriver(data JobDriverData) *gameplay.JobDriver {
+func DecodeJobDriver(kmap *gameplay.Map, data JobDriverData) *gameplay.JobDriver {
 	jobDriver := gameplay.NewJobDriver(data.Type, nil)
-	if data.Position != nil {
-		jobDriver.Tile = gameplay.GameInstance.Map.Tiles[data.Position.Base.X][data.Position.Base.Y][data.Position.Z]
-	}
 	jobDriver.ToilIndex = data.ToilIndex
-	jobDriver.Template.DecodeData(jobDriver, data.Data)
+	if data.Position != nil {
+		jobDriver.Tile = kmap.Tiles[data.Position.Base.X][data.Position.Base.Y][data.Position.Z]
+	}
+	if data.Data != nil {
+		jobDriver.Template.DecodeData(jobDriver, data.Data)
+	}
+	jobDriver.Template.Initialize(jobDriver)
 
 	return jobDriver
 }

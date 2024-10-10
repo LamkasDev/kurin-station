@@ -47,7 +47,7 @@ func RenderUTF8SolidTexture(renderer *sdl.Renderer, texture *TextureWithSize, po
 		H: int32(float32(texture.Size.H) * scale.Y),
 	}
 	if err := renderer.Copy(texture.Texture, nil, rect); err != nil {
-		return err, nil
+		return err, rect
 	}
 
 	return nil, rect

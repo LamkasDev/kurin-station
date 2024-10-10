@@ -11,6 +11,7 @@ var MobContainer = map[string]*MobTemplate{}
 func RegisterMobs() {
 	MobContainer["character"] = NewMobTemplateCharacter()
 	MobContainer["cat"] = NewMobTemplateCat()
+	MobContainer["tarantula"] = NewMobTemplateTarantula()
 }
 
 func NewMob(mobType string, faction Faction) *Mob {
@@ -22,6 +23,7 @@ func NewMob(mobType string, faction Faction) *Mob {
 		Position:            sdlutils.Vector3{},
 		Direction:           common.DirectionEast,
 		Fatigue:             0,
+		Health:              NewHealth(),
 		PositionRender:      sdl.FPoint{},
 		Movement:            sdl.Point{},
 		MovementTicks:       0,

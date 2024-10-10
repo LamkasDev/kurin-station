@@ -5,4 +5,5 @@ type Faction uint8
 const (
 	FactionPlayer = Faction(0)
 	FactionTrader = Faction(1)
+	FactionWild   = Faction(2)
 )

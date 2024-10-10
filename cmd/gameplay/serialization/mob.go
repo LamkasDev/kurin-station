@@ -15,8 +15,10 @@ type MobData struct {
 	Position   sdlutils.Vector3
 	Direction  common.Direction
 	Fatigue    int32
+	Health     gameplay.Health
 	JobTracker JobTrackerData
 	Data       []byte
+	ExtraData  []byte
 }
 
 func EncodeMob(mob *gameplay.Mob) MobData {
@@ -27,18 +29,22 @@ func EncodeMob(mob *gameplay.Mob) MobData {
 		Position:   mob.Position,
 		Direction:  mob.Direction,
 		Fatigue:    mob.Fatigue,
+		Health:     mob.Health,
 		JobTracker: EncodeJobTracker(mob.JobTracker),
+	}
+	if mob.Data != nil {
+		data.Data = mob.Template.EncodeData(mob)
 	}
 	switch mob.Data.(type) {
 	case *gameplay.MobCharacterData:
-		mobData, _ := binary.Marshal(EncodeCharacterData(mob))
-		data.Data = mobData
+		extraData, _ := binary.Marshal(EncodeCharacterData(mob))
+		data.ExtraData = extraData
 	}
 
 	return data
 }
 
-func DecodeMob(data MobData) *gameplay.Mob {
+func PredecodeMob(kmap *gameplay.Map, data MobData) *gameplay.Mob {
 	mob := gameplay.NewMob(data.Type, data.Faction)
 	mob.Id = data.Id
 	mob.Gender = data.Gender
@@ -46,13 +52,18 @@ func DecodeMob(data MobData) *gameplay.Mob {
 	mob.PositionRender = sdlutils.PointToFPoint(data.Position.Base)
 	mob.Direction = data.Direction
 	mob.Fatigue = data.Fatigue
-	DecodeJobTracker(data.JobTracker, mob)
+	mob.Health = data.Health
+	mob.JobTracker = DecodeJobTracker(kmap, data.JobTracker, mob)
+	if data.Data != nil {
+		mob.Template.DecodeData(mob, data.Data)
+	}
 	switch mob.Data.(type) {
 	case *gameplay.MobCharacterData:
-		var mobData CharacterData
-		binary.Unmarshal(data.Data, &mobData)
-		DecodeCharacterData(mobData, mob)
+		var extraData CharacterData
+		binary.Unmarshal(data.ExtraData, &extraData)
+		DecodeCharacterData(extraData, mob)
 	}
+	kmap.Mobs = append(kmap.Mobs, mob)
 
 	return mob
 }

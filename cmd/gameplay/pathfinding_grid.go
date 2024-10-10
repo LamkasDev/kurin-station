@@ -29,7 +29,7 @@ func NewPathfindingGrid(kmap *Map) PathfindingGrid {
 }
 
 func GetNodeAt(grid *PathfindingGrid, position sdlutils.Vector3) *PathfindingNode {
-	if CanEnterMapPosition(&GameInstance.Map, position) == EnteranceStatusNo {
+	if CanEnterMapPosition(GameInstance.Map, position) == EnteranceStatusNo {
 		return nil
 	}
 

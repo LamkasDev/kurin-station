@@ -68,3 +68,7 @@ func FindClosestItemOfType(kmap *Map, position sdlutils.Vector3, itemType string
 
 	return items[0]
 }
+
+func GetItemDescription(item *Item) string {
+	return item.Type
+}

@@ -10,8 +10,8 @@ func NewMobTemplateCat() *MobTemplate {
 func ProcessCat(mob *Mob) {
 	ProcessMob(mob)
 	if mob.JobTracker.Job == nil {
-		job := NewJobDriver("panic", nil)
-		job.Template.Initialize(job, nil)
+		job := NewJobDriver("wander", nil)
+		job.Template.Initialize(job)
 		AssignTrackerJob(mob.JobTracker, job)
 	}
 	if GameInstance.Ticks%900 == 0 {

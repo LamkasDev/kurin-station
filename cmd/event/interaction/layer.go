@@ -39,7 +39,7 @@ func ProcessEventLayerInteraction(layer *event.EventLayer) error {
 	gameplay.GameInstance.HoveredTile = nil
 	gameplay.GameInstance.HoveredObject = nil
 	mousePosition := render.ScreenToWorldPosition(gfx.RendererInstance.Context.MousePosition)
-	tile := gameplay.GetTileAt(&gameplay.GameInstance.Map, sdlutils.Vector3{Base: mousePosition, Z: gameplay.GameInstance.SelectedCharacter.Position.Z})
+	tile := gameplay.GetTileAt(gameplay.GameInstance.Map, sdlutils.Vector3{Base: mousePosition, Z: gameplay.GameInstance.SelectedZ})
 	if tile != nil {
 		gameplay.GameInstance.HoveredTile = tile
 		gameplay.GameInstance.HoveredObject = gameplay.GetObjectAtTile(tile)
@@ -47,11 +47,11 @@ func ProcessEventLayerInteraction(layer *event.EventLayer) error {
 
 	gameplay.GameInstance.HoveredItem = nil
 	for _, currentItem := range gameplay.GameInstance.Map.Items {
-		if !gameplay.CanMobInteractWithItem(gameplay.GameInstance.SelectedCharacter, currentItem) {
+		if !currentItem.Template.CanPickup || !gameplay.CanMobInteractWithItem(gameplay.GameInstance.SelectedCharacter, currentItem) {
 			continue
 		}
 		graphic := itemData.Items[currentItem.Type]
-		hoveredOffset := gfx.GetHoveredOffset(&gfx.RendererInstance.Context, item.GetItemRect(data.ItemLayer, currentItem))
+		hoveredOffset := gfx.GetHoveredOffset(&gfx.RendererInstance.Context, item.GetItemRect(data.ItemLayer, currentItem, graphic.Textures[0].Base))
 		hoveredOffset = sdlutils.RotatePoint(hoveredOffset, sdl.Point{X: graphic.Textures[0].Surface.W / 2, Y: graphic.Textures[0].Surface.H / 2}, float32(currentItem.Transform.Rotation))
 		if gfx.IsHoveredOffsetSolid(graphic.Textures[0], hoveredOffset) {
 			gameplay.GameInstance.HoveredItem = currentItem
@@ -60,16 +60,13 @@ func ProcessEventLayerInteraction(layer *event.EventLayer) error {
 	}
 
 	gameplay.GameInstance.HoveredMob = nil
-	for _, currentCharacter := range gameplay.GameInstance.Mobs {
-		switch currentCharacter.Data.(type) {
-		case *gameplay.MobCharacterData:
-			if !gameplay.CanMobInteractWithMob(gameplay.GameInstance.SelectedCharacter, currentCharacter) {
-				continue
-			}
-			hoveredOffset := gfx.GetHoveredOffset(&gfx.RendererInstance.Context, mob.GetMobRect(currentCharacter))
-			if hoveredOffset.InRect(&sdl.Rect{W: gameplay.TileSize.X, H: gameplay.TileSize.Y}) {
-				gameplay.GameInstance.HoveredMob = currentCharacter
-			}
+	for _, currentMob := range gameplay.GameInstance.Map.Mobs {
+		if !gameplay.CanMobInteractWithMob(gameplay.GameInstance.SelectedCharacter, currentMob) {
+			continue
+		}
+		hoveredOffset := gfx.GetHoveredOffset(&gfx.RendererInstance.Context, mob.GetMobRect(currentMob))
+		if hoveredOffset.InRect(&sdl.Rect{W: gameplay.TileSize.X, H: gameplay.TileSize.Y}) {
+			gameplay.GameInstance.HoveredMob = currentMob
 		}
 	}
 

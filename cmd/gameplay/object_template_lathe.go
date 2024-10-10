@@ -60,7 +60,7 @@ func CreateNewOrderAtLathe(lathe *Object, order *LatheOrder) bool {
 	data.Orders = append(data.Orders, order)
 	if len(data.Orders) == 1 {
 		job := NewJobDriver("manufacture", lathe.Tile)
-		job.Template.Initialize(job, nil)
+		job.Template.Initialize(job)
 		PushJobToController(GameInstance.JobController[FactionPlayer], job)
 	}
 	PlaySound(&GameInstance.SoundController, "servostep")
@@ -77,7 +77,7 @@ func ProgressOrdersAtLathe(lathe *Object) bool {
 	if data.Orders[0].TicksLeft == 0 {
 		AddItemToMapRaw(
 			NewItem(data.Orders[0].ItemType, data.Orders[0].ItemCount),
-			&GameInstance.Map,
+			GameInstance.Map,
 			&sdlutils.Transform{
 				Position: common.GetPositionInDirectionFVCenter(lathe.Tile.Position, common.DirectionEast),
 				Rotation: 0,

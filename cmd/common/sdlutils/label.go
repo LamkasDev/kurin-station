@@ -29,12 +29,12 @@ func RenderLabelRaw(renderer *sdl.Renderer, label *RendererLabel, text string, p
 			label.Texture.Texture.Destroy()
 		}
 		if label.Texture, err = CreateUTF8SolidTexture(renderer, label.Font, label.Color, text); err != nil {
-			return err, nil
+			return err, &sdl.Rect{X: position.X, Y: position.Y}
 		}
 	}
 	if label.Texture != nil {
 		return RenderUTF8SolidTexture(renderer, label.Texture, position, scale)
 	}
 
-	return nil, nil
+	return nil, &sdl.Rect{X: position.X, Y: position.Y}
 }

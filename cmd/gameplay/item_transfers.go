@@ -28,9 +28,11 @@ func RemoveItemFromCharacterRaw(item *Item, character *Mob) bool {
 	return false
 }
 
-func AddItemToMapRaw(item *Item, kmap *Map, transform *sdlutils.Transform) {
+func AddItemToMapRaw(item *Item, kmap *Map, transform *sdlutils.Transform) *Item {
 	item.Transform = transform
 	kmap.Items = append(kmap.Items, item)
+
+	return item
 }
 
 func AddItemToCharacterRaw(item *Item, character *Mob) bool {

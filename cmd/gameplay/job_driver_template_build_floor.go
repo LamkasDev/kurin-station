@@ -11,19 +11,18 @@ type JobDriverBuildFloorData struct {
 
 func NewJobDriverTemplateBuildFloor() *JobDriverTemplate {
 	template := NewJobDriverTemplate[*JobDriverBuildFloorData]("build_floor")
-	template.Initialize = func(job *JobDriver, data interface{}) {
-		buildData := data.(*JobDriverBuildFloorData)
+	template.Initialize = func(job *JobDriver) {
+		data := job.Data.(*JobDriverBuildFloorData)
 		job.Toils = []*JobToil{}
-		job.Toils = append(job.Toils, NewJobToil("goto", &JobToilGotoData{Target: buildData.Position}))
+		job.Toils = append(job.Toils, NewJobToil("goto", &JobToilGotoData{Target: data.Position}))
 		buildToil := NewJobToil(
 			"build_floor",
 			&JobToilBuildFloorData{
-				Position: buildData.Position,
-				TileType: buildData.TileType,
+				Position: data.Position,
+				TileType: data.TileType,
 			},
 		)
 		job.Toils = append(job.Toils, buildToil)
-		job.Data = data
 	}
 
 	return template

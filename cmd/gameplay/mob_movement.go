@@ -6,9 +6,9 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-func TeleportMobRandom(mob *Mob) {
+func TeleportMobRandom(mob *Mob, z uint8) {
 	for {
-		position := GetRandomMapPosition(&GameInstance.Map, GameInstance.Map.BaseZ)
+		position := GetRandomMapPosition(GameInstance.Map, z)
 		if MoveMob(mob, position) {
 			mob.PositionRender = sdlutils.PointToFPoint(position.Base)
 			break
@@ -21,11 +21,11 @@ func MoveMobDirection(mob *Mob, direction common.Direction) bool {
 }
 
 func MoveMob(mob *Mob, position sdlutils.Vector3) bool {
-	if CanEnterMapPosition(&GameInstance.Map, position) == EnteranceStatusNo {
+	if CanEnterMapPosition(GameInstance.Map, position) == EnteranceStatusNo {
 		return false
 	}
 	TurnMobTo(mob, position.Base)
-	tile := GetTileAt(&GameInstance.Map, position)
+	tile := GetTileAt(GameInstance.Map, position)
 	object := GetObjectAtTile(tile)
 	if object != nil {
 		switch data := object.Data.(type) {

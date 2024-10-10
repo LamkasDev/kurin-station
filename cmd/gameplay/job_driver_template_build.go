@@ -6,10 +6,10 @@ type JobDriverBuildData struct {
 
 func NewJobDriverTemplateBuild() *JobDriverTemplate {
 	template := NewJobDriverTemplate[*JobDriverBuildData]("build")
-	template.Initialize = func(job *JobDriver, data interface{}) {
-		buildData := data.(*JobDriverBuildData)
+	template.Initialize = func(job *JobDriver) {
+		data := job.Data.(*JobDriverBuildData)
 		job.Toils = []*JobToil{}
-		objectTemplate := ObjectContainer[buildData.ObjectType]
+		objectTemplate := ObjectContainer[data.ObjectType]
 		for _, requirement := range objectTemplate.Requirements {
 			pickupToil := NewJobToil(
 				"pickup",
@@ -21,8 +21,7 @@ func NewJobDriverTemplateBuild() *JobDriverTemplate {
 			job.Toils = append(job.Toils, pickupToil)
 		}
 		job.Toils = append(job.Toils, NewJobToil("goto", &JobToilGotoData{Target: job.Tile.Position}))
-		job.Toils = append(job.Toils, NewJobToil("build", &JobToilBuildData{ObjectType: buildData.ObjectType}))
-		job.Data = data
+		job.Toils = append(job.Toils, NewJobToil("build", &JobToilBuildData{ObjectType: data.ObjectType}))
 	}
 
 	return template

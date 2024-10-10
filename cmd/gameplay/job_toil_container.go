@@ -11,6 +11,7 @@ func RegisterJobToils() {
 	JobToilContainer["manufacture"] = NewJobToilTemplateManufacture()
 	JobToilContainer["panic"] = NewJobToilTemplatePanic()
 	JobToilContainer["pickup"] = NewJobToilTemplatePickup()
+	JobToilContainer["wander"] = NewJobToilTemplateWander()
 }
 
 func NewJobToil(toilType string, data interface{}) *JobToil {

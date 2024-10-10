@@ -18,7 +18,7 @@ func NewObjectTemplateTeleporter() *ObjectTemplate {
 		if data.Processing {
 			data.Ticks++
 			if data.Ticks >= 120 {
-				mobs := GetMobsOnTile(&GameInstance.Map, object.Tile)
+				mobs := GetMobsOnTile(GameInstance.Map, object.Tile)
 				if len(mobs) > 0 {
 					for _, mob := range mobs {
 						MoveMob(mob, data.Target)
@@ -41,7 +41,7 @@ func NewObjectTemplateTeleporter() *ObjectTemplate {
 			if GameInstance.Ticks%20 != 0 {
 				return
 			}
-			mobs := GetMobsOnTile(&GameInstance.Map, object.Tile)
+			mobs := GetMobsOnTile(GameInstance.Map, object.Tile)
 			if len(mobs) == 0 {
 				return
 			}

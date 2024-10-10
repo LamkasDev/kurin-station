@@ -54,19 +54,11 @@ func NewObjectTemplate[D any](objectType string, smooth bool) *ObjectTemplate {
 		OnCreate:  func(object *Object) {},
 		OnDestroy: func(object *Object) {},
 		EncodeData: func(object *Object) []byte {
-			if object.Data == nil {
-				return []byte{}
-			}
-
 			objData := object.Data.(D)
 			data, _ := binary.Marshal(&objData)
 			return data
 		},
 		DecodeData: func(object *Object, data []byte) {
-			if len(data) == 0 {
-				return
-			}
-
 			var objData D
 			binary.Unmarshal(data, &objData)
 			object.Data = objData
