@@ -42,6 +42,28 @@ func ProcessEventLayerForce(layer *event.EventLayer) error {
 			item.Transform.Position.Base = force.Position.Base
 		}
 	}
+	for _, force := range gameplay.GameInstance.ForceController.Projectiles {
+		projectile := force.Data.(*gameplay.Projectile)
+		result, rawCollider := gameplay.AdvanceForce(force)
+		switch result {
+		case gameplay.ForceResultOutOfBounds:
+		case gameplay.ForceResultReached:
+			gameplay.RemoveProjectileFromMap(gameplay.GameInstance.Map, projectile)
+			delete(gameplay.GameInstance.ForceController.Projectiles, projectile)
+		case gameplay.ForceResultCollided:
+			switch collider := rawCollider.(type) {
+			case *gameplay.Object:
+				gameplay.HitObject(collider)
+			case *gameplay.Mob:
+				gameplay.HitMob(collider)
+				collider.Health.LastDamageSource = projectile.Source
+			}
+			gameplay.RemoveProjectileFromMap(gameplay.GameInstance.Map, projectile)
+			delete(gameplay.GameInstance.ForceController.Projectiles, projectile)
+		case gameplay.ForceResultNone:
+			projectile.Position.Base = force.Position.Base
+		}
+	}
 
 	return nil
 }

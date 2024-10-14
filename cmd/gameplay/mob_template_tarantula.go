@@ -2,6 +2,9 @@ package gameplay
 
 func NewMobTemplateTarantula() *MobTemplate {
 	template := NewMobTemplateRaw[interface{}]("tarantula")
+	template.Initialize = func(mob *Mob) {
+		mob.Thinktree = NewThinktreeBasic()
+	}
 	template.Process = ProcessTarantula
 
 	return template
@@ -9,9 +12,4 @@ func NewMobTemplateTarantula() *MobTemplate {
 
 func ProcessTarantula(mob *Mob) {
 	ProcessMob(mob)
-	if mob.JobTracker.Job == nil {
-		job := NewJobDriver("wander", nil)
-		job.Template.Initialize(job)
-		AssignTrackerJob(mob.JobTracker, job)
-	}
 }

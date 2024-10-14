@@ -10,13 +10,14 @@ import (
 )
 
 type Map struct {
-	Seed    int64
-	Size    sdlutils.Vector3
-	BaseZ   uint8
-	Tiles   [][][]*Tile
-	Mobs    []*Mob
-	Objects []*Object
-	Items   []*Item
+	Seed        int64
+	Size        sdlutils.Vector3
+	BaseZ       uint8
+	Tiles       [][][]*Tile
+	Mobs        []*Mob
+	Objects     []*Object
+	Items       []*Item
+	Projectiles []*Projectile
 
 	Random      *rand.Rand
 	Pathfinding PathfindingGrid
@@ -24,13 +25,14 @@ type Map struct {
 
 func NewMap(size sdlutils.Vector3, baseZ uint8) *Map {
 	kmap := &Map{
-		Seed:    0,
-		Size:    size,
-		BaseZ:   baseZ,
-		Tiles:   make([][][]*Tile, size.Base.X),
-		Mobs:    []*Mob{},
-		Objects: []*Object{},
-		Items:   []*Item{},
+		Seed:        0,
+		Size:        size,
+		BaseZ:       baseZ,
+		Tiles:       make([][][]*Tile, size.Base.X),
+		Mobs:        []*Mob{},
+		Objects:     []*Object{},
+		Items:       []*Item{},
+		Projectiles: []*Projectile{},
 	}
 	kmap.Random = rand.New(rand.NewSource(kmap.Seed))
 	for x := range kmap.Size.Base.X {
@@ -130,9 +132,11 @@ func PopulateMap(kmap *Map) {
 	TeleportMobRandom(npcCharacter, GameInstance.Map.BaseZ)
 	kmap.Mobs = append(kmap.Mobs, npcCharacter)
 
-	cat := NewMob("cat", FactionPlayer)
-	TeleportMobRandom(cat, GameInstance.Map.BaseZ)
-	kmap.Mobs = append(kmap.Mobs, cat)
+	for range 1 {
+		cat := NewMob("cat", FactionPlayer)
+		TeleportMobRandom(cat, GameInstance.Map.BaseZ)
+		kmap.Mobs = append(kmap.Mobs, cat)
+	}
 
 	for range 1 {
 		tarantula := NewMob("tarantula", FactionWild)
@@ -140,7 +144,7 @@ func PopulateMap(kmap *Map) {
 		kmap.Mobs = append(kmap.Mobs, tarantula)
 	}
 
-	for range 5 {
+	for range 800 {
 		tarantula := NewMob("tarantula", FactionWild)
 		TeleportMobRandom(tarantula, GameInstance.Map.BaseZ-1)
 		kmap.Mobs = append(kmap.Mobs, tarantula)

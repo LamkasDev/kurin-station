@@ -3,10 +3,11 @@ package gameplay
 import "github.com/kelindar/binary"
 
 type JobDriverTemplate struct {
-	Type       string
-	Initialize JobDriverInitialize
-	EncodeData JobDriverEncodeData
-	DecodeData JobDriverDecodeData
+	Type          string
+	ReturnsOnFail bool
+	Initialize    JobDriverInitialize
+	EncodeData    JobDriverEncodeData
+	DecodeData    JobDriverDecodeData
 }
 
 type (
@@ -17,8 +18,9 @@ type (
 
 func NewJobDriverTemplate[D any](jobType string) *JobDriverTemplate {
 	return &JobDriverTemplate{
-		Type:       jobType,
-		Initialize: func(job *JobDriver) {},
+		Type:          jobType,
+		ReturnsOnFail: true,
+		Initialize:    func(job *JobDriver) {},
 		EncodeData: func(job *JobDriver) []byte {
 			jobData := job.Data.(D)
 			data, _ := binary.Marshal(&jobData)

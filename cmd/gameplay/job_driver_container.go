@@ -3,6 +3,7 @@ package gameplay
 var JobDriverContainer = map[string]*JobDriverTemplate{}
 
 func RegisterJobDrivers() {
+	JobDriverContainer["attack"] = NewJobDriverTemplateAttack()
 	JobDriverContainer["build_floor"] = NewJobDriverTemplateBuildFloor()
 	JobDriverContainer["build"] = NewJobDriverTemplateBuild()
 	JobDriverContainer["destroy_floor"] = NewJobDriverTemplateDestroyFloor()

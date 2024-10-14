@@ -7,6 +7,7 @@ type MobCharacterData struct {
 func NewMobTemplateCharacter() *MobTemplate {
 	template := NewMobTemplateRaw[interface{}]("character")
 	template.Initialize = func(mob *Mob) {
+		mob.Health.Points = 10
 		mob.Data = &MobCharacterData{
 			Inventory: NewInventory(),
 		}

@@ -2,7 +2,6 @@ package gameplay
 
 func NewJobToilTemplateDestroyFloor() *JobToilTemplate {
 	template := NewJobToilTemplate[interface{}]("destroy_floor")
-	template.Start = ProcessJobToilDestroyFloor
 	template.Process = ProcessJobToilDestroyFloor
 
 	return template

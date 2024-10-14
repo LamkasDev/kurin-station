@@ -29,6 +29,8 @@ func HitMob(mob *Mob) {
 	)
 	CreateParticle(&GameInstance.ParticleController, particle)
 	mob.Health.Points--
+	mob.Health.LastDamageTicks = GameInstance.Ticks
+	mob.Health.LastDamageSource = nil
 	if mob.Health.Points <= 0 {
 		KillMob(mob)
 		mob.Health.Dead = true
@@ -44,5 +46,6 @@ func MobHitObject(mob *Mob, target *Object) {
 func MobHitMob(mob *Mob, target *Mob) {
 	PlayMobAnimation(mob, "hit")
 	HitMob(target)
+	target.Health.LastDamageSource = mob
 	mob.Fatigue += 60
 }

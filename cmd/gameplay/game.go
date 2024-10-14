@@ -54,6 +54,7 @@ func InitializeGame() {
 	RegisterJobToils()
 	RegisterJobDrivers()
 	RegisterObjectiveRequirements()
+	RegisterThinktreeNodes()
 	PopulateMap(GameInstance.Map)
 }
 

@@ -12,7 +12,6 @@ type JobToilBuildFloorData struct {
 
 func NewJobToilTemplateBuildFloor() *JobToilTemplate {
 	template := NewJobToilTemplate[*JobToilBuildFloorData]("build_floor")
-	template.Start = ProcessJobToilBuildFloor
 	template.Process = ProcessJobToilBuildFloor
 
 	return template

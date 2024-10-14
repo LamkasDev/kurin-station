@@ -3,6 +3,7 @@ package gameplay
 var JobToilContainer = map[string]*JobToilTemplate{}
 
 func RegisterJobToils() {
+	JobToilContainer["attack"] = NewJobToilTemplateAttack()
 	JobToilContainer["build_floor"] = NewJobToilTemplateBuildFloor()
 	JobToilContainer["build"] = NewJobToilTemplateBuild()
 	JobToilContainer["destroy"] = NewJobToilTemplateDestroy()

@@ -130,7 +130,8 @@ func RenderRendererLayerHUD(layer *gfx.RendererLayer) error {
 	sdlutils.RenderLabel(gfx.RendererInstance.Renderer, "hud.credits", gfx.RendererInstance.Fonts.Default, sdlutils.White, fmt.Sprint(gameplay.GameInstance.Credits), sdl.Point{X: creditRect.X + creditRect.W + int32(gfx.RendererInstance.Context.WindowScale.X*8), Y: creditRect.Y}, gfx.RendererInstance.Context.WindowScale)
 
 	// Center Right - Health
-	gfx.RenderUITexture(data.Icons["healthdoll"].Texture, sdl.Point{X: int32(gfx.RendererInstance.Context.WindowScale.X * 8), Y: 0}, sdl.FPoint{X: 2, Y: 2}, gfx.UIAnchorCenterRight)
+	healthRect, _ := gfx.RenderUITexture(data.Icons["healthdoll"].Texture, sdl.Point{X: int32(gfx.RendererInstance.Context.WindowScale.X * 8), Y: 0}, sdl.FPoint{X: 2, Y: 2}, gfx.UIAnchorCenterRight)
+	sdlutils.RenderLabel(gfx.RendererInstance.Renderer, "hud.health", gfx.RendererInstance.Fonts.Default, sdlutils.White, fmt.Sprint(gameplay.GameInstance.SelectedCharacter.Health.Points), sdl.Point{X: healthRect.X + int32(gfx.RendererInstance.Context.WindowScale.X*25), Y: healthRect.Y + int32(gfx.RendererInstance.Context.WindowScale.Y*25)}, gfx.RendererInstance.Context.WindowScale)
 
 	return nil
 }
