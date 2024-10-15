@@ -55,6 +55,7 @@ func InitializeGame() {
 	RegisterJobDrivers()
 	RegisterObjectiveRequirements()
 	RegisterThinktreeNodes()
+	RegisterBodyparts()
 	PopulateMap(GameInstance.Map)
 }
 
@@ -127,8 +128,4 @@ func DestroyObject(obj *Object) {
 	DestroyObjectRaw(GameInstance.Map, obj)
 	obj.Template.OnDestroy(obj)
 	NarratorOnDestroyObject(obj)
-}
-
-func KillMob(mob *Mob) {
-	mob.Template.OnDeath(mob)
 }

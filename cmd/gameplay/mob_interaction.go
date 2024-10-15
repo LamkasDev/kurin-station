@@ -28,13 +28,17 @@ func HitMob(mob *Mob) {
 		sdl.Color{R: 210, G: 40, B: 40},
 	)
 	CreateParticle(&GameInstance.ParticleController, particle)
-	mob.Health.Points--
+	HitBodypart(GetRandomUndamagedBodypart(mob.Health), 1)
 	mob.Health.LastDamageTicks = GameInstance.Ticks
 	mob.Health.LastDamageSource = nil
-	if mob.Health.Points <= 0 {
+	if GetHealthPoints(mob.Health) <= 0 {
 		KillMob(mob)
-		mob.Health.Dead = true
 	}
+}
+
+func KillMob(mob *Mob) {
+	mob.Health.Dead = true
+	mob.Template.OnDeath(mob)
 }
 
 func MobHitObject(mob *Mob, target *Object) {

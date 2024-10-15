@@ -15,7 +15,7 @@ type MobData struct {
 	Position   sdlutils.Vector3
 	Direction  common.Direction
 	Fatigue    int32
-	Health     gameplay.Health
+	Health     HealthData
 	JobTracker JobTrackerData
 	Data       []byte
 	ExtraData  []byte
@@ -29,7 +29,7 @@ func EncodeMob(mob *gameplay.Mob) MobData {
 		Position:   mob.Position,
 		Direction:  mob.Direction,
 		Fatigue:    mob.Fatigue,
-		Health:     mob.Health,
+		Health:     EncodeHealthData(mob),
 		JobTracker: EncodeJobTracker(mob.JobTracker),
 	}
 	if mob.Data != nil {
@@ -52,8 +52,8 @@ func PredecodeMob(kmap *gameplay.Map, data MobData) *gameplay.Mob {
 	mob.PositionRender = sdlutils.PointToFPoint(data.Position.Base)
 	mob.Direction = data.Direction
 	mob.Fatigue = data.Fatigue
-	mob.Health = data.Health
-	mob.JobTracker = DecodeJobTracker(kmap, data.JobTracker, mob)
+	DecodeHealthData(data.Health, mob)
+	DecodeJobTracker(kmap, data.JobTracker, mob)
 	if data.Data != nil {
 		mob.Template.DecodeData(mob, data.Data)
 	}

@@ -18,11 +18,9 @@ func EncodeJobTracker(tracker *gameplay.JobTracker) JobTrackerData {
 	return data
 }
 
-func DecodeJobTracker(kmap *gameplay.Map, data JobTrackerData, character *gameplay.Mob) *gameplay.JobTracker {
-	tracker := gameplay.NewJobTracker(character)
+func DecodeJobTracker(kmap *gameplay.Map, data JobTrackerData, character *gameplay.Mob) {
+	character.JobTracker = gameplay.NewJobTracker(character)
 	if data.Job != nil {
-		gameplay.AssignTrackerJob(tracker, DecodeJobDriver(kmap, *data.Job))
+		gameplay.AssignTrackerJob(character.JobTracker, DecodeJobDriver(kmap, *data.Job))
 	}
-
-	return tracker
 }

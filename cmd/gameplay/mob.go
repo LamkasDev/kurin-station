@@ -22,7 +22,7 @@ type Mob struct {
 	Position   sdlutils.Vector3
 	Direction  common.Direction
 	Fatigue    int32
-	Health     Health
+	Health     *Health
 	JobTracker *JobTracker
 
 	PositionRender      sdl.FPoint

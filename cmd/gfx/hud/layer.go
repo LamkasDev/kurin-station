@@ -30,7 +30,18 @@ func NewRendererLayerHUD(itemLayer *gfx.RendererLayer) *gfx.RendererLayer {
 }
 
 func LoadRendererLayerHUD(layer *gfx.RendererLayer) error {
-	textures := []string{"hand_l", "lhandactive", "hand_r", "rhandactive", "act_equip", "swap_1", "swap_2", "pda", "selector", "template", "template_active", "credit", "objective_window", "cat", "healthdoll", "crit_overlay"}
+	textures := []string{
+		"hand_l", "lhandactive", "hand_r", "rhandactive",
+		"act_equip", "swap_1", "swap_2", "pda", "selector", "template", "template_active",
+		"credit", "objective_window", "cat",
+		"healthdoll", "healthdoll_dead", "crit_overlay",
+		"health_head_1", "health_head_2", "health_head_3", "health_head_4", "health_head_5",
+		"health_l_arm_1", "health_l_arm_2", "health_l_arm_3", "health_l_arm_4", "health_l_arm_5",
+		"health_r_arm_1", "health_r_arm_2", "health_r_arm_3", "health_r_arm_4", "health_r_arm_5",
+		"health_chest_1", "health_chest_2", "health_chest_3", "health_chest_4", "health_chest_5",
+		"health_l_leg_1", "health_l_leg_2", "health_l_leg_3", "health_l_leg_4", "health_l_leg_5",
+		"health_r_leg_1", "health_r_leg_2", "health_r_leg_3", "health_r_leg_4", "health_r_leg_5",
+	}
 	var err error
 	for _, texture := range textures {
 		if layer.Data.(*RendererLayerHUDData).Icons[texture], err = NewHUDGraphic(texture); err != nil {
@@ -130,8 +141,17 @@ func RenderRendererLayerHUD(layer *gfx.RendererLayer) error {
 	sdlutils.RenderLabel(gfx.RendererInstance.Renderer, "hud.credits", gfx.RendererInstance.Fonts.Default, sdlutils.White, fmt.Sprint(gameplay.GameInstance.Credits), sdl.Point{X: creditRect.X + creditRect.W + int32(gfx.RendererInstance.Context.WindowScale.X*8), Y: creditRect.Y}, gfx.RendererInstance.Context.WindowScale)
 
 	// Center Right - Health
-	healthRect, _ := gfx.RenderUITexture(data.Icons["healthdoll"].Texture, sdl.Point{X: int32(gfx.RendererInstance.Context.WindowScale.X * 8), Y: 0}, sdl.FPoint{X: 2, Y: 2}, gfx.UIAnchorCenterRight)
-	sdlutils.RenderLabel(gfx.RendererInstance.Renderer, "hud.health", gfx.RendererInstance.Fonts.Default, sdlutils.White, fmt.Sprint(gameplay.GameInstance.SelectedCharacter.Health.Points), sdl.Point{X: healthRect.X + int32(gfx.RendererInstance.Context.WindowScale.X*25), Y: healthRect.Y + int32(gfx.RendererInstance.Context.WindowScale.Y*25)}, gfx.RendererInstance.Context.WindowScale)
+	if gameplay.GameInstance.SelectedCharacter.Health.Dead {
+		gfx.RenderUITexture(data.Icons["healthdoll_dead"].Texture, sdl.Point{X: int32(gfx.RendererInstance.Context.WindowScale.X * 8), Y: 0}, sdl.FPoint{X: 2, Y: 2}, gfx.UIAnchorCenterRight)
+	} else {
+		gfx.RenderUITexture(data.Icons["healthdoll"].Texture, sdl.Point{X: int32(gfx.RendererInstance.Context.WindowScale.X * 8), Y: 0}, sdl.FPoint{X: 2, Y: 2}, gfx.UIAnchorCenterRight)
+		for _, bodypart := range gameplay.GameInstance.SelectedCharacter.Health.Bodyparts {
+			state := gameplay.GetBodypartState(bodypart)
+			if state != 0 {
+				gfx.RenderUITexture(data.Icons[fmt.Sprintf("health_%s_%d", bodypart.Type, state)].Texture, sdl.Point{X: int32(gfx.RendererInstance.Context.WindowScale.X * 8), Y: 0}, sdl.FPoint{X: 2, Y: 2}, gfx.UIAnchorCenterRight)
+			}
+		}
+	}
 
 	return nil
 }
